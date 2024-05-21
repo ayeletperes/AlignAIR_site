@@ -1,0 +1,39 @@
+import React, { useRef, useState, useEffect } from 'react';
+
+export default function SequenceInput({selectedChain, setSequence, sequence}){
+    const sequenceInputRef = useRef(null);
+
+    const example_sequences = {
+        IGH:"CGGGTCGGCTTGAAGGAGCCTGGTCCTGTGCTGGTTGAACCCACAGCGACCTTCCCGCTGTCCTGCACCGNCCCTTTGTTCTCACNCAGACGTACAAGATTAGCTGCGACCTTGACTCGTCGGCCCCCAGAGGAGGCTCTGGACTGGCCGACACCCACNTTNTCGACCTGACACAGACTCTCTCCAGAACATGCCTGAGGAGGGGTCTGAACCTCTCCACGGACACCTCCAGATGTCAGGTGGTCNTTACCAAGAACAATTTGGACCCTCCGGACACAGACANCTATCTCTTTGCACGGCGAGGGGACTCCGGTGAGAANTTACGACTTTGACCAGTGGGTCAAGGAATTGCTGGCCACCGTCTCCTCAG",
+        IGK:"CGGGTCGGCTTGAAGGAGCCTGGTCCTGTGCTGGTTGAACCCACAGCGACCTTCCCGCTGTCCTGCACCGNCCCTTTGTTCTCACNCAGACGTACAAGATTAGCTGCGACCTTGACTCGTCGGCCCCCAGAGGAGGCTCTGGACTGGCCGACACCCACNTTNTCGACCTGACACAGACTCTCTCCAGAACATGCCTGAGGAGGGGTCTGAACCTCTCCACGGACACCTCCAGATGTCAGGTGGTCNTTACCAAGAACAATTTGGACCCTCCGGACACAGACANCTATCTCTTTGCACGGCGAGGGGACTCCGGTGAGAANTTACGACTTTGACCAGTGGGTCAAGGAATTGCTGGCCACCGTCTCCTCAG",
+        IGL:"CGGGTCGGCTTGAAGGAGCCTGGTCCTGTGCTGGTTGAACCCACAGCGACCTTCCCGCTGTCCTGCACCGNCCCTTTGTTCTCACNCAGACGTACAAGATTAGCTGCGACCTTGACTCGTCGGCCCCCAGAGGAGGCTCTGGACTGGCCGACACCCACNTTNTCGACCTGACACAGACTCTCTCCAGAACATGCCTGAGGAGGGGTCTGAACCTCTCCACGGACACCTCCAGATGTCAGGTGGTCNTTACCAAGAACAATTTGGACCCTCCGGACACAGACANCTATCTCTTTGCACGGCGAGGGGACTCCGGTGAGAANTTACGACTTTGACCAGTGGGTCAAGGAATTGCTGGCCACCGTCTCCTCAG"
+    };
+
+    const handleExample = () => {
+        if (selectedChain) {
+          sequenceInputRef.current.value = example_sequences[selectedChain];
+          setSequence(sequenceInputRef.current.value);
+        }
+    };
+    
+    const clear = () => {
+        sequenceInputRef.current.value = '';
+        setSequence(sequenceInputRef.current.value);
+    }
+
+    return (
+        <>
+            <div className="row">
+                <p>Or enter a sequence :</p>
+                <button className="example-button" onClick={handleExample} ref={sequenceInputRef}>Sequence example</button>
+            </div>
+            <div className="sequence-text-area">
+                <textarea id="sequenceInput" value={sequence} onChange={e => setSequence(e.target.value)}> </textarea>
+                <button onClick={clear}>
+                    <span id="clear-btn">Clear</span>
+                </button>
+            </div>
+        </>
+    )
+
+}

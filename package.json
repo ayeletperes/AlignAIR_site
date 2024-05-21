@@ -1,0 +1,59 @@
+{
+  "homepage": "https://ayeletperes.github.io/AlignAIR_site/",
+  "name": "AlignAIR",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Immunoglobulin alignment and analysis tool",
+  "keywords": [],
+  "main": "src/index.jsx",
+  "license": "MIT",
+  "dependencies": {
+    "@fluentui/react": "^8.61.2",
+    "@fluentui/react-charting": "^5.19.28",
+    "@fluentui/react-components": "^9.46.3",
+    "@fluentui/react-northstar": "^0.66.5",
+    "@open-tech-world/react-form": "0.9.1",
+    "@tensorflow/tfjs": "^4.16.0",
+    "@tensorflow/tfjs-node": "^4.17.0",
+    "biomsa": "^0.3.3",
+    "bootstrap": "^5.3.2",
+    "chart.js": "^4.4.2",
+    "formik": "^2.4.5",
+    "os-utils": "^0.0.14",
+    "react": "17.0.2",
+    "react-bootstrap": "^2.10.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "17.0.2",
+    "react-inputs-validation": "^4.9.10",
+    "react-router-dom": "^6.23.1",
+    "react-scripts": "^5.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.5",
+    "@babel/preset-env": "^7.24.5",
+    "@babel/preset-react": "^7.24.1",
+    "@babel/runtime": "^7.23.9",
+    "@vitejs/plugin-react": "^4.2.1",
+    "gh-pages": "^6.1.1",
+    "typescript": "^3.2.1",
+    "vite": "^5.0.12"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "dev": "vite",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  },
+  "type": "module",
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
