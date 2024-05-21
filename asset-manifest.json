@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.js": "/AlignAIR_site/static/js/main.5a273175.js",
+    "main.js": "/AlignAIR_site/static/js/main.4c864ef4.js",
     "static/media/landing_page.jpg": "/AlignAIR_site/static/media/landing_page.bfe08072ac25a59f64f4.jpg",
     "index.html": "/AlignAIR_site/index.html",
-    "main.5a273175.js.map": "/AlignAIR_site/static/js/main.5a273175.js.map"
+    "main.4c864ef4.js.map": "/AlignAIR_site/static/js/main.4c864ef4.js.map"
   },
   "entrypoints": [
-    "static/js/main.5a273175.js"
+    "static/js/main.4c864ef4.js"
   ]
 }
