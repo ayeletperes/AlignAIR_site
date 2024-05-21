@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/AlignAIR_site/static/js/main.5c9c13cc.js",
+    "index.html": "/AlignAIR_site/index.html",
+    "main.5c9c13cc.js.map": "/AlignAIR_site/static/js/main.5c9c13cc.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.5c9c13cc.js"
+  ]
+}
