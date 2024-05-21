@@ -9,21 +9,20 @@ import ToolPageApp from "./toolPage";
 // initializeIcons(/* optional base url */);
 
 const Routing = () => (
-  <Router>
-    <Routes>
-      <Route path="/" element={<HomePageAPP />} />
-      <Route path="/alignair" element={<ToolPageApp />} />
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
-  </Router>
+  <Routes>
+    <Route path="/" element={<HomePageAPP />} />
+    <Route path="/alignair" element={<ToolPageApp />} />
+    <Route path="*" element={<Navigate to="/" />} />
+  </Routes>
 );
 
 const rootElement = document.getElementById("root");
+
 ReactDOM.render(
   <StrictMode>
-    <HashRouter>
+    <Router>
       <Routing />
-    </HashRouter>
+    </Router>
   </StrictMode>,
   rootElement
 );

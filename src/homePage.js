@@ -1,6 +1,12 @@
 import Header from './alignairPageHeader';
 import Footer from './alignairPageFooter';
+import Image from './images/landing_page.jpg'
 
+const assets = {
+    Image
+  }
+
+  
 export default function HomePageAPP(){
     return(
         <div>
@@ -9,7 +15,7 @@ export default function HomePageAPP(){
                     <h1 style={{ fontSize: '64px', fontFamily: 'Inter, sans-serif' }}>AlignAIR</h1>
                     <p style={{ fontSize: '24px', fontFamily: 'Inter, sans-serif', color: "#828282"}}>Improving immunoglobulin sequence alignment.</p>
                     <a href="/alignair" className="start-button" style={{fontSize: "20px", padding: '15px 30px'}}>Start</a>
-                    <img src="/landing_page.jpg" width="800" height="600"/>
+                    <img src={assets.Image} width="800" height="600"/>
                 </div>
                 <footer>
                     <div className="footer-logo">AlignAIR</div>

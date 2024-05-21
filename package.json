@@ -1,11 +1,11 @@
 {
   "homepage": "https://ayeletperes.github.io/AlignAIR_site/",
-  "name": "AlignAIR",
+  "name": "alignair",
   "version": "0.1.0",
   "private": true,
   "description": "Immunoglobulin alignment and analysis tool",
   "keywords": [],
-  "main": "src/index.jsx",
+  "main": "src/index.js",
   "license": "MIT",
   "dependencies": {
     "@fluentui/react": "^8.61.2",
