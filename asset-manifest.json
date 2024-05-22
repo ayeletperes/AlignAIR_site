@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.js": "/AlignAIR_site/static/js/main.0b64c374.chunk.js",
-    "main.js.map": "/AlignAIR_site/static/js/main.0b64c374.chunk.js.map",
+    "main.js": "/AlignAIR_site/static/js/main.32aa1c5b.chunk.js",
+    "main.js.map": "/AlignAIR_site/static/js/main.32aa1c5b.chunk.js.map",
     "runtime~main.js": "/AlignAIR_site/static/js/runtime~main.25b7dc1b.js",
     "runtime~main.js.map": "/AlignAIR_site/static/js/runtime~main.25b7dc1b.js.map",
-    "static/js/2.d12d3668.chunk.js": "/AlignAIR_site/static/js/2.d12d3668.chunk.js",
-    "static/js/2.d12d3668.chunk.js.map": "/AlignAIR_site/static/js/2.d12d3668.chunk.js.map",
+    "static/js/2.76d42043.chunk.js": "/AlignAIR_site/static/js/2.76d42043.chunk.js",
+    "static/js/2.76d42043.chunk.js.map": "/AlignAIR_site/static/js/2.76d42043.chunk.js.map",
     "index.html": "/AlignAIR_site/index.html",
-    "precache-manifest.4962d655bcfe70119cddbdc624a08d13.js": "/AlignAIR_site/precache-manifest.4962d655bcfe70119cddbdc624a08d13.js",
+    "precache-manifest.9dc65ceb10d2684385b04c712983a126.js": "/AlignAIR_site/precache-manifest.9dc65ceb10d2684385b04c712983a126.js",
     "service-worker.js": "/AlignAIR_site/service-worker.js",
     "static/media/landing_page.jpg": "/AlignAIR_site/static/media/landing_page.a090c432.jpg"
   }
