@@ -8,10 +8,10 @@ const Header = () => (
       <Logo alt="AlignAIR" style={{ width: '100px', height: '100px', borderRadius: '0px' }}/>
     </div> */}
     <nav>
-      <a href="/">Home</a>
-      <a href="/alignair">AlignAIR tool</a>
-      <a href="#">Help</a>
-      <a href="#">About</a>
+      <a href="#/#">Home</a>
+      <a href="#/tool">AlignAIR tool</a>
+      {/* <a href="#">Help</a>
+      <a href="#">About</a> */}
     </nav>
   </header>
 );

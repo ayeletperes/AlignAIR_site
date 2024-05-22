@@ -1,4 +1,5 @@
 import { AlignSeq} from './Charts';
+import React  from 'react';
 
 
 export default function testAlignment(){

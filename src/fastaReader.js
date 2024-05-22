@@ -77,7 +77,7 @@ export class FastaReader {
     processFastaContents(IGHV, IGHD, IGHJ) {
         const { alleleCallOHE: vAlleleCallOHE, sortedDataDict: sortedIGHVDataDict } = this.sortAndReturnDict(IGHV);
         const { alleleCallOHE: dAlleleCallOHE, sortedDataDict: sortedIGHDDataDict } = this.sortAndReturnDict(IGHD);
-        dAlleleCallOHE[Object.keys(dAlleleCallOHE).length] = "Short-D";
+        dAlleleCallOHE[Object.keys(dAlleleCallOHE).length] = {name:"Short-D",sequence:""};
         const { alleleCallOHE: jAlleleCallOHE, sortedDataDict: sortedIGHJDataDict } = this.sortAndReturnDict(IGHJ);
 
         return {

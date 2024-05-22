@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import LoadModelComponent from './loadModel';
 import FileUpload from './fileUpload';
 import SequenceInput from './sequenceInput';
@@ -8,8 +8,8 @@ function Content({setSelectedChain, selectedChain, setFile, setSequence, sequenc
         <div className="content">
             <div className="left-column">
                 <LoadModelComponent setSelectedChain={setSelectedChain} selectedChain={selectedChain} setModel={setModel} setOutputIndices={setOutputIndices} setIsLoading={setIsLoading}/>
-                <FileUpload setFile={setFile}/>
                 <SequenceInput selectedChain={selectedChain} setSequence={setSequence} sequence={sequence}/>
+                <FileUpload setFile={setFile}/>
             </div>
             <div className="right-column">
             <ParamInput params={params} setParams={setParams}/>

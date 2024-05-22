@@ -22,7 +22,7 @@ export async function readFileContent(file) {
   });
 }
 
-async function submitSequences(sequenceInput, fileInput, params, model, outputIndices, setResults, setInteractiveState) {
+async function submitSequences(sequenceInput, fileInput, params, model, outputIndices, setResults) {
 
   let fastaLines = sequenceInput;
   if (!sequenceInput && fileInput) {
@@ -37,24 +37,19 @@ async function submitSequences(sequenceInput, fileInput, params, model, outputIn
   }
 
   const sequenceData = fastaReader.queryToDict(fastaLines);
-  const confidences = { v_allele: params.vConf, d_allele: params.dConf, j_allele: params.jConf };
-  const caps = { v_allele: params.vCap, d_allele: params.dCap, j_allele: params.jCap };
-  const segs = { v_allele: params.vSeg, d_allele: params.dSeg, j_allele: params.jSeg };
-  const AlleleCallOHE = { v_allele: vAlleleCallOHE, d_allele: dAlleleCallOHE, j_allele: jAlleleCallOHE };
+  const confidences = { v_call: params.vConf, d_call: params.dConf, j_call: params.jConf };
+  const caps = { v_call: params.vCap, d_call: params.dCap, j_call: params.jCap };
+  const AlleleCallOHE = { v_call: vAlleleCallOHE, d_call: dAlleleCallOHE, j_call: jAlleleCallOHE };
   const keys = Object.keys(sequenceData);
   const numElements = 500;
 
-  await processAllBatches(keys, sequenceData, AlleleCallOHE, confidences, caps, segs, model, outputIndices, numElements)
-
-  console.log('Sequence data:', sequenceData);
+  await processAllBatches(keys, sequenceData, AlleleCallOHE, confidences, caps, model, outputIndices, numElements)
   // set the results
   setResults(sequenceData);
-  // set the interactive state to true if the number of sequences is below 15
-  setInteractiveState(Object.keys(sequenceData).length < 15);
 }
 
 
-export default function Submission({setSubmission, submission, sequence, file, params, model, outputIndices, setResults, setInteractiveState}){
+export default function Submission({setSubmission, submission, sequence, file, params, model, outputIndices, setResults}){
   // TODO: Implement the submission button. Add the following:
   // - A function that checks if there is a sequence or file to submit
   // - A function that sets the submission state to true if there is a sequence or file to submit
@@ -69,7 +64,7 @@ export default function Submission({setSubmission, submission, sequence, file, p
     }else if (sequence || file) {
       setSubmission(true);
       const startTime = new Date().getTime();
-      submitSequences(sequence, file, params, model, outputIndices, setResults, setInteractiveState).then(() => {
+      submitSequences(sequence, file, params, model, outputIndices, setResults).then(() => {
           const endTime = new Date().getTime();
           setTime((endTime - startTime)/1000);
       });

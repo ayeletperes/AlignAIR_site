@@ -25,7 +25,7 @@ export class SequenceTokenizer {
    */
   static encodeAndEqualPadSequence(sequence, maxSeqLength = 576) {
     sequence = sequence.split('');
-    const encodedSequence = new Int32Array(sequence.length);
+    const encodedSequence = new Float32Array(sequence.length);
     
     for (let i = 0; i < sequence.length; i++) {
       encodedSequence[i] = this.tokenizerDictionary[sequence[i]] || 0;
@@ -33,14 +33,14 @@ export class SequenceTokenizer {
     const remainingLength = maxSeqLength - encodedSequence.length;
     let paddingArray = this.padArrays[remainingLength];
     if (!paddingArray) {
-      paddingArray = new Int32Array(remainingLength);
+      paddingArray = new Float32Array(remainingLength);
       const paddingLength = remainingLength % 2 === 0 ? remainingLength / 2 : (remainingLength + 1) / 2;
       paddingArray.fill(0, 0, paddingLength);
       this.padArrays[remainingLength] = paddingArray;
     }
     const padStart = paddingArray.slice(0, paddingArray.length / 2);
     const padEnd = paddingArray.slice(paddingArray.length / 2);
-    const finalSequence = new Int32Array(maxSeqLength);
+    const finalSequence = new Float32Array(maxSeqLength);
     finalSequence.set(padStart, 0);
     finalSequence.set(encodedSequence, padStart.length);
     finalSequence.set(padEnd, padStart.length + encodedSequence.length);
@@ -57,7 +57,7 @@ export class SequenceTokenizer {
   static tokenizeSingleSequence(sequence, maxSeqLength = 576) {
     const paddedArray = SequenceTokenizer.encodeAndEqualPadSequence(sequence, maxSeqLength);
     
-    const paddedSequenceTensor = tf.tensor2d([paddedArray], [1, maxSeqLength], 'int32');
+    const paddedSequenceTensor = tf.tensor2d([paddedArray], [1, maxSeqLength], 'float32');
     const input = {
       'tokenized_sequence': paddedSequenceTensor
     };

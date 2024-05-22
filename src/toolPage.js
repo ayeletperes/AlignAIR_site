@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import Header from './alignairPageHeader';
 import Content from './toolPageContent';
-import Footer from './alignairPageFooter';
 import Submission from './toolPageSubmission';
 import AlignairPageResults from './toolPageResults';
 
@@ -25,15 +24,23 @@ export default function ToolPageApp(){
       dSeg: 0.01,
       jSeg: 0.01,
   });
-  const [interactiveState, setInteractiveState] = useState(false);
 
   return(
     <div>
       <Header />
       <Content setFile={setFile} setSequence={setSequence} sequence={sequence} setSelectedChain={setSelectedChain} selectedChain={selectedChain} setModel={setModel} setOutputIndices={setOutputIndices} setIsLoading={setIsLoading} params={params} setParams={setParams}/>
-      <Submission setSubmission={setSubmission} submission={submission} sequence={sequence} file={file} params={params} model={model} outputIndices={outputIndices} setResults={setResults} setInteractiveState={setInteractiveState}/>
-      {/* <AlignairPageResults submission={submission}/> */}
-      <Footer />
+      {!isLoading && 
+        <>
+          <Submission setSubmission={setSubmission} submission={submission} sequence={sequence} file={file} params={params} model={model} outputIndices={outputIndices} setResults={setResults} /> 
+          <AlignairPageResults results={results} />
+        </>
+      }
+      <footer>
+        <div className="footer-logo">AlignAIR</div>
+        <a href="https://github.com" className="github-logo">
+            <i className="fab fa-github" style={{fontSize: '24px', color: '#828282'}}></i>
+        </a>
+      </footer>
     </div>
   )
 };

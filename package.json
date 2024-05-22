@@ -1,12 +1,18 @@
 {
-  "homepage": "https://ayeletperes.github.io/AlignAIR_site/",
+  "homepage": "https://ayeletperes.github.io/AlignAIR_site/#",
   "name": "alignair",
   "version": "0.1.0",
   "private": true,
   "description": "Immunoglobulin alignment and analysis tool",
-  "keywords": [],
+  "keywords": [
+    "AIRR-seq",
+    "immunoglobulin",
+    "alignment",
+    "analysis",
+    "repertoire"
+  ],
   "main": "src/index.js",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE.txt",
   "dependencies": {
     "@fluentui/react": "^8.61.2",
     "@fluentui/react-charting": "^5.19.28",
@@ -14,7 +20,7 @@
     "@fluentui/react-northstar": "^0.66.5",
     "@open-tech-world/react-form": "0.9.1",
     "@tensorflow/tfjs": "^4.16.0",
-    "@tensorflow/tfjs-node": "^4.17.0",
+    "@tensorflow/tfjs-node": "^0.1.11",
     "biomsa": "^0.3.3",
     "bootstrap": "^5.3.2",
     "chart.js": "^4.4.2",
@@ -26,7 +32,7 @@
     "react-dom": "17.0.2",
     "react-inputs-validation": "^4.9.10",
     "react-router-dom": "^6.23.1",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^3.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.24.5",
