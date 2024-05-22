@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "7a0b8a64f38fa01dc361ea566639d284",
+    "revision": "638b40134e8bad2ae26dabc1da54821d",
     "url": "/AlignAIR_site/index.html"
   },
   {
@@ -8,8 +8,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/AlignAIR_site/static/js/2.d12d3668.chunk.js"
   },
   {
-    "revision": "03220ee12ac3f9dfcd45",
-    "url": "/AlignAIR_site/static/js/main.0b64c374.chunk.js"
+    "revision": "5720e37d552f5fd3e3ff",
+    "url": "/AlignAIR_site/static/js/main.53b22cf8.chunk.js"
   },
   {
     "revision": "60c59fa30b8cf6826fb1",
