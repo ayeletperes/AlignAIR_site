@@ -1,6 +1,6 @@
 import * as tf from "@tensorflow/tfjs";
 import { SequenceTokenizer } from "./processSequence";
-import {extractAllele, extratSegmentation, extratProductivity} from "./postProcessing";
+import {extractAllele, extratSegmentation, extratProductivity, extractGermline} from "./postProcessing";
 
 // post processing of the batch
 export async function processBatch(batchKeys, dataDict, AlleleCallOHE, confidences, caps, model, outputIndices) {
@@ -65,12 +65,23 @@ export async function processBatch(batchKeys, dataDict, AlleleCallOHE, confidenc
       });
     }));
 
-    // for each key in dataDict, add the germline alignment
-    // batchKeys.forEach(key => {
-    //   const item = dataDict[key];
-      
-    // });      
-
+    // for each key in dataDict, add the germline alignment. Here, we just gonna pull the records for the first match. 
+    let dictionary = {};
+    Object.entries(AlleleCallOHE).forEach(([index, value]) => {
+      dictionary[index] = Object.values(value).reduce((obj, item) => {
+        obj[item.name] = item.sequence;
+        return obj;
+      }, {});
+    });
+    console.log(dictionary);
+    batchKeys.forEach(key => {
+      const item = dataDict[key];
+      ['v', 'd', 'j'].forEach((allele) => {
+        const segments = extractGermline.HeuristicReferenceMatcher(item, allele, dictionary[`${allele}_call`]);
+        dataDict[key] = { ...dataDict[key], ...segments };
+      });
+    });      
+    console.log(dataDict);
     tensorsToDispose.forEach(tensor => tf.dispose(tensor));
     predicted.forEach(tensor => tensor.dispose());
 }

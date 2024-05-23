@@ -126,12 +126,16 @@ export class extractGermline {
 
     static HeuristicReferenceMatcher(sequence, segment, referenceAlleles, call_id=0, k = 15, s = 30) {
         // get the alignment of the sequence.
-        const segmentedSequence = sequence.sequence.slice(sequence[{segment}+'_sequence_start'], sequence[{segment}+'_sequence_end']);
+        
+        const segmentedSequence = sequence.sequence.slice(sequence[`${segment}_sequence_start`], sequence[`${segment}_sequence_end`]);
         const segmentLength = segmentedSequence.length
-        const call = sequence[{segment}+'_call'][{call_id}];
-        const referenceSequence = referenceAlleles[call].sequence;
+        const call = sequence[`${segment}_call`][call_id];
+        const referenceSequence = referenceAlleles[call];
+        console.log(call);
+        console.log(referenceSequence);
+        console.log(segmentedSequence);
         const referenceLength = referenceSequence.length;
-
+       
         if (segmentLength === referenceLength) {
             return({
                 [segment+'_alignment_start']: 0,
