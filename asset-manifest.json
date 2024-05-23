@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.js": "www.alignair.ai/static/js/main.f2642881.chunk.js",
-    "main.js.map": "www.alignair.ai/static/js/main.f2642881.chunk.js.map",
-    "runtime~main.js": "www.alignair.ai/static/js/runtime~main.da56c29f.js",
-    "runtime~main.js.map": "www.alignair.ai/static/js/runtime~main.da56c29f.js.map",
-    "static/js/2.76d42043.chunk.js": "www.alignair.ai/static/js/2.76d42043.chunk.js",
-    "static/js/2.76d42043.chunk.js.map": "www.alignair.ai/static/js/2.76d42043.chunk.js.map",
-    "index.html": "www.alignair.ai/index.html",
-    "precache-manifest.b107cf65c264d44c563745602b4dbc40.js": "www.alignair.ai/precache-manifest.b107cf65c264d44c563745602b4dbc40.js",
-    "service-worker.js": "www.alignair.ai/service-worker.js",
-    "static/media/landing_page.jpg": "www.alignair.ai/static/media/landing_page.a090c432.jpg"
+    "main.js": "/static/js/main.f2642881.chunk.js",
+    "main.js.map": "/static/js/main.f2642881.chunk.js.map",
+    "runtime~main.js": "/static/js/runtime~main.a8a9905a.js",
+    "runtime~main.js.map": "/static/js/runtime~main.a8a9905a.js.map",
+    "static/js/2.76d42043.chunk.js": "/static/js/2.76d42043.chunk.js",
+    "static/js/2.76d42043.chunk.js.map": "/static/js/2.76d42043.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.d9a4d6db879e93eeedd7a8f9eee8b4e6.js": "/precache-manifest.d9a4d6db879e93eeedd7a8f9eee8b4e6.js",
+    "service-worker.js": "/service-worker.js",
+    "static/media/landing_page.jpg": "/static/media/landing_page.a090c432.jpg"
   }
 }
