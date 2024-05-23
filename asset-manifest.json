@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.js": "/AlignAIR_site/static/js/main.66779f3d.chunk.js",
-    "main.js.map": "/AlignAIR_site/static/js/main.66779f3d.chunk.js.map",
-    "runtime~main.js": "/AlignAIR_site/static/js/runtime~main.25b7dc1b.js",
-    "runtime~main.js.map": "/AlignAIR_site/static/js/runtime~main.25b7dc1b.js.map",
-    "static/js/2.537f4b81.chunk.js": "/AlignAIR_site/static/js/2.537f4b81.chunk.js",
-    "static/js/2.537f4b81.chunk.js.map": "/AlignAIR_site/static/js/2.537f4b81.chunk.js.map",
-    "index.html": "/AlignAIR_site/index.html",
-    "precache-manifest.3793f04a881de8c69a66a4e6590d43e1.js": "/AlignAIR_site/precache-manifest.3793f04a881de8c69a66a4e6590d43e1.js",
-    "service-worker.js": "/AlignAIR_site/service-worker.js",
-    "static/media/landing_page.jpg": "/AlignAIR_site/static/media/landing_page.a090c432.jpg"
+    "main.js": "www.alignair.ai/static/js/main.f2642881.chunk.js",
+    "main.js.map": "www.alignair.ai/static/js/main.f2642881.chunk.js.map",
+    "runtime~main.js": "www.alignair.ai/static/js/runtime~main.da56c29f.js",
+    "runtime~main.js.map": "www.alignair.ai/static/js/runtime~main.da56c29f.js.map",
+    "static/js/2.76d42043.chunk.js": "www.alignair.ai/static/js/2.76d42043.chunk.js",
+    "static/js/2.76d42043.chunk.js.map": "www.alignair.ai/static/js/2.76d42043.chunk.js.map",
+    "index.html": "www.alignair.ai/index.html",
+    "precache-manifest.b107cf65c264d44c563745602b4dbc40.js": "www.alignair.ai/precache-manifest.b107cf65c264d44c563745602b4dbc40.js",
+    "service-worker.js": "www.alignair.ai/service-worker.js",
+    "static/media/landing_page.jpg": "www.alignair.ai/static/media/landing_page.a090c432.jpg"
   }
 }

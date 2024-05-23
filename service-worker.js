@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/AlignAIR_site/precache-manifest.3793f04a881de8c69a66a4e6590d43e1.js"
+  "www.alignair.ai/precache-manifest.b107cf65c264d44c563745602b4dbc40.js"
 );
 
 self.addEventListener('message', (event) => {
@@ -33,7 +33,7 @@ workbox.core.clientsClaim();
 self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-workbox.routing.registerNavigationRoute(workbox.precaching.getCacheKeyForURL("/AlignAIR_site/index.html"), {
+workbox.routing.registerNavigationRoute(workbox.precaching.getCacheKeyForURL("www.alignair.ai/index.html"), {
   
   blacklist: [/^\/_/,/\/[^/]+\.[^/]+$/],
 });
