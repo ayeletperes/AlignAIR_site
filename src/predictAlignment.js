@@ -65,6 +65,11 @@ export async function processBatch(batchKeys, dataDict, AlleleCallOHE, confidenc
       });
     }));
 
+    // for each key in dataDict, add the germline alignment
+    // batchKeys.forEach(key => {
+    //   const item = dataDict[key];
+      
+    // });      
 
     tensorsToDispose.forEach(tensor => tf.dispose(tensor));
     predicted.forEach(tensor => tensor.dispose());

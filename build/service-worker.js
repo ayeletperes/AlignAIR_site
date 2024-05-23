@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/AlignAIR_site/precache-manifest.9dc65ceb10d2684385b04c712983a126.js"
+  "/AlignAIR_site/precache-manifest.ac061a75412d196256268be47c091bc4.js"
 );
 
 self.addEventListener('message', (event) => {

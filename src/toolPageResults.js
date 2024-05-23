@@ -1,5 +1,5 @@
 import React from 'react';
-import {TabSetResults} from './processResults'; //ResultsTable TabSetResults, 
+import {TabSetResults, DownloadResultsTable} from './processResults'; //ResultsTable TabSetResults, 
 const AlignairPageResults = ({ results }) => {
   
   // if the length of results is less then 15, return the tabset view, else return "In production"
@@ -11,9 +11,7 @@ const AlignairPageResults = ({ results }) => {
   } else {
     if(results){
       return (
-        <div>
-          <h2>In production</h2>
-        </div>
+        <DownloadResultsTable results={results} />
       );
     } else{
       // return null if there are no results
