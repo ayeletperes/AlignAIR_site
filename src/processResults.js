@@ -93,7 +93,7 @@ function SelectWidget({call, results, reference, setSelected, selected, selected
     const seq = extractGermline.getGermlineSequence({results:results, segment:call.charAt(0), referenceAlleles:reference[call], call_id:index, k:k});
     setSelected(seq);
     const alleleElement = document.querySelector(`.allele.${call}`);
-    console.log(alleleElement.textContent);
+    
     alleleElement.textContent = seq;
 
     const likelihoodElement = document.querySelector(`.likelihood.${call}`);

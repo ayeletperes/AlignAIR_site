@@ -83,7 +83,8 @@ export default function Submission({modelReady, setSubmission, submission, seque
     <>
       <div className="submmit-button-container">
         <button id="submitButton" className="submmit-button" onClick={handleClick} disabled={modelReady}>
-          {submissionStatus ? "Submitting..." : "Submit"}
+          {/* {submissionStatus ? "Submitting..." : "Submit"} */}
+          Submit
         </button>
       </div>
       {submissionStatus && !submission && (

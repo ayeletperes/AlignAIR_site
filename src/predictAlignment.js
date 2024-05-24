@@ -74,7 +74,7 @@ export async function processBatch(batchKeys, dataDict, AlleleCallOHE, confidenc
       }, {});
     });
     
-    console.log(dictionary);
+    
     batchKeys.forEach(key => {
       const item = dataDict[key];
       ['v', 'd', 'j'].forEach((allele) => {
@@ -83,7 +83,7 @@ export async function processBatch(batchKeys, dataDict, AlleleCallOHE, confidenc
         dataDict[key] = { ...dataDict[key], ...segments };
       });
     });      
-    console.log(dataDict);
+    
     tensorsToDispose.forEach(tensor => tf.dispose(tensor));
     predicted.forEach(tensor => tensor.dispose());
 }
