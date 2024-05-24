@@ -53,6 +53,13 @@ export class extratSegmentation {
 
 export class extractGermline {
     
+    static calculatePadSize(sequence, maxLength = 576) {
+        const totalPadding = maxLength - sequence.length;
+        const padSize = Math.floor(totalPadding / 2);
+
+        return padSize;
+    }
+
     static AA_Score(s1, s2) {
         let alignmentScore = 0;
         let velocity = 0;
@@ -83,7 +90,7 @@ export class extractGermline {
     }
 
     static alignWithGermline(shortSegment, refSeq, k = 20, s = 25) {
-        if (shortSegment.length < 20) return [-1, -1];
+        if (shortSegment.length < k) return [-1, -1];
 
         const L_seg = shortSegment.length;
         const L_ref = refSeq.length;
@@ -124,40 +131,44 @@ export class extractGermline {
         return [bestStartPos, bestEndPos];
     }
 
-    static HeuristicReferenceMatcher(sequence, segment, referenceAlleles, call_id=0, k = 15, s = 30) {
+    static HeuristicReferenceMatcher({results, segment, referenceAlleles, call_id=0, k = 15, s = 30}) {
         // get the alignment of the sequence.
         
-        const segmentedSequence = sequence.sequence.slice(sequence[`${segment}_sequence_start`], sequence[`${segment}_sequence_end`]);
+        const segmentedSequence = results.sequence.slice(results[`${segment}_sequence_start`], results[`${segment}_sequence_end`]);
         const segmentLength = segmentedSequence.length
-        const call = sequence[`${segment}_call`][call_id];
+        const call = results[`${segment}_call`][call_id];
         const referenceSequence = referenceAlleles[call];
-        console.log(call);
-        console.log(referenceSequence);
-        console.log(segmentedSequence);
         const referenceLength = referenceSequence.length;
        
         if (segmentLength === referenceLength) {
             return({
-                [segment+'_alignment_start']: 0,
-                [segment+'_alignment_end']: referenceLength
+                [segment+'_germline_start']: 0,
+                [segment+'_germline_end']: referenceLength
             });
         } else if (segmentLength > referenceLength) {
             const [refStart, refEnd] = this.alignWithGermline(segmentedSequence, referenceSequence, k, s);
             return({
-                [segment+'_alignment_start']: refStart,
-                [segment+'_alignment_end']: refEnd
+                [segment+'_germline_start']: refStart,
+                [segment+'_germline_end']: refEnd
             });
         } else if (segmentLength < referenceLength) {
             const [refStart, refEnd] = this.alignWithGermline(segmentedSequence, referenceSequence, k, s);
             if (refStart !== null) {
                 return({
-                    [segment+'_alignment_start']: refStart,
-                    [segment+'_alignment_end']: refEnd
+                    [segment+'_germline_start']: refStart,
+                    [segment+'_germline_end']: refEnd
                 });
             } else {
                 throw new Error('Error in alignment');
             }
         }
+    }
+
+    static getGermlineSequence({results, segment, referenceAlleles, call_id=0, k = 15, s = 30}) {
+        const { [segment+'_germline_start']: refStart, [segment+'_germline_end']: refEnd } = this.HeuristicReferenceMatcher({results, segment, referenceAlleles, call_id, k, s});
+        const call = results[`${segment}_call`][call_id];
+        const referenceSequence = referenceAlleles[call];
+        return referenceSequence.slice(refStart, refEnd);
     }
 }
 

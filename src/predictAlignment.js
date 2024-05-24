@@ -73,11 +73,13 @@ export async function processBatch(batchKeys, dataDict, AlleleCallOHE, confidenc
         return obj;
       }, {});
     });
+    
     console.log(dictionary);
     batchKeys.forEach(key => {
       const item = dataDict[key];
       ['v', 'd', 'j'].forEach((allele) => {
-        const segments = extractGermline.HeuristicReferenceMatcher(item, allele, dictionary[`${allele}_call`]);
+        const k = allele === 'd' ? 5 : 15;
+        const segments = extractGermline.HeuristicReferenceMatcher({results:item, segment:allele, referenceAlleles:dictionary[`${allele}_call`], k:k});
         dataDict[key] = { ...dataDict[key], ...segments };
       });
     });      

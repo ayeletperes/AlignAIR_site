@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Genome Browser Style Graph</title>
+    <style>
+        .sequence-container {
+            font-family: monospace;
+            white-space: nowrap;
+            margin: 0px;
+            position: relative; /* Added position relative for alignment */
+        }
+        .row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .label {
+            width: 100px;
+            font-weight: bold;
+        }
+        .sequence {
+            display: flex;
+            align-items: center;
+            position: relative; /* Added position relative for alignment */
+        }
+        .region {
+            position: relative;
+            display: inline-block;
+            text-align: center;
+            border-radius: 15px;
+            padding: 2px 10px;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+        .fr-region {
+            background-color: lightblue;
+        }
+        .cdr-region {
+            background-color: lightgreen;
+        }
+        .allele {
+            padding: 5px 0px;
+            border: 1px solid #ccc;
+        }
+        .likelihood-high {
+            background-color: lightcoral;
+        }
+        .likelihood-medium {
+            background-color: lightgoldenrodyellow;
+        }
+        .likelihood-low {
+            background-color: lightgreen;
+        }
+        .dotted-line {
+            border-left: 1px dotted black;
+            height: 100%; /* Full height of the container */
+            position: absolute; /* Position absolute for alignment */
+            top: 0; /* Align to the top */
+            left: 50%; /* Align to the middle horizontally */
+            transform: translateX(-50%); /* Adjust for horizontal centering */
+            z-index: -1; /* Move below other content */
+        }
+        .select-options {
+            position: relative; /* Added position relative for alignment */
+            z-index: 1; /* Ensure it's above the dotted line */
+        }
+    </style>
+</head>
+<body>
+    <div class="sequence-container">
+        <div class="row">
+            <div class="label">Regions:</div>
+            <div class="sequence">
+                <div class="region fr-region" style="width: 14ch;">FR1</div>
+                <div class="region cdr-region" style="width: 12ch;">CDR1</div>
+                <!-- Add more regions as needed -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="label">Input Seq:</div>
+            <div class="sequence input-sequence">CGGGTCGGCTTGAAGGAGCCTGGTCCTGTGCTGGTTGAACCCACAG</div>
+        </div>
+        <div class="row">
+            <div class="label">
+                <select onchange="selectAllele(this, 'v-call')">
+                    <option value="V*01" data-sequence="CGGGTCGGCTTTAA" >V*01</option>
+                    <option value="V*02" data-sequence="CGGGTCGGCTTTAT" >V*02</option>
+                </select>
+            </div>
+            <div class="sequence">
+                <span class="allele v-call">CGGGTCGGCTTTAA</span>
+                <!-- <div class="dotted-line"></div> -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="label">
+                <select onchange="selectAllele(this, 'd-call')">
+                    <option value="D*01" data-sequence="GCCTGGTCCC" data-likelihood="medium">D*01</option>
+                    <!-- Add more options as needed -->
+                </select>
+            </div>
+            <div class="sequence" style="margin-left: 22ch;">
+                <span class="allele d-call">GCCTGGTCCC</span>
+                <!-- <div class="dotted-line"></div> Add the vertical dotted line here -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="label">
+                <select onchange="selectAllele(this, 'j-call')">
+                    <option value="J*01" data-sequence="GAACCCACAG" data-likelihood="low">J*01</option>
+                    <!-- Add more options as needed -->
+                </select>
+            </div>
+            <div class="sequence" style="margin-left: 34ch;">
+                <span class="allele j-call">GAACCCACAG</span>
+                <!-- <div class="dotted-line"></div> Add the vertical dotted line here -->
+            </div>
+        </div>
+        <div class="select-options">
+            <div class="labelsel">Select option...</div>
+            <div class="options">
+                <div>Option 1</div>
+                <div>Option 2</div>
+                <div>Option 3</div>
+                <div>Lot of text to display, so it can expand multiple lines and expand the select main text also</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectAllele(selectElement, alleleType) {
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const sequence = selectedOption.getAttribute('data-sequence');
+            const inputSequenceElement = document.querySelector('.sequence-container .row:nth-child(1) .sequence');
+            const inputSequence = inputSequenceElement.textContent;
+
+            const alleleElement = document.querySelector(`.allele.${alleleType}`);
+            alleleElement.textContent = sequence;
+
+            // Compare sequences and apply styling to differences
+            let coloredSequence = '';
+            for (let i = 0; i < inputSequence.length; i++) {
+                const inputChar = inputSequence[i];
+                const alleleChar = sequence[i];
+                if (inputChar !== alleleChar) {
+                    coloredSequence += `<span style="color: red;">${alleleChar}</span>`;
+                } else {
+                    coloredSequence += alleleChar;
+                }
+            }
+            alleleElement.innerHTML = coloredSequence;
+
+            // Ensure alignment remains consistent
+            if (alleleType === 'v-call') {
+                alleleElement.parentElement.style.marginLeft = '0ch';
+            } else if (alleleType === 'd-call') {
+                alleleElement.parentElement.style.marginLeft = '22ch';
+            } else if (alleleType === 'j-call') {
+                alleleElement.parentElement.style.marginLeft = '34ch';
+            }
+        }
+
+        const sel = document.querySelector('.select-options');
+        const label = document.querySelector('.labelsel');
+        const options = document.querySelector('.options');
+
+        options.setAttribute('hidden', true);
+
+        sel.addEventListener('click', (e) => {
+            e.stopPropagation();
+            options.removeAttribute('hidden');
+        });
+
+        document.body.addEventListener('click', (e) => {
+            options.setAttribute('hidden', true);
+        });
+
+        options.addEventListener('click', (e) => {
+            if (e.target.tagName === 'DIV') {
+                e.stopPropagation();
+                label.textContent = e.target.textContent;
+                e.target.classList.add('selected');
+                Array.from(e.target.parentNode.children).forEach((child) => {
+                    if (child !== e.target) {
+                        child.classList.remove('selected');
+                    }
+                });
+                options.setAttribute('hidden', true);
+            }
+        });
+    </script>
+</body>
+</html>

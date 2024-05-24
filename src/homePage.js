@@ -1,9 +1,11 @@
 import React  from 'react';
 import Header from './alignairPageHeader';
 import Image from './images/landing_page.jpg'
+import Logo from './images/alignair_logo.svg';
 
 const assets = {
-    Image
+    Image,
+    Logo
   }
 
   
@@ -13,8 +15,9 @@ export default function HomePageAPP(){
                 <Header />
                 <div className="content-home">
                     <h1 style={{ fontSize: '64px', fontFamily: 'Inter, sans-serif' }}>AlignAIR</h1>
+                    {/* <img src={assets.Logo} alt="Computer screen with dna"  style={{ width: '200px', height: 'auto', borderRadius: '0px' }}/> */}
                     <p style={{ fontSize: '24px', fontFamily: 'Inter, sans-serif', color: "#828282"}}>Improving immunoglobulin sequence alignment.</p>
-                    <a href="#/tool" className="start-button" style={{fontSize: "20px", padding: '15px 30px'}}>Start</a>
+                    <a href="#/alignair" className="start-button" style={{fontSize: "20px", padding: '15px 30px'}}>Start</a>
                     <img src={assets.Image} alt="Computer screen with dna" width="800" height="600"/>
                 </div>
                 <footer>

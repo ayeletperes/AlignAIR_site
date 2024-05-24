@@ -43,7 +43,7 @@ class HeuristicReferenceMatcher {
     }
 
     alignWithGermline(shortSegment, refSeq, k = 20, s = 25) {
-        if (shortSegment.length < 20) return [-1, -1];
+        if (shortSegment.length < k) return [-1, -1];
 
         const L_seg = shortSegment.length;
         const L_ref = refSeq.length;

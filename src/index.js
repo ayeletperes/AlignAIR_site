@@ -12,7 +12,7 @@ import ToolPageApp from "./toolPage";
 const Routing = () => (
   <Routes>
     <Route path="/" element={<HomePageAPP />} />
-    <Route path="/tool" element={<ToolPageApp />} />
+    <Route path="/alignair" element={<ToolPageApp />} />
     <Route path="*" element={<Navigate to="/" />} />
   </Routes>
 );

@@ -49,7 +49,7 @@ async function submitSequences(sequenceInput, fileInput, params, model, outputIn
 }
 
 
-export default function Submission({setSubmission, submission, sequence, file, params, model, outputIndices, setResults}){
+export default function Submission({modelReady, setSubmission, submission, sequence, file, params, model, outputIndices, setResults}){
   // TODO: Implement the submission button. Add the following:
   // - A function that checks if there is a sequence or file to submit
   // - A function that sets the submission state to true if there is a sequence or file to submit
@@ -82,11 +82,10 @@ export default function Submission({setSubmission, submission, sequence, file, p
   return(
     <>
       <div className="submmit-button-container">
-        <button id="submitButton" className="submmit-button" onClick={handleClick}>Submit</button>
+        <button id="submitButton" className="submmit-button" onClick={handleClick} disabled={modelReady}>
+          {submissionStatus ? "Submitting..." : "Submit"}
+        </button>
       </div>
-      {submission && (
-          <p>Submitting sequences...</p>
-      )}
       {submissionStatus && !submission && (
           <>
             <button id="resetButton" className="example-button" onClick={handleReset}>Reset results</button>

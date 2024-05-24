@@ -11,7 +11,7 @@ export default function ToolPageApp(){
   const [selectedChain, setSelectedChain] = useState('IGH');
   const [model, setModel] = useState(null);
   const [outputIndices, setOutputIndices] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [modelReady, setModelReady] = useState(true);
   const [results, setResults] = useState(null);
   const [params, setParams] = useState({
       vCap: 3,
@@ -28,10 +28,10 @@ export default function ToolPageApp(){
   return(
     <div>
       <Header />
-      <Content setFile={setFile} setSequence={setSequence} sequence={sequence} setSelectedChain={setSelectedChain} selectedChain={selectedChain} setModel={setModel} setOutputIndices={setOutputIndices} setIsLoading={setIsLoading} params={params} setParams={setParams}/>
-      {!isLoading && 
+      <Content setFile={setFile} setSequence={setSequence} sequence={sequence} setSelectedChain={setSelectedChain} selectedChain={selectedChain} setModel={setModel} setOutputIndices={setOutputIndices} setIsLoading={setModelReady} params={params} setParams={setParams}/>
+      <Submission modelReady={modelReady} setSubmission={setSubmission} submission={submission} sequence={sequence} file={file} params={params} model={model} outputIndices={outputIndices} setResults={setResults} /> 
+      {!modelReady && 
         <>
-          <Submission setSubmission={setSubmission} submission={submission} sequence={sequence} file={file} params={params} model={model} outputIndices={outputIndices} setResults={setResults} /> 
           <AlignairPageResults results={results} />
         </>
       }

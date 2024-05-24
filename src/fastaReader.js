@@ -1,4 +1,4 @@
-import {IGHV,IGHD,IGHJ} from "./Reference";
+import {IGHV,IGHD,IGHJ,IGHVnameConvert} from "./Reference";
 
 export class FastaReader {
     
@@ -74,8 +74,13 @@ export class FastaReader {
         return { alleleCallOHE, sortedDataDict };
     }
 
-    processFastaContents(IGHV, IGHD, IGHJ) {
+    processFastaContents(IGHV, IGHD, IGHJ, IGHVnameConvert) {
         const { alleleCallOHE: vAlleleCallOHE, sortedDataDict: sortedIGHVDataDict } = this.sortAndReturnDict(IGHV);
+        // go over each name in the vAlleleCallOHE and convert the name to the IGHVnameConvert
+        Object.keys(vAlleleCallOHE).forEach((key) => {
+            vAlleleCallOHE[key].name = IGHVnameConvert[vAlleleCallOHE[key].name];
+        });
+
         const { alleleCallOHE: dAlleleCallOHE, sortedDataDict: sortedIGHDDataDict } = this.sortAndReturnDict(IGHD);
         dAlleleCallOHE[Object.keys(dAlleleCallOHE).length] = {name:"Short-D",sequence:""};
         const { alleleCallOHE: jAlleleCallOHE, sortedDataDict: sortedIGHJDataDict } = this.sortAndReturnDict(IGHJ);
@@ -99,4 +104,6 @@ export const {
     sortedIGHDDataDict,
     jAlleleCallOHE,
     sortedIGHJDataDict,
-} = fastaReader.processFastaContents(IGHV, IGHD, IGHJ);
+} = fastaReader.processFastaContents(IGHV, IGHD, IGHJ, IGHVnameConvert);
+
+
