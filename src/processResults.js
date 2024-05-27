@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { extractGermline } from './postProcessing';
 
 export function ResultsHTMLTable({results}) {
@@ -53,17 +53,17 @@ export function ResultsHTMLTable({results}) {
 
 function getColor(likelihood) {
   if (likelihood > 0.9) {
-    return 'green';
+    return '#baffc9';
   } else if (likelihood > 0.8) {
-    return 'blue';
+    return '#bae1ff';
   } else if (likelihood > 0.7) {
-    return 'purple';
+    return '#eecbff';
   } else if (likelihood > 0.6) {
-    return 'yellow';
+    return '#f7e7b4';
   } else if (likelihood > 0.5) {
-    return 'orange';
+    return '#ffdfba';
   } else {
-    return 'red';
+    return '#ffb3ba';
   }
 }
 
@@ -92,12 +92,54 @@ function SelectWidget({call, results, reference, setSelected, selected, selected
     const k = call === 'd_call' ? 5 : 15;
     const seq = extractGermline.getGermlineSequence({results:results, segment:call.charAt(0), referenceAlleles:reference[call], call_id:index, k:k});
     setSelected(seq);
+    
     const alleleElement = document.querySelector(`.allele.${call}`);
     
     alleleElement.textContent = seq;
 
     const likelihoodElement = document.querySelector(`.likelihood.${call}`);
-    likelihoodElement.textContent = Math.round(likelihoods[index] * 100)+'%';
+    likelihoodElement.textContent = Number(likelihoods[index].toFixed(3));
+    likelihoodElement.style.width = likelihoods[index] * 100 + 100 + 'px';
+    likelihoodElement.style.backgroundColor = getColor(likelihoods[index]);
+    
+  }
+
+  return (
+    <>
+      <select value={selectedAllele}  onChange={handleChange} style={{fontSize:"18px"}}> 
+        {alleles.map((allele, index) => (
+          <option key={index} value={allele}>
+            {allele}
+          </option>
+        ))}
+      </select>
+    </>
+  );
+}
+
+function SelectWidgetVertical({call, results, reference, setSelected, selected, selectedAllele, setSelectedAllele, setSplitedSeq}){
+  const alleles = results[call];
+  const likelihoods = results[`${call.charAt(0)}_likelihoods`];
+
+  const handleChange = (event) => {
+    const allele = event.target.value;
+    setSelectedAllele(allele);
+    const index = alleles.indexOf(allele);
+    const k = call === 'd_call' ? 5 : 15;
+    const seq = extractGermline.getGermlineSequence({results:results, segment:call.charAt(0), referenceAlleles:reference[call], call_id:index, k:k});
+    setSelected(seq);
+    const splitedSeq = splitSequence(seq, 70);
+    setSplitedSeq(splitedSeq);
+
+    splitedSeq.map((seq, index) => {
+      let alleleElement = document.querySelector(`.allele.${call}-${index}`);
+      alleleElement.textContent = seq;
+      // alleleElement = document.querySelector(`.alignment-label.${call}-${index}`);
+      // alleleElement.textContent = allele;
+    });
+
+    const likelihoodElement = document.querySelector(`.likelihood.${call}`);
+    likelihoodElement.textContent = Number(likelihoods[index].toFixed(3));
     likelihoodElement.style.width = likelihoods[index] * 100 + 100 + 'px';
     likelihoodElement.style.backgroundColor = getColor(likelihoods[index]);
     
@@ -144,13 +186,22 @@ const getRegionColor = (regionName) => {
   }
 };
 
-function AlignmentBrowser({results, referenceAlleles}){
+function splitSequence(sequence, maxCharsPerRow){
+  const numRows = Math.ceil(sequence.length / maxCharsPerRow)
+  const chunkSize = Math.ceil(sequence.length / numRows);
+  
+  const chunks = [];
+  for (let i = 0; i < sequence.length; i += chunkSize) {
+    chunks.push(sequence.slice(i, i + chunkSize));
+  }
+  return chunks;
+};
+
+function AlignmentBrowser({ results, referenceAlleles }) {
   const [selectedSequenceV, setSelectedSequenceV] = useState('');
   const [selectedSequenceD, setSelectedSequenceD] = useState('');
   const [selectedSequenceJ, setSelectedSequenceJ] = useState('');
   
-  // const results = Object.entries(resultsObj)[0][1];
-
   const [selectedAlleleV, setSelectedAlleleV] = useState(results.v_call[0]);
   const [selectedAlleleD, setSelectedAlleleD] = useState(results.d_call[0]);
   const [selectedAlleleJ, setSelectedAlleleJ] = useState(results.j_call[0]);
@@ -159,74 +210,203 @@ function AlignmentBrowser({results, referenceAlleles}){
   const [selectedLikelihoodD, setSelectedLikelihoodD] = useState(results.d_likelihoods[0]);
   const [selectedLikelihoodJ, setSelectedLikelihoodJ] = useState(results.j_likelihoods[0]);
   
+  const maxCharsPerRow = 70;
+  
+  const [splitedSequenceV, setSplitedSequenceV] = useState([]);
+  const [splitedSequenceD, setSplitedSequenceD] = useState([]);
+  const [splitedSequenceJ, setSplitedSequenceJ] = useState([]);
+
   useEffect(() => {
     setSelectedSequenceV(
       referenceAlleles['v_call'][results.v_call[0]].slice(results.v_germline_start, results.v_germline_end)
     );
+    
 
     setSelectedSequenceD(
       referenceAlleles['d_call'][results.d_call[0]].slice(results.d_germline_start, results.d_germline_end)
     );
-    console.log(results.j_germline_start, results.j_germline_end);
+    
+    
     setSelectedSequenceJ(
       referenceAlleles['j_call'][results.j_call[0]].slice(results.j_germline_start, results.j_germline_end)
     );
+    
+
   }, [results, referenceAlleles]);
 
-  
-  const d_left_margin = results.d_sequence_start;
-  const j_left_margin = results.j_sequence_start ;
-
-  // const createRegionTags = () => {
-  //   return Object.entries(regions).map(([regionName, [start, end]]) => {
-  //     if (start === null) start = 0;
-  //     if (end === null) end = results.sequence.length;
-  //     // TODO fix for sequences that don't start at 0
-  //     console.log(end, start)
-  //     return (
-  //       <span
-  //         key={regionName}
-  //         style={{
-  //           gridColumn:3,
-  //           left: `${start}ch`,
-  //           width: `${end - start}ch`,
-  //           backgroundColor: getRegionColor(regionName),
-  //           color: 'white',
-  //           textAlign: 'center',
-  //           position: 'absolute',
-  //           fontSize: '18px',
-  //           // padding: '2px',
-  //           borderRadius: '3px'
-  //         }}
-  //       >
-  //         {regionName}
-  //       </span>
-  //     );
-  //   });
-  // };
-
+  useEffect(() => {
+    setSplitedSequenceV(splitSequence(selectedSequenceV, maxCharsPerRow));
+    setSplitedSequenceD(splitSequence(selectedSequenceD, maxCharsPerRow));
+    setSplitedSequenceJ(splitSequence(selectedSequenceJ, maxCharsPerRow));
+  },[selectedSequenceV, selectedSequenceD, selectedSequenceJ])
 
   const rows = {
-    header: 1,
-    seq: 2,
-    v: 3,
-    d: 4,
-    j: 5,
-  }
-  return (
-    <>
-      <div className="alignment-browser">
+        header: 1,
+        seq: 2,
+        v: 3,
+        d: 4,
+        j: 5,
+      }
 
-        <div className="alignment-label" style={{gridRow: rows.header}}>Allele</div>
-        <div className="alignment-label" style={{gridColumn:2, gridRow: rows.header}}>Likelihood</div>
-        {/* <div className="region-tags" style={{ gridColumn:3, gridRow: rows.header }}>
-          {createRegionTags()}
-        </div> */}
+  const [isVerticalView, setIsVerticalView] = useState(false);
+  
+  const toggleView = () => {
+    setIsVerticalView(!isVerticalView);
+    
+  };
 
-        <div className="sequence input-sequence" style={{gridRow: rows.seq}}>{results.sequence}</div>
-        
-        <div className="alignment-label" style={{gridRow: rows.v}}>
-          <SelectWidget
+  
+  // console.log(splitSequence(selectedSequenceV, rowsVertical))
+  // console.log(splitSequence(selectedSequenceD, rowsVertical))
+  // console.log(splitSequence(selectedSequenceJ, rowsVertical))
+
+  const d_left_margin = results.d_sequence_start;
+  const j_left_margin = results.j_sequence_start ;
+  
+  
+
+  const renderVerticalView = () => (
+    <div className="alignment-browser vertical-view">
+      <div className="alignment-label" style={{ gridRow: 1 }}>Allele</div>
+      <div className="alignment-label" style={{ gridColumn: 2, gridRow: 1 }}>Likelihood</div>
+
+      {splitSequence(results.sequence.slice(0,results.v_sequence_end), maxCharsPerRow).map((chunk, index) => (
+        <React.Fragment key={`input-sequence-v-${index}`}>
+          
+          <div className={`alignment-label`} style={{ gridRow: (index * 2) + 2, gridColumn:1 }}>
+            <span className={`alignment-label v_input-${index}`}>V</span>
+          </div>
+          
+          <div className="sequence input-sequence-v" style={{ gridRow: (index * 2) + 2 }}>
+            <span className="sequence">{chunk}</span>
+          </div>
+        </React.Fragment>
+      ))}
+
+      <div className="alignment-label" style={{ gridRow: rows.v }}>
+          <SelectWidgetVertical
+            call='v_call'
+            results={results}
+            reference={referenceAlleles}
+            setSelected={setSelectedSequenceV}
+            selected={selectedSequenceV}
+            selectedAllele={selectedAlleleV}
+            setSelectedAllele={setSelectedAlleleV}
+            setSplitedSeq={setSplitedSequenceV}
+          />
+        </div>
+      <div className="bar" style={{gridRow: rows.v}}>
+        <div className="likelihood v_call" style={{gridRow: rows.v, width:`${Math.round(selectedLikelihoodV*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodV)}`}}>{Number(selectedLikelihoodV.toFixed(3))}</div>
+      </div>
+
+      {splitedSequenceV.map((chunk, index) => (
+        <React.Fragment key={`v-sequence-${index}`}>
+          {index > 0 && (
+            <div className={`alignment-label`} style={{ gridRow: (index * 2) + rows.v, gridColumn:1 }}>
+              <span className={`alignment-label v_call-${index}`}>{selectedAlleleV}</span>
+            </div>
+          )}
+          <div className="sequence" style={{ gridRow: (index * 2) + rows.v }}>
+            <span className={`allele v_call-${index}`}>{chunk}</span>
+          </div>
+        </React.Fragment>
+      ))}
+
+      {splitSequence(results.sequence.slice(results.v_sequence_end+1,results.j_sequence_start), maxCharsPerRow).map((chunk, index) => (
+        <React.Fragment key={`input-sequence-d-${index}`}>
+          <div className={`alignment-label`} style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + rows.v -1), gridColumn:1 }}>
+            <span className={`alignment-label d_input-${index}`}>D</span>
+          </div>
+          
+          <div className="sequence input-sequence-d" style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + rows.v -1) }}>
+            <span className="sequence" style={{color:'gray'}}>{chunk.slice(0,(results.d_sequence_start-results.v_sequence_end-1))}</span>
+            <span className="sequence">{chunk.slice((results.d_sequence_start-results.v_sequence_end-1), (results.d_sequence_end-results.v_sequence_end-1))}</span>
+            <span className="sequence" style={{color:'gray'}}>{chunk.slice((results.d_sequence_end-results.v_sequence_end))}</span>
+          </div>
+        </React.Fragment>
+      ))}
+
+      <div className="alignment-label" style={{ gridRow: (splitedSequenceV.length*2)+ rows.v }}>
+        <SelectWidgetVertical
+          call='d_call'
+          results={results}
+          reference={referenceAlleles}
+          setSelected={setSelectedSequenceD}
+          selected={selectedSequenceD}
+          selectedAllele={selectedAlleleD}
+          setSelectedAllele={setSelectedAlleleD}
+          setSplitedSeq={setSplitedSequenceD}
+        />
+      </div>
+      
+      <div className="bar" style={{gridRow: (splitedSequenceV.length*2) + rows.v}}>
+        <div className="likelihood d_call" style={{gridRow: (splitedSequenceV.length*2) + rows.v, width:`${Math.round(selectedLikelihoodD*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodD)}`}}>{Number(selectedLikelihoodD.toFixed(3))}</div>
+      </div>
+      
+      {splitedSequenceD.map((chunk, index) => (
+        <React.Fragment key={`d-sequence-${index}`}>
+          {index > 0 && (
+            <div className={`alignment-label d_call-${index}`} style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + rows.v), gridColumn:1 }}>
+              {selectedAlleleD}
+            </div>
+          )}
+          <div className="sequence" style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + rows.v), marginLeft: `${d_left_margin-(results.v_sequence_end+1)}ch`}}>
+            <span className={`allele d_call-${index}`}>{chunk}</span>
+          </div>
+        </React.Fragment>
+      ))}
+
+
+      {splitSequence(results.sequence.slice(results.j_sequence_start,results.j_sequence_end), maxCharsPerRow).map((chunk, index) => (
+        <React.Fragment key={`input-sequence-j-${index}`}>
+          <div className={`alignment-label`} style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + (splitedSequenceD.length*2) + rows.v -1), gridColumn:1 }}>
+            <span className={`alignment-label j_input-${index}`}>J</span>
+          </div>
+          <div className="sequence input-sequence-j" style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + (splitedSequenceD.length*2) + rows.v -1) }}>
+            <span className="sequence">{chunk}</span>
+          </div>
+        </React.Fragment>
+      ))}
+
+      <div className="alignment-label" style={{ gridRow: ((splitedSequenceV.length*2) + (splitedSequenceD.length*2) + rows.v) }}>
+        <SelectWidgetVertical
+          call='j_call'
+          results={results}
+          reference={referenceAlleles}
+          setSelected={setSelectedSequenceJ}
+          selected={selectedSequenceJ}
+          selectedAllele={selectedAlleleJ}
+          setSelectedAllele={setSelectedAlleleJ}
+          setSplitedSeq={setSplitedSequenceJ}
+        />
+      </div>
+      
+      <div className="bar" style={{gridRow: ((splitedSequenceV.length*2) + (splitedSequenceD.length*2) + rows.v)}}>
+        <div className="likelihood j_call" style={{gridRow: ((splitedSequenceV.length*2) + (splitedSequenceD.length*2) + rows.v), width:`${Math.round(selectedLikelihoodD*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodJ)}`}}>{Number(selectedLikelihoodJ.toFixed(3))}</div>
+      </div>
+      
+      {splitedSequenceJ.map((chunk, index) => (
+        <React.Fragment key={`j-sequence-${index}`}>
+          {index > 0 && (
+            <div className={`alignment-label j_call-${index}`} style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + (splitedSequenceD.length*2) + rows.v), gridColumn:1 }}>
+              {selectedAlleleJ}
+            </div>
+          )}
+          <div className="sequence" style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + (splitedSequenceD.length*2) + rows.v)}}>
+            <span className={`allele j_call-${index}`}>{chunk}</span>
+          </div>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+
+  const renderHorizontalView = () => (
+    <div className="alignment-browser">
+            <div className="alignment-label" style={{gridRow: rows.header}}>Allele</div>
+         <div className="alignment-label" style={{gridColumn:2, gridRow: rows.header}}>Likelihood</div>
+         <div className="sequence input-sequence" style={{gridRow: rows.seq}}>{results.sequence}</div>
+                 <div className="alignment-label" style={{gridRow: rows.v}}>
+           <SelectWidget
             call='v_call'
             results={results}
             reference={referenceAlleles}
@@ -237,7 +417,7 @@ function AlignmentBrowser({results, referenceAlleles}){
           />
         </div>
         <div className="bar" style={{gridRow: rows.v}}>
-          <div className="likelihood v_call" style={{gridRow: rows.v, width:`${Math.round(selectedLikelihoodV*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodV)}`}}>{Math.round(selectedLikelihoodV*100)}%</div>
+          <div className="likelihood v_call" style={{gridRow: rows.v, width:`${Math.round(selectedLikelihoodV*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodV)}`}}>{Number(selectedLikelihoodV.toFixed(3))}</div>
         </div>
         <div className="sequence" style={{gridRow: rows.v}}>
           <span className="allele v_call" style={{gridRow: rows.v}}>{selectedSequenceV}</span>
@@ -254,7 +434,7 @@ function AlignmentBrowser({results, referenceAlleles}){
           />
         </div>
         <div className="bar" style={{gridRow: rows.d}}>
-          <div className="likelihood d_call" style={{gridRow: rows.d, width:`${Math.round(selectedLikelihoodD*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodD)}`}}>{Math.round(selectedLikelihoodD*100)}%</div>
+          <div className="likelihood d_call" style={{gridRow: rows.d, width:`${Math.round(selectedLikelihoodD*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodD)}`}}>{Number(selectedLikelihoodD.toFixed(3))}</div>
         </div>
         <div className="sequence" style={{gridRow: rows.d, marginLeft: `${d_left_margin}ch`}}>
           <span className="allele d_call" style={{gridRow: rows.d}}>{selectedSequenceD}</span>
@@ -271,15 +451,28 @@ function AlignmentBrowser({results, referenceAlleles}){
           />
         </div>
         <div className="bar" style={{gridRow: rows.j}}>
-          <div className="likelihood j_call" style={{gridRow: rows.j, width:`${Math.round(selectedLikelihoodJ*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodJ)}`}}>{Math.round(selectedLikelihoodJ*100)}%</div>
+          <div className="likelihood j_call" style={{gridRow: rows.j, width:`${Math.round(selectedLikelihoodJ*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodJ)}`}}>{Number(selectedLikelihoodJ.toFixed(3))}</div>
         </div>
         <div className="sequence" style={{gridRow: rows.j, marginLeft: `${j_left_margin}ch`}}>
           <span className="allele j_call" style={{gridRow: rows.j}}>{selectedSequenceJ}</span>
         </div>
       </div>
-    </>
+  );
+
+  return (
+    <div>
+      <button id="toggleWrap" className="alignment-btn" onClick={toggleView}>
+        {isVerticalView ? 'Horizontal view' : 'Vertical view'}
+      </button>
+      {isVerticalView ? renderVerticalView() : renderHorizontalView()}
+    </div>
   );
 }
+
+
+
+
+
 
 export function TabSetResults({results, referenceAlleles}){
   // for each sequence in the results create a tab

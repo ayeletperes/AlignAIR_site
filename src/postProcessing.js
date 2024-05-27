@@ -41,10 +41,8 @@ export class extratSegmentation {
     }
 
     static async calculateSegment(prediction, sequence, maxLength = 576){
-        
         const segmenSize = Math.round(await prediction.arraySync());
         const padSize = this.calculatePadSize(sequence, maxLength);
-        
         return segmenSize-padSize;
     };
     

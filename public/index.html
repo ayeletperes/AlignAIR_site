@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
             integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
             crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
         <title>AlignAIR</title>
         <style>
             body {
@@ -355,7 +356,7 @@
                 box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
             }
             .styled-table thead tr {
-                background-color: #009879;
+                background-color: #68c4af;
                 color: #ffffff;
                 text-align: left;
             }
@@ -370,11 +371,11 @@
                 background-color: #f3f3f3;
             }
             .styled-table tbody tr:last-of-type {
-                border-bottom: 2px solid #009879;
+                border-bottom: 2px solid #68c4af;
             }
             .styled-table tbody tr.active-row {
                 font-weight: bold;
-                color: #009879;
+                color: #68c4af;
             }
             /* Style the tab */
             .tab {
@@ -402,8 +403,8 @@
 
             /* Create an active/current tablink class */
             .tab button.active {
-                background-color: #009879;
-                border: 1px solid #009879;
+                background-color: #68c4af;
+                border: 1px solid #68c4af;
             }
 
             .tab button.deactive {
@@ -450,6 +451,17 @@
                 grid-template-columns: 150px 200px auto;
                 gap: 10px;
             }
+            .vertical-view {
+                font-family: monospace;
+                position: relative;
+                overflow-x: auto;
+                white-space: nowrap;
+                box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+                grid-auto-rows: minmax(100px, auto);
+                display: grid;
+                grid-template-columns: 150px 200px 200ch;
+                gap: 10px;
+            }
             .alignment-label {
                 grid-column: 1;
                 font-weight: bold;
@@ -463,15 +475,15 @@
             .bar {
                 grid-column: 2;
                 background-color: white;
-                border-radius: 15px; 
+                border-radius: 0px; 
             } 
             .likelihood { 
                 grid-column: 2;
                 background-color: rgb(116, 194, 92); 
-                color: white; 
+                color: rgb(168, 158, 158); 
                 text-align: right; 
                 font-size: 20px; 
-                border-radius: 15px; 
+                border-radius: 0px; 
             } 
 
             .region {
@@ -494,6 +506,122 @@
                 grid-column: 3;
                 border: 1px solid #ccc;
                 box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+            }
+            .alignment-btn {
+                background-color: #68c4af;
+                border-radius: 10px;
+                color: #fff;
+                border: none;
+                padding: 2px 10px;
+                cursor: pointer;
+            }
+            /* ToolTip */
+            .tooltip {
+                position: relative;
+            }
+            .tooltip__item {
+            position: absolute;
+            min-width: 100px;
+            padding: 20px;
+            visibility: hidden;
+            opacity: 0;
+            background: white;
+            transition: all 0.25s cubic-bezier(0, 0, 0.2, 1);
+            color: #484848;
+            border: 1px solid #cecece;
+            border-radius: 3px;
+            font-weight: 500;
+            box-shadow: 0 2px 1px #bcbcbc;
+            z-index: 4;
+            /* white-space: pre-line;  */
+            }
+            .tooltip__item:after {
+            content: "";
+            display: block;
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            }
+            .tooltip__initiator {
+            cursor: pointer;
+            z-index: 5;
+            }
+            .tooltip[data-direction="right"] .tooltip__initiator:hover ~ .tooltip__item {
+            transform: translate3d(0, -50%, 0);
+            visibility: visible;
+            opacity: 1;
+            }
+            .tooltip[data-direction="right"] .tooltip__item {
+            top: 50%;
+            left: calc(100% + 1em);
+            transform: translate3d(15px, -50%, 0);
+            }
+            .tooltip[data-direction="right"] .tooltip__item:after {
+            top: 50%;
+            left: -0.5em;
+            transform: translate3d(0, -50%, 0);
+            border-width: 0.5em 0.5em 0.5em 0;
+            border-color: transparent white transparent transparent;
+            -webkit-filter: drop-shadow(0px 2px 1px #bcbcbc);
+            filter: drop-shadow(0px 2px 1px #bcbcbc);
+            }
+            .tooltip[data-direction="left"] .tooltip__initiator:hover ~ .tooltip__item {
+            transform: translate3d(0, -50%, 0);
+            visibility: visible;
+            opacity: 1;
+            }
+            .tooltip[data-direction="left"] .tooltip__item {
+            top: 50%;
+            right: calc(100% + 1em);
+            transform: translate3d(15px, -50%, 0);
+            }
+            .tooltip[data-direction="left"] .tooltip__item:after {
+            top: 50%;
+            right: -0.5em;
+            transform: translate3d(0, -50%, 0);
+            border-width: 0.5em 0 0.5em 0.5em;
+            border-color: transparent transparent transparent white;
+            -webkit-filter: drop-shadow(0px 2px 1px #bcbcbc);
+            filter: drop-shadow(0px 2px 1px #bcbcbc);
+            }
+            .tooltip[data-direction="top"] .tooltip__initiator:hover ~ .tooltip__item, .tooltip[data-direction="bottom"] .tooltip__initiator:hover ~ .tooltip__item {
+            transform: translate3d(-50%, 0, 0);
+            visibility: visible;
+            opacity: 1;
+            }
+            .tooltip[data-direction="top"] .tooltip__item, .tooltip[data-direction="bottom"] .tooltip__item {
+            left: 50%;
+            transform: translate3d(-50%, -15px, 0);
+            }
+            .tooltip[data-direction="top"] .tooltip__item:after, .tooltip[data-direction="bottom"] .tooltip__item:after {
+            left: 50%;
+            transform: translate3d(-50%, 0, 0);
+            }
+            .tooltip[data-direction="top"] .tooltip__item {
+            bottom: calc(100% + 1em);
+            }
+            .tooltip[data-direction="top"] .tooltip__item:after {
+            bottom: -0.5em;
+            border-width: 0.5em 0.5em 0 0.5em;
+            border-color: white transparent transparent transparent;
+            filter: drop-shadow(0px 2px 1px #bcbcbc);
+            -webkit-filter: drop-shadow(0px 2px 1px #bcbcbc);
+            }
+            .tooltip[data-direction="bottom"] .tooltip__item {
+            top: calc(100% + 1em);
+            }
+            .tooltip[data-direction="bottom"] .tooltip__item:after {
+            top: -0.5em;
+            border-width: 0 0.5em 0.5em 0.5em;
+            border-color: transparent transparent white transparent;
+            filter: drop-shadow(0px -1px 1px #bcbcbc);
+            -webkit-filter: drop-shadow(0px -1px 1px #bcbcbc);
+            }
+
+            .fa.fa-info-circle {
+            font-size: 14px;
+            color: #e4cab5;
             }
         </style>
     </head>

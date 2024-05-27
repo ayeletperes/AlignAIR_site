@@ -65,37 +65,56 @@ export async function warmUpModel(model, indices, maxSeqLength) {
     return status;
 }
 
-function LoadModelComponent({ setSelectedChain, selectedChain, setModel, setOutputIndices, setIsLoading}) {
+function LoadModelComponent({ setSelectedChain, selectedChain, setModel, setOutputIndices, setIsLoading }) {
     // constants
     const model_urls = {
         IGH: "tfjs/AlignAIRR/model.json",
         IGK: "tfjs/AlignAIRR/model.json",
         IGL: "tfjs/AlignAIRR/model.json",
-    }
-    // const desiredModelOutputNames = ['v_segment', 'indel_count', 'd_segment', 'mutation_rate', 'j_allele', 'd_allele', 'j_segment', 'v_allele'];
-    
+    };
+
     const maxSeqLength = 576;
-    
+
     const fetchModel = async () => {
         const model_url = model_urls[selectedChain];
         try {
+            // Fetch model
+            console.log(`Fetching model from ${model_url}`);
+            const response = await fetch(model_url);
+            const arrayBuffer = await response.arrayBuffer();
+            
+            // Validate buffer length
+            console.log("Buffer length:", arrayBuffer.byteLength);
+            if (arrayBuffer.byteLength % 4 !== 0) {
+                throw new Error("Buffer length is not a multiple of 4");
+            }
+
+            // Convert buffer to Float32Array
+            const floatArray = new Float32Array(arrayBuffer);
+            console.log("Float32Array created successfully");
+
+            // Load the model
             const { model, indices } = await loadModel(model_url);
             setModel(model);
             setOutputIndices(indices);
             setIsLoading(false);
             console.log('Model loaded successfully');
+
+            // Warm up the model
             const status = warmUpModel(model, indices, maxSeqLength);
             if (status === 'success') {
                 console.log('Warmup completed.');
             }
         } catch (error) {
             console.error("Error loading model:", error);
+            setIsLoading(false);
         }
     };
 
     useEffect(() => {
         fetchModel();
     }, [selectedChain]);
+
     // Function to handle button selection
     const selectButton = (buttonId) => {
         setSelectedChain(buttonId);

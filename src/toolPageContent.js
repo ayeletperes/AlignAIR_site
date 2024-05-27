@@ -3,6 +3,7 @@ import LoadModelComponent from './loadModel';
 import FileUpload from './fileUpload';
 import SequenceInput from './sequenceInput';
 import ParamInput from './paramInput';
+
 function Content({setSelectedChain, selectedChain, setFile, setSequence, sequence, setModel, setOutputIndices, setIsLoading, params, setParams}) {
     return(
         <div className="content">

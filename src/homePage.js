@@ -8,7 +8,7 @@ const assets = {
     Logo
   }
 
-  
+// TODO replace the github link with the actual github link  
 export default function HomePageAPP(){
     return(
         <div>

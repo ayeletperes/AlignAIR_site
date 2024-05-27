@@ -9,7 +9,9 @@ const Header = () => (
   <header>
     {/* <div className="logo">AlignAIR</div> */}
     <div className="logo">
-      <img src={assets.Logo} alt="logo" style={{ width: '100px', height: 'auto', borderRadius: '0px' }}/>
+      <a href="#/">
+        <img src={assets.Logo} alt="logo" style={{ width: '100px', height: 'auto', borderRadius: '0px' }}/>
+      </a>
     </div>
     <nav>
       <a href="#/">Home</a>
