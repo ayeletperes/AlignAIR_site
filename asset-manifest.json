@@ -1,15 +1,21 @@
 {
   "files": {
-    "main.js": "/static/js/main.0ad12e25.chunk.js",
-    "main.js.map": "/static/js/main.0ad12e25.chunk.js.map",
-    "runtime~main.js": "/static/js/runtime~main.a8a9905a.js",
-    "runtime~main.js.map": "/static/js/runtime~main.a8a9905a.js.map",
-    "static/js/2.61ca89d4.chunk.js": "/static/js/2.61ca89d4.chunk.js",
-    "static/js/2.61ca89d4.chunk.js.map": "/static/js/2.61ca89d4.chunk.js.map",
+    "main.js": "/static/js/main.3c1b24ac.chunk.js",
+    "main.js.map": "/static/js/main.3c1b24ac.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.82cd3aa7.js",
+    "runtime-main.js.map": "/static/js/runtime-main.82cd3aa7.js.map",
+    "static/js/2.82b864fc.chunk.js": "/static/js/2.82b864fc.chunk.js",
+    "static/js/2.82b864fc.chunk.js.map": "/static/js/2.82b864fc.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.4510a7e14849359335200db038aa0bf4.js": "/precache-manifest.4510a7e14849359335200db038aa0bf4.js",
+    "precache-manifest.f5b1e58e8c84f758c0a21fe4d9b4b8fc.js": "/precache-manifest.f5b1e58e8c84f758c0a21fe4d9b4b8fc.js",
     "service-worker.js": "/service-worker.js",
+    "static/js/2.82b864fc.chunk.js.LICENSE.txt": "/static/js/2.82b864fc.chunk.js.LICENSE.txt",
     "static/media/alignair_logo.svg": "/static/media/alignair_logo.766699c9.svg",
     "static/media/landing_page.jpg": "/static/media/landing_page.a090c432.jpg"
-  }
+  },
+  "entrypoints": [
+    "static/js/runtime-main.82cd3aa7.js",
+    "static/js/2.82b864fc.chunk.js",
+    "static/js/main.3c1b24ac.chunk.js"
+  ]
 }
