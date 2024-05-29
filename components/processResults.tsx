@@ -533,7 +533,9 @@ const AlignmentBrowser: React.FC<AlignmentBrowserProps> = ({ results, referenceA
       <div className='bg-white relative overflow-x-auto'>
         {isVerticalView ? renderVerticalView() : renderHorizontalView()}
       </div> */}
-      renderVerticalView()
+      <div className='bg-white relative overflow-x-auto'>
+        {renderVerticalView()}
+      </div>
     </div>
   );
 }
@@ -762,7 +764,7 @@ interface TabSetResultsProps {
 
 export const TabSetResults: React.FC<TabSetResultsProps> = ({ results, referenceAlleles }) => {
   const [activeTab, setActiveTab] = useState<string>('query 0');
-  const hasD = 'd_call' in results;
+  const hasD = 'd_call' in results['query 0'];
   const AlignmentView = hasD ? AlignmentBrowser : AlignmentBrowserLight;
 
   const handleClick = (index: string) => {
