@@ -1,2 +1,6 @@
 node_modules
 tensorflow_convert.sh
+.next
+.src
+/.next/
+/.src/
