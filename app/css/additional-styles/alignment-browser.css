@@ -1,0 +1,78 @@
+.tab {
+@apply overflow-hidden border bg-[#f1f1f1] border-solid border-[#ccc];
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+@apply bg-inherit float-left cursor-pointer transition-[0.3s] text-[17px] px-4 py-3.5 border-[none] hover:bg-[#ccc];
+outline: none;
+}
+
+/* Change background color of buttons on hover */
+
+/* Create an active/current tablink class */
+.tab button.active {
+@apply bg-[#68c4af] border border-solid border-[#68c4af];
+}
+.tab button.deactive {
+@apply bg-inherit border-[inherit];
+}
+
+/* Style the tab content */
+.tabcontent {
+@apply hidden border max-w-full overflow-x-auto px-3 py-1.5 border-t-[none] border-solid border-[#ccc];
+}
+.tabcontent.active {
+@apply block;
+
+/* Show the active tab's content */
+}
+.tabcontent::-webkit-scrollbar {
+@apply w-2.5;
+}
+.tabcontent::-webkit-scrollbar-track {
+background: #f1f1f1;
+}
+.tabcontent::-webkit-scrollbar-thumb {
+background: #888;
+}
+.tabcontent::-webkit-scrollbar-thumb:hover {
+background: #555;
+}
+.alignment-browser {
+@apply whitespace-nowrap relative overflow-x-auto shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(100px,auto)] grid grid-cols-[150px_200px_auto] gap-2.5;
+font-family: monospace;
+/* Added position relative for alignment */
+}
+.vertical-view {
+@apply relative overflow-x-auto whitespace-nowrap shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(100px,auto)] grid grid-cols-[150px_200px_200ch] gap-2.5;
+font-family: monospace;
+}
+.alignment-label {
+@apply col-[1] font-[bold] text-black text-lg;
+}
+.sequence {
+@apply items-center text-lg text-black col-[3];
+}
+.bar {
+@apply col-[2] bg-[white] rounded-none;
+}
+.likelihood {
+@apply col-[2] bg-[rgb(116,194,92)] text-[rgb(168,158,158)] text-right text-xl rounded-none;
+}
+.region {
+@apply relative inline-block text-center mx-[5px] px-2.5 py-0.5 rounded-[15px];
+}
+.fr-region {
+@apply bg-[lightblue];
+}
+.cdr-region {
+@apply bg-[lightgreen];
+}
+.allele {
+@apply col-[3] border shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] border-solid border-[#ccc];
+/* padding: 5px 0px; */
+}
+.alignment-btn {
+@apply bg-[#68c4af] text-white cursor-pointer px-2.5 py-0.5 rounded-[10px] border-[none];
+}

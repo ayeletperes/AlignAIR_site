@@ -1,0 +1,18 @@
+/*
+  Based on TailwindCSS recommendations,
+  consider using classes instead of the `@apply` directive
+  @see https://tailwindcss.com/docs/reusing-styles#avoiding-premature-abstraction
+*/
+
+.sequence-text-area {
+    @apply relative h-[150px] bg-[white] p-5 border-[3px] border-solid border-[#e0eafc];
+  }
+.sequence-text-area textarea {
+    @apply w-full h-[150px] box-border bg-[white] resize-none text-base p-2.5 border-[none];
+    /* This ensures the input takes up the full width of the div */
+    outline: none;
+}
+.sequence-text-area button {
+    @apply absolute bg-[#828282] text-[white] text-xs border cursor-pointer px-2.5 py-[5px] rounded-[10px] border-[none] border-solid border-[#828282] right-2.5 top-2.5 hover:bg-[#45a049];
+}
+  
