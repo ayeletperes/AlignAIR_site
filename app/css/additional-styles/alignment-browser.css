@@ -40,25 +40,24 @@ background: #888;
 background: #555;
 }
 .alignment-browser {
-@apply whitespace-nowrap relative overflow-x-auto shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(100px,auto)] grid grid-cols-[150px_200px_auto] gap-2.5;
-font-family: monospace;
+@apply whitespace-nowrap relative font-sans overflow-x-auto shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(100px,auto)] grid grid-cols-[150px_200px_auto] gap-2.5;
+
 /* Added position relative for alignment */
 }
 .vertical-view {
-@apply relative overflow-x-auto whitespace-nowrap shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(100px,auto)] grid grid-cols-[150px_200px_200ch] gap-2.5;
-font-family: monospace;
+@apply relative overflow-x-auto font-sans whitespace-nowrap shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(100px,auto)] grid grid-cols-[150px_200px_200ch] gap-2.5;
 }
 .alignment-label {
-@apply col-[1] font-[bold] text-black text-lg;
+@apply col-[1] font-[bold] font-sans text-black text-lg;
 }
 .sequence {
-@apply items-center text-lg text-black col-[3];
+@apply items-center text-lg font-sans text-black col-[3];
 }
 .bar {
 @apply col-[2] bg-[white] rounded-none;
 }
 .likelihood {
-@apply col-[2] bg-[rgb(116,194,92)] text-[rgb(168,158,158)] text-right text-xl rounded-none;
+@apply col-[2] bg-[rgb(116,194,92)] text-[rgb(168,158,158)] font-sans text-right text-xl rounded-none;
 }
 .region {
 @apply relative inline-block text-center mx-[5px] px-2.5 py-0.5 rounded-[15px];
@@ -70,7 +69,7 @@ font-family: monospace;
 @apply bg-[lightgreen];
 }
 .allele {
-@apply col-[3] border shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] border-solid border-[#ccc];
+@apply col-[3] border shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] font-sans border-solid border-[#ccc];
 /* padding: 5px 0px; */
 }
 .alignment-btn {

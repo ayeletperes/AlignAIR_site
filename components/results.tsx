@@ -1,6 +1,6 @@
 import React from 'react';
 import { TabSetResults, DownloadResultsTable } from './processResults'; // ResultsTable TabSetResults,
-import {IGType, IGHVConverted, sortedIGHD, sortedIGHJ} from './reference';
+import {IGType, IGHVConverted, sortedIGHD, sortedIGHJ, LightJ, LightV} from './reference';
 
 
 type AlleleCallOHE = { [k: string]: IGType | null };
@@ -9,7 +9,7 @@ const Results: React.FC<{ results: any, selectedChain: string }> = ({ results, s
   
   let AlleleCallOHE: AlleleCallOHE = { v_call: IGHVConverted, d_call: sortedIGHD, j_call: sortedIGHJ };
   if (selectedChain === 'Light') {
-    AlleleCallOHE = { v_call: IGHVConverted, d_call: null, j_call: sortedIGHJ };
+    AlleleCallOHE = { v_call: LightV, d_call: null, j_call: LightJ };
   }
 
   

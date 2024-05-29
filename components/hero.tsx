@@ -28,6 +28,7 @@ export default function Hero() {
   return (
     <section>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative"  ref={sectionRef}>
+        <div className="absolute inset-0">
           <Starfield
             starCount={300}
             starColor={[255, 255, 255]}
@@ -36,6 +37,7 @@ export default function Hero() {
             sectionW={sectionSize.width}
             sectionH={sectionSize.height}
           />
+        </div>
         {/* Illustration behind hero content */}
         <div className="absolute left-0 bottom-0 -ml-20 hidden lg:block pointer-events-none" aria-hidden="true" data-aos="fade-up" data-aos-delay="400">
           <svg className="max-w-full" width="564" height="552" viewBox="0 0 564 552" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -58,7 +60,7 @@ export default function Hero() {
           </div> */}
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
             <h1 className="h1 mb-4" data-aos="fade-up">AlignAIR</h1>
-            <p className="text-xl text-gray-400 mb-8" data-aos="fade-up" data-aos-delay="200">Improving immunoglobulin sequence alignment.</p>
+            <p className="text-xl text-gray-400 mb-8" data-aos="fade-up" data-aos-delay="200">Improving Adaptive Immune Receptor Alignment.</p>
             <div className="max-w-xs mx-auto sm:max-w-none sm:flex sm:justify-center">
               <div data-aos="fade-up" data-aos-delay="400">
                 <a className="btn text-white bg-purple-600 hover:bg-purple-700 w-full mb-4 sm:w-auto sm:mb-0" href="/alignair">Start aligning</a>

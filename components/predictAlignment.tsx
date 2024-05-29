@@ -1,6 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
-import { SequenceTokenizer } from './processSequence';
-import { extractAllele, extratSegmentation, extratProductivity, extractGermline } from './postProcessing';
+import { SequenceTokenizer, SequenceTokenizerLight } from './processSequence';
+import { extractAllele, extratSegmentation, extratProductivity, extractGermline, extratType } from './postProcessing';
 
 export async function processBatch(
   batchKeys: string[],
@@ -11,9 +11,18 @@ export async function processBatch(
   model: tf.LayersModel,
   outputIndices: { [key: string]: number }
 ) {
+  let features = ['v_call', 'd_call', 'j_call', 'v_sequence_start', 'v_sequence_end', 'd_sequence_start', 'd_sequence_end', 'j_sequence_start', 'j_sequence_end', 'productive', 'mutation_rate', 'ar_indels']
+  let chain = 'Heavy';
+  let tokenizer = SequenceTokenizer;
+  if (!AlleleCallOHE['d_call']) {
+    features = ['v_call', 'j_call', 'v_sequence_start', 'v_sequence_end', 'j_sequence_start', 'j_sequence_end', 'productive', 'mutation_rate', 'ar_indels', 'type']
+    chain = 'Light';
+    tokenizer = SequenceTokenizerLight;
+  }
+
   const batch = batchKeys.map(key => dataDict[key]);
   const encodedSequencesPromises = batch.map(item =>
-    SequenceTokenizer.encodeAndEqualPadSequence(item.sequence.replace(/\n/g, '').toUpperCase())
+    tokenizer.encodeAndEqualPadSequence(item.sequence.replace(/\n/g, '').toUpperCase())
   );
   const encodedSequences = await Promise.all(encodedSequencesPromises);
   const stackSequences = tf.stack(encodedSequences);
@@ -27,8 +36,10 @@ export async function processBatch(
     sequences.push(item.sequence);
   });
 
+  
+
   await Promise.all(
-    ['v_call', 'd_call', 'j_call', 'v_sequence_start', 'v_sequence_end', 'd_sequence_start', 'd_sequence_end', 'j_sequence_start', 'j_sequence_end', 'productive', 'mutation_rate', 'ar_indels'].map(async feature => {
+    features.map(async feature => {
       const outputIndex = outputIndices[feature];
       if (Array.isArray(predicted)) {
         if (predicted[outputIndex] instanceof tf.Tensor) {
@@ -66,9 +77,15 @@ export async function processBatch(
                 tensorsToDispose.push(tensor);
                 return productive;
               } else {
-                const segment = extratSegmentation.calculateSegment(tensor, sequences[Number(index)]);
-                tensorsToDispose.push(tensor);
-                return segment;
+                if (feature === 'type') {
+                  const type = extratType.assesTyep(tensor);
+                  tensorsToDispose.push(tensor);
+                  return type;
+                } else {
+                  const segment = extratSegmentation.calculateSegment(tensor, sequences[Number(index)]);
+                  tensorsToDispose.push(tensor);
+                  return segment;
+                }
               }
             }
           }
@@ -98,10 +115,11 @@ export async function processBatch(
   );
 
   // for each key in dataDict, add the germline alignment. Here, we just gonna pull the records for the first match.
-  console.log('dataDict:', dataDict)
+  
   batchKeys.forEach(key => {
     const item = dataDict[key];
-    ['v', 'd', 'j'].forEach((allele: string) => {
+    const alleles = chain==='Heavy' ? ['v', 'd', 'j'] : ['v', 'j'];
+    alleles.forEach((allele: string) => {
       const k = allele === 'd' ? 5 : 15;
       const segments = extractGermline.HeuristicReferenceMatcher({
         results: item,

@@ -44,6 +44,7 @@ export default function App() {
     <>
       <Form
         setFile={setFile as Dispatch<SetStateAction<File | null>>}
+        file={file}
         setSequence={setSequence as Dispatch<SetStateAction<string>>}
         sequence={sequence}
         setSelectedChain={setSelectedChain as Dispatch<SetStateAction<string>>}

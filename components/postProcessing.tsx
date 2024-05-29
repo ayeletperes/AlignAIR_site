@@ -216,3 +216,18 @@ static HeuristicReferenceMatcher({
       };
     }
     
+    export class extratType {
+      static async assesTyep(prediction: tf.Tensor) {
+        let type: string = '';
+        const typeArray = prediction.arraySync();
+        if (typeof typeArray === 'number') {
+          type = typeArray > 0.5? 'IGK': 'IGL';
+        } else if (Array.isArray(typeArray) && typeArray.length > 0 && typeof typeArray[0] === 'number') {
+          type = typeArray[0] > 0.5? 'IGK': 'IGL';
+        } else {
+            throw new Error('Unexpected data format in typeArray.');
+        }
+        
+        return type;
+      };
+    }

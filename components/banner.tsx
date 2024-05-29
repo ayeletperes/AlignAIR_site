@@ -19,7 +19,7 @@ export default function Banner() {
                 target="_blank"
                 rel="noreferrer"
               >
-                Download<span className="hidden sm:inline"> on GitHub</span>
+                Download <span className="font-medium hover:underline text-emerald-400"> AlignAIR </span> command line <span className="hidden sm:inline"> from GitHub</span>
               </a>{' '}
               {/* <span className="italic px-1.5">or</span>{' '}
               <a className="font-medium hover:underline text-emerald-400" href="https://cruip.com/open-pro/" target="_blank" rel="noreferrer">

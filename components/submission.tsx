@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {IGType, IGHVConverted, sortedIGHD, sortedIGHJ} from './reference';
+import {IGType, IGHVConverted, sortedIGHD, sortedIGHJ, LightJ, LightV} from './reference';
 import { fastaReader } from './fastaReader';
 import { processAllBatches } from './predictAlignment';
 import { countTotalSequences } from './fileProcessor';
@@ -73,14 +73,14 @@ async function submitSequences(
 
   let AlleleCallOHE: AlleleCallOHE = { v_call: IGHVConverted, d_call: sortedIGHD, j_call: sortedIGHJ };
   if (selectedChain === 'Light') {
-    AlleleCallOHE = { v_call: IGHVConverted, d_call: null, j_call: sortedIGHJ };
+    AlleleCallOHE = { v_call: LightV, d_call: null, j_call: LightJ };
   }
 
   const keys = Object.keys(sequenceData);
   const numElements = 500;
 
   await processAllBatches(keys, sequenceData, AlleleCallOHE, confidences, caps, model, outputIndices, numElements);
-  console.log('Results:', sequenceData);
+  
   setResults(sequenceData);
 }
 
@@ -99,13 +99,13 @@ const Submission: React.FC<SubmissionProps> = ({
   const [submissionStatus, setSubmissionStatus] = useState(false);
   const [time, setTime] = useState(0);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (!sequence && !file) {
       window.alert('No sequence or file to submit');
     } else if (sequence || file) {
       setSubmission(true);
       const startTime = new Date().getTime();
-      submitSequences(selectedChain, sequence, file, params, model, outputIndices, setResults).then(() => {
+      await submitSequences(selectedChain, sequence, file, params, model, outputIndices, setResults).then(() => {
         const endTime = new Date().getTime();
         setTime((endTime - startTime) / 1000);
       });
@@ -124,11 +124,30 @@ const Submission: React.FC<SubmissionProps> = ({
     <section>
       <div className="relative pt-8 pb-10 md:pt-12 md:pb-16">
         <div className="flex items-center justify-center">
-          <button type="button" id="submitButton" className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg px-5 py-3 text-center me-2 mb-2" onClick={handleClick} disabled={modelReady}>Submit</button>
+          {/* <button type="button" id="submitButton" className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg px-5 py-3 text-center me-2 mb-2" onClick={handleClick} disabled={modelReady}>Submit</button> */}
+          {submissionStatus && !submission ? (
+              <button
+                id="resetButton"
+                className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                onClick={handleReset}
+              >
+                Reset results
+              </button>
+            ) : (
+              <button
+                type="button"
+                id="submitButton"
+                className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg px-5 py-3 text-center me-2 mb-2"
+                onClick={handleClick}
+                disabled={modelReady || submission}
+              >
+                {submission ? 'Submitting' : 'Submit'}
+              </button>
+            )}
         </div>
         {submissionStatus && !submission && (
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <button id="resetButton" className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" onClick={handleReset}>Reset results</button>
+            {/* <button id="resetButton" className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" onClick={handleReset}>Reset results</button> */}
             <p>
               Process sequences in: <span>{formatTime(time)}</span>
             </p>

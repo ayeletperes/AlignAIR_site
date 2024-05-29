@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
-import { SequenceTokenizer } from './processSequence';
+import { SequenceTokenizer, SequenceTokenizerLight } from './processSequence';
 import React, { useEffect, useState } from 'react';
 
 export async function loadModel(model_url: string) {
@@ -7,21 +7,8 @@ export async function loadModel(model_url: string) {
         throw new Error('Model URL is null or undefined.');
     }
     const model = await tf.loadGraphModel(model_url);
-    const indices = {
-        mutation_rate: 0,
-        v_call: 1,
-        d_sequence_start: 2,
-        v_sequence_start: 3,
-        d_sequence_end: 4,
-        j_sequence_end: 5,
-        v_sequence_end: 6,
-        j_call: 7,
-        ar_indels: 8,
-        j_sequence_start: 9,
-        d_call: 10,
-        productive: 11,
-    };
-    return { model, indices };
+    
+    return model;
 }
 
 export async function warmUpModel(model: tf.GraphModel, indices: Record<string, number>, maxSeqLength: number) {
@@ -29,6 +16,26 @@ export async function warmUpModel(model: tf.GraphModel, indices: Record<string, 
   const encodedSequences = SequenceTokenizer.tokenizeSingleSequence(seq, maxSeqLength) as tf.NamedTensorMap;
   let status = 'failed';
   const predicted = model.predict(encodedSequences);
+  if (!predicted) {
+    console.error('Prediction failed.');
+    status = 'failed';
+  }else{
+    status = 'success';
+  }
+  return status;
+}
+
+export async function warmUpModelLight(model: tf.GraphModel, indices: Record<string, number>, maxSeqLength: number) {
+  const seq = 'GATATTGTGATGACCCAGACTCCACTCTCCTCACCTGTCACCCTTGGACAGCCGGCCTCCATCTCCTGCAGGTCTAGTCAAAGCCTCGTACACAGTGATGGAAACCCCTACTTGAGTTGGCTTCAGCAGAGGCCAGGCCAGCCTCCAAGACTCCTAATTTATAAGATTTCTAACCGGTTCTCTGGGGTCCCAGACAGATTCAGTGGCAGTGGGGCAGGGACAGATTTCACACTGAAAATCAGCAGGGTGGAAGCTGAGGATGTCGGGGTTTATTACTGCACGCAAGCTACACAATTTCTCTGGACGTTCGGCCAAGGGACCAAGGTGGAAATCAAAC';
+  const encodedSequences = SequenceTokenizerLight.tokenizeSingleSequence(seq, maxSeqLength) as tf.NamedTensorMap;
+  let status = 'failed';
+  const predicted = model.predict(encodedSequences);
+  if (process.env.NODE_ENV === 'development') {
+    console.log(predicted)
+    Object.values(predicted).forEach((tensor, index) => {
+      console.log('Index:', index, ' Values: ', tensor.arraySync());
+    })
+  }
   if (!predicted) {
     console.error('Prediction failed.');
     status = 'failed';
@@ -53,8 +60,6 @@ const model_urls: { [key: string]: string } = {
 
 const LoadModelComponent: React.FC<LoadModelComponentProps> = ({ setSelectedChain, selectedChain, setModel, setOutputIndices, setIsLoading }) => {
     const [selectedModel, setSelectedModel] = useState<string>('tfjs/AlignAIRR/model.json');
-    console.log(selectedModel);
-    console.log(selectedChain);
     const maxSeqLength = 576;
   
     const fetchModel = async () => {
@@ -66,20 +71,53 @@ const LoadModelComponent: React.FC<LoadModelComponentProps> = ({ setSelectedChai
         try {
             const response = await fetch(selectedModel);
             const arrayBuffer = await response.arrayBuffer();
-            console.log(arrayBuffer);
+            
             if (arrayBuffer.byteLength % 4 !== 0 && selectedChain === 'Heavy') {
               throw new Error('Buffer length is not a multiple of 4');
             }
         
-            const { model, indices } = await loadModel(selectedModel);
+            const model = await loadModel(selectedModel);
+
             if (process.env.NODE_ENV === 'development') {
               console.log('Model loaded:', model);
-            }
+            } 
+
             setModel(model);
-            setOutputIndices(indices);
             setIsLoading(false);
-    
-            const status = await warmUpModel(model, indices, maxSeqLength);
+            let status = 'failed'
+            if(selectedChain === 'Light'){
+              const indicesLight = {
+                v_sequence_end: 0,
+                j_sequence_end: 1,
+                v_sequence_start: 2,
+                productive: 3,
+                ar_indels: 4,
+                j_sequence_start: 5,
+                j_call: 6,
+                mutation_rate: 7,
+                type: 8,
+                v_call: 9,
+              };
+              setOutputIndices(indicesLight);
+              status = await warmUpModelLight(model, indicesLight, maxSeqLength);
+            }else{
+              const indices = {
+                  mutation_rate: 0,
+                  v_call: 1,
+                  d_sequence_start: 2,
+                  v_sequence_start: 3,
+                  d_sequence_end: 4,
+                  j_sequence_end: 5,
+                  v_sequence_end: 6,
+                  j_call: 7,
+                  ar_indels: 8,
+                  j_sequence_start: 9,
+                  d_call: 10,
+                  productive: 11,
+              };
+              setOutputIndices(indices);
+              status = await warmUpModel(model, indices, maxSeqLength);
+            }
             if (status === 'failed') {
                 console.log('Warmup failed.');
             }

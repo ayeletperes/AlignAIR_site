@@ -1,18 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { extractGermline } from './postProcessing';
 
+function formatLikelihood(value: number) {
+  // Adjust this condition as needed
+  if (value < 0.001) {
+    return value.toExponential(2);
+  } else {
+    return value.toFixed(3);
+  }
+}
+
 interface ResultsHTMLTableProps {
   results: any;
 }
 // Number(likelihoods[index].toFixed(3))
 export function ResultsHTMLTable({ results }: ResultsHTMLTableProps) {
+  // check if d_call key in results
+  const hasD = 'd_call' in results;
+
   return (
     <div className="relative overflow-x-auto ">
       <table className="overflow-x-auto w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border-collapse my-6 font-sans min-w-[400px] shadow-md sm:rounded-lg">
-        {/* Table headers */}
         <thead>
           <tr className="bg-[#68c4af] text-white border-b-2 border-[#68c4af]">
             <th className="px-4 py-2">Sequence ID</th>
+            <th className="px-4 py-2">Type</th>
             <th className="px-4 py-2">V call</th>
             <th className="px-4 py-2">D call</th>
             <th className="px-4 py-2">J call</th>
@@ -30,23 +42,24 @@ export function ResultsHTMLTable({ results }: ResultsHTMLTableProps) {
             <th className="px-4 py-2">J sequence end</th>
           </tr>
         </thead>
-        {/* Table body */}
+        
         <tbody className="bg-white border-b-2 border-[#68c4af]">
           <tr>
             <td className="px-4 py-2">{results.name}</td>
+            {hasD? <td className="px-4 py-2">{'IGH'}</td> : <td className="px-4 py-2">{results.type}</td>}
             <td className="px-4 py-2">{results.v_call.join(', ')}</td>
-            <td className="px-4 py-2">{results.d_call.join(', ')}</td>
+            {hasD? <td className="px-4 py-2">{results.d_call.join(', ')}</td> : <td className="px-4 py-2">{''}</td>}
             <td className="px-4 py-2">{results.j_call.join(', ')}</td>
-            <td className="px-4 py-2">{results.v_likelihoods.map((value: number) => value.toFixed(5)).join(',')}</td>
-            <td className="px-4 py-2">{results.d_likelihoods.map((value: number) => value.toFixed(5)).join(',')}</td>
-            <td className="px-4 py-2">{results.j_likelihoods.map((value: number) => value.toFixed(5)).join(',')}</td>
+            <td className="px-4 py-2">{results.v_likelihoods.map((value: number) => formatLikelihood(value)).join(',')}</td>
+            {hasD? <td className="px-4 py-2">{results.d_likelihoods.map((value: number) => formatLikelihood(value)).join(',')}</td> : <td className="px-4 py-2">{''}</td>}
+            <td className="px-4 py-2">{results.j_likelihoods.map((value: number) => formatLikelihood(value)).join(',')}</td>
             <td className="px-4 py-2">{results.productive ? 'True' : 'False'}</td>
-            <td className="px-4 py-2">{Number(results.mutation_rate.toFixed(5))}</td>
+            <td className="px-4 py-2">{formatLikelihood(Number(results.mutation_rate))}</td>
             <td className="px-4 py-2">{results.ar_indels}</td>
             <td className="px-4 py-2">{results.v_sequence_start}</td>
             <td className="px-4 py-2">{results.v_sequence_end}</td>
-            <td className="px-4 py-2">{results.d_sequence_start}</td>
-            <td className="px-4 py-2">{results.d_sequence_end}</td>
+            {hasD? <td className="px-4 py-2">{results.d_sequence_start}</td> : <td className="px-4 py-2">{''}</td>}
+            {hasD? <td className="px-4 py-2">{results.d_sequence_end}</td> : <td className="px-4 py-2">{''}</td>}
             <td className="px-4 py-2">{results.j_sequence_start}</td>
             <td className="px-4 py-2">{results.j_sequence_end}</td>
           </tr>
@@ -259,6 +272,7 @@ interface AlignmentBrowserProps {
 }
 
 const AlignmentBrowser: React.FC<AlignmentBrowserProps> = ({ results, referenceAlleles }) => {
+  
   const [selectedSequenceV, setSelectedSequenceV] = useState<string>('');
   const [selectedSequenceD, setSelectedSequenceD] = useState<string>('');
   const [selectedSequenceJ, setSelectedSequenceJ] = useState<string>('');
@@ -513,17 +527,231 @@ const AlignmentBrowser: React.FC<AlignmentBrowserProps> = ({ results, referenceA
 
   return (
     <div>
-      <button id="toggleWrap" className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" onClick={toggleView}>
+      {/* <button id="toggleWrap" className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" onClick={toggleView}>
         {isVerticalView ? 'Horizontal view' : 'Vertical view'}
       </button>
       <div className='bg-white relative overflow-x-auto'>
         {isVerticalView ? renderVerticalView() : renderHorizontalView()}
-      </div>
+      </div> */}
+      renderVerticalView()
     </div>
   );
 }
 
+const AlignmentBrowserLight: React.FC<AlignmentBrowserProps> = ({ results, referenceAlleles }) => {
+  
+  const [selectedSequenceV, setSelectedSequenceV] = useState<string>('');
+  const [selectedSequenceJ, setSelectedSequenceJ] = useState<string>('');
 
+  const [selectedAlleleV, setSelectedAlleleV] = useState<string>(results.v_call[0]);
+  const [selectedAlleleJ, setSelectedAlleleJ] = useState<string>(results.j_call[0]);
+
+  const [selectedLikelihoodV, setSelectedLikelihoodV] = useState<number>(results.v_likelihoods[0]);
+  const [selectedLikelihoodJ, setSelectedLikelihoodJ] = useState<number>(results.j_likelihoods[0]);
+
+  const maxCharsPerRow = 70;
+
+  const [splitedSequenceV, setSplitedSequenceV] = useState<string[]>([]);
+  const [splitedSequenceJ, setSplitedSequenceJ] = useState<string[]>([]);
+
+  useEffect(() => {
+    setSelectedSequenceV(
+      referenceAlleles['v_call'][results.v_call[0]].slice(results.v_germline_start, results.v_germline_end)
+    );
+
+    setSelectedSequenceJ(
+      referenceAlleles['j_call'][results.j_call[0]].slice(results.j_germline_start, results.j_germline_end)
+    );
+  }, [results, referenceAlleles]);
+
+  useEffect(() => {
+    setSplitedSequenceV(splitSequence(selectedSequenceV, maxCharsPerRow));
+    setSplitedSequenceJ(splitSequence(selectedSequenceJ, maxCharsPerRow));
+  }, [selectedSequenceV, selectedSequenceJ]);
+
+  const rows = {
+    header: 1,
+    seq: 2,
+    v: 3,
+    j: 4,
+  };
+
+  const [isVerticalView, setIsVerticalView] = useState<boolean>(false);
+  
+  const toggleView = () => {
+    setIsVerticalView(!isVerticalView);
+    
+  };
+
+  const j_left_margin = results.j_sequence_start ;
+  
+  
+
+  const renderVerticalView = () => (
+    <div className="alignment-browser vertical-view">
+      <div className="alignment-label" style={{ gridRow: 1 }}>Allele</div>
+      <div className="alignment-label" style={{ gridColumn: 2, gridRow: 1 }}>Likelihood</div>
+
+      {splitSequence(results.sequence.slice(0,results.v_sequence_end), maxCharsPerRow).map((chunk, index) => (
+        <React.Fragment key={`input-sequence-v-${index}`}>
+          
+          <div className={`alignment-label`} style={{ gridRow: (index * 2) + 2, gridColumn:1 }}>
+            <span className={`alignment-label v_input-${index}`}>V</span>
+          </div>
+          
+          <div className="sequence input-sequence-v" style={{ gridRow: (index * 2) + 2 }}>
+            <span className="sequence">{chunk}</span>
+          </div>
+        </React.Fragment>
+      ))}
+
+      <div className="alignment-label" style={{ gridRow: rows.v }}>
+          <SelectWidgetVertical
+            call='v_call'
+            results={results}
+            reference={referenceAlleles}
+            setSelected={setSelectedSequenceV}
+            selected={selectedSequenceV}
+            selectedAllele={selectedAlleleV}
+            setSelectedAllele={setSelectedAlleleV}
+            setSplitedSeq={setSplitedSequenceV}
+          />
+        </div>
+      <div className="bar" style={{gridRow: rows.v}}>
+        <div className="likelihood v_call" style={{gridRow: rows.v, width:`${Math.round(selectedLikelihoodV*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodV)}`}}>{Number(selectedLikelihoodV.toFixed(3))}</div>
+      </div>
+
+      {splitedSequenceV.map((chunk, index) => (
+        <React.Fragment key={`v-sequence-${index}`}>
+          {index > 0 && (
+            <div className={`alignment-label`} style={{ gridRow: (index * 2) + rows.v, gridColumn:1 }}>
+              <span className={`alignment-label v_call-${index}`}>{selectedAlleleV}</span>
+            </div>
+          )}
+          <div className="sequence" style={{ gridRow: (index * 2) + rows.v }}>
+            <span className={`allele v_call-${index}`}>{chunk}</span>
+          </div>
+        </React.Fragment>
+      ))}
+
+      {splitSequence(results.sequence.slice(results.v_sequence_end+1), maxCharsPerRow).map((chunk, index) => (
+        <React.Fragment key={`input-sequence-j-${index}`}>
+          <div className={`alignment-label`} style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + rows.v -1), gridColumn:1 }}>
+            <span className={`alignment-label j_input-${index}`}>J</span>
+          </div>
+          
+          <div className="sequence input-sequence-j" style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + rows.v -1) }}>
+            <span className="sequence" style={{color:'gray'}}>{chunk.slice(0,(results.j_sequence_start-results.v_sequence_end-1))}</span>
+            <span className="sequence">{chunk.slice((results.j_sequence_start-results.v_sequence_end-1), (results.j_sequence_end-results.v_sequence_end-1))}</span>
+          </div>
+        </React.Fragment>
+      ))}
+
+      <div className="alignment-label" style={{ gridRow: (splitedSequenceV.length*2)+ rows.v }}>
+        <SelectWidgetVertical
+          call='j_call'
+          results={results}
+          reference={referenceAlleles}
+          setSelected={setSelectedSequenceJ}
+          selected={selectedSequenceJ}
+          selectedAllele={selectedAlleleJ}
+          setSelectedAllele={setSelectedAlleleJ}
+          setSplitedSeq={setSplitedSequenceJ}
+        />
+      </div>
+      
+      <div className="bar" style={{gridRow: (splitedSequenceV.length*2) + rows.v}}>
+        <div className="likelihood d_call" style={{gridRow: (splitedSequenceV.length*2) + rows.v, width:`${Math.round(selectedLikelihoodJ*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodJ)}`}}>{Number(selectedLikelihoodJ.toFixed(3))}</div>
+      </div>
+      
+      {splitedSequenceJ.map((chunk, index) => (
+        <React.Fragment key={`j-sequence-${index}`}>
+          {index > 0 && (
+            <div className={`alignment-label j_call-${index}`} style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + rows.v), gridColumn:1 }}>
+              {selectedAlleleJ}
+            </div>
+          )}
+          <div className="sequence" style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + rows.v), marginLeft: `${j_left_margin-(results.v_sequence_end+1)}ch`}}>
+            <span className={`allele j_call-${index}`}>{chunk}</span>
+          </div>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+
+  // const renderHorizontalView = () => (
+  //   <div className="alignment-browser">
+  //           <div className="alignment-label" style={{gridRow: rows.header}}>Allele</div>
+  //        <div className="alignment-label" style={{gridColumn:2, gridRow: rows.header}}>Likelihood</div>
+  //        <div className="sequence input-sequence" style={{gridRow: rows.seq}}>{results.sequence}</div>
+  //                <div className="alignment-label" style={{gridRow: rows.v}}>
+  //          <SelectWidget
+  //           call='v_call'
+  //           results={results}
+  //           reference={referenceAlleles}
+  //           setSelected={setSelectedSequenceV}
+  //           selected={selectedSequenceV}
+  //           selectedAllele={selectedAlleleV}
+  //           setSelectedAllele={setSelectedAlleleV}
+  //         />
+  //       </div>
+  //       <div className="bar" style={{gridRow: rows.v}}>
+  //         <div className="likelihood v_call" style={{gridRow: rows.v, width:`${Math.round(selectedLikelihoodV*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodV)}`}}>{Number(selectedLikelihoodV.toFixed(3))}</div>
+  //       </div>
+  //       <div className="sequence" style={{gridRow: rows.v}}>
+  //         <span className="allele v_call" style={{gridRow: rows.v}}>{selectedSequenceV}</span>
+  //       </div>
+  //       <div className="alignment-label" style={{gridRow: rows.d}}>
+  //         <SelectWidget
+  //           call='d_call'
+  //           results={results}
+  //           reference={referenceAlleles}
+  //           setSelected={setSelectedSequenceD}
+  //           selected={selectedSequenceD}
+  //           selectedAllele={selectedAlleleD}
+  //           setSelectedAllele={setSelectedAlleleD}
+  //         />
+  //       </div>
+  //       <div className="bar" style={{gridRow: rows.d}}>
+  //         <div className="likelihood d_call" style={{gridRow: rows.d, width:`${Math.round(selectedLikelihoodD*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodD)}`}}>{Number(selectedLikelihoodD.toFixed(3))}</div>
+  //       </div>
+  //       <div className="sequence" style={{gridRow: rows.d, marginLeft: `${d_left_margin}ch`}}>
+  //         <span className="allele d_call" style={{gridRow: rows.d}}>{selectedSequenceD}</span>
+  //       </div>
+  //       <div className="alignment-label" style={{gridRow: rows.j}}>
+  //         <SelectWidget
+  //           call='j_call'
+  //           results={results}
+  //           reference={referenceAlleles}
+  //           setSelected={setSelectedSequenceJ}
+  //           selected={selectedSequenceJ}
+  //           selectedAllele={selectedAlleleJ}
+  //           setSelectedAllele={setSelectedAlleleJ}
+  //         />
+  //       </div>
+  //       <div className="bar" style={{gridRow: rows.j}}>
+  //         <div className="likelihood j_call" style={{gridRow: rows.j, width:`${Math.round(selectedLikelihoodJ*100)+100}px`, backgroundColor:`${getColor(selectedLikelihoodJ)}`}}>{Number(selectedLikelihoodJ.toFixed(3))}</div>
+  //       </div>
+  //       <div className="sequence" style={{gridRow: rows.j, marginLeft: `${j_left_margin}ch`}}>
+  //         <span className="allele j_call" style={{gridRow: rows.j}}>{selectedSequenceJ}</span>
+  //       </div>
+  //     </div>
+  // );
+
+  return (
+    <div>
+      {/* <button id="toggleWrap" className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" onClick={toggleView}>
+        {isVerticalView ? 'Horizontal view' : 'Vertical view'}
+      </button>
+      <div className='bg-white relative overflow-x-auto'>
+        {isVerticalView ? renderVerticalView() : renderHorizontalView()}
+      </div> */}
+      <div className='bg-white relative overflow-x-auto'>
+        {renderVerticalView()}
+      </div>
+    </div>
+  );
+}
 
 
 
@@ -534,31 +762,90 @@ interface TabSetResultsProps {
 
 export const TabSetResults: React.FC<TabSetResultsProps> = ({ results, referenceAlleles }) => {
   const [activeTab, setActiveTab] = useState<string>('query 0');
+  const hasD = 'd_call' in results;
+  const AlignmentView = hasD ? AlignmentBrowser : AlignmentBrowserLight;
 
-  // console.log(activeTab)
   const handleClick = (index: string) => {
     setActiveTab(index);
   };
 
   return (
-    <div className="bg-white">
+    <div className="mb-4 border-b border-gray-200 dark:border-gray-700">
       <div className="tab">
         {Object.entries(results).map(([index, item]: [string, any]) => (
-          <button key={index} className={`button${activeTab === index ? ' active' : ''}`} onClick={() => handleClick(index)}>{item.name}</button>
+          <button
+            className={`inline-block p-4 border-b-2 rounded-t-lg text-black hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 ${
+              activeTab === index ? 'border-blue-500 text-blue-600' : 'border-transparent'
+            }`}
+            key={index}
+            id={index}
+            type="button"
+            role="tab"
+            aria-controls={index}
+            aria-selected={activeTab === index}
+            onClick={() => handleClick(index)}
+          >
+            {item.name}
+          </button>
         ))}
       </div>
-
       {Object.entries(results).map(([index, item]: [string, any]) => (
-        // console.log(index), 
-        <div key={index} id={item.name} className={`tabcontent${activeTab === index ? ' active' : ''}`}>
+        <div
+          key={index}
+          id={item.name}
+          className={`p-4 rounded-lg bg-gray-50 dark:bg-gray-800 ${
+            activeTab === index ? '' : 'hidden'
+          }`}
+          role="tabpanel"
+          aria-labelledby={index}
+        >
           <ResultsHTMLTable results={item} />
-          <br/>
-          <AlignmentBrowser results={item} referenceAlleles={referenceAlleles}/>
+          <br />
+          <AlignmentView results={item} referenceAlleles={referenceAlleles} />
         </div>
       ))}
     </div>
   );
-}
+};
+
+// export const TabSetResults: React.FC<TabSetResultsProps> = ({ results, referenceAlleles }) => {
+//   const [activeTab, setActiveTab] = useState<string>('query 0');
+//   const hasD = 'd_call' in results;
+//   // console.log(activeTab)
+//   const handleClick = (index: string) => {
+//     setActiveTab(index);
+//   };
+//   const AlignmentView = hasD? AlignmentBrowser : AlignmentBrowserLight;
+
+//   return (
+//     <div className="mb-4 border-b border-gray-200 dark:border-gray-700">
+//       <div className="tab">
+//         {Object.entries(results).map(([index, item]: [string, any]) => (
+//           // <button key={index} className={`button${activeTab === index ? ' active' : ''}`} onClick={() => handleClick(index)}>{item.name}</button>
+//           // <button key={index} className='inline-block p-4 border-b-2 rounded-t-lg' onClick={() => handleClick(index)}>{item.name}</button>
+//           <button className="inline-block p-4 border-b-2 rounded-t-lg text-black hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" 
+//           key={index}
+//           id={index} 
+//           data-tabs-target={`#${index}`}
+//           type="button" 
+//           role="tab" 
+//           aria-controls={index}
+//           aria-selected="false">{item.name}</button>
+//         ))}
+//       </div>
+//       {Object.entries(results).map(([index, item]: [string, any]) => (
+//         // console.log(index), 
+//         // <div key={index} id={item.name} className={`tabcontent${activeTab === index ? ' active' : ''}`}>
+//         <div key={index} id={item.name} className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" role="tabpanel" aria-labelledby="profile-tab">
+//           <ResultsHTMLTable results={item} />
+//           <br/>
+//           <AlignmentView results={item} referenceAlleles={referenceAlleles}/>
+//         </div>
+//       ))}
+      
+//     </div>
+//   );
+// }
 
 
 // add a function that process the results into a downloadable table
@@ -567,23 +854,25 @@ interface ResultsTSVTableProps {
 }
 
 export function ResultsTSVTable({ results }: ResultsTSVTableProps) {
+  const hasD = 'd_call' in results;
   const data = Object.entries(results).map(([index, sequence]: [string, any]) => { // Add type annotation for 'sequence'
     return {
       sequence_id: (sequence as { name: string }).name,
       sequence: sequence.sequence,
+      type: hasD? 'IGH' : sequence.type,
       v_call: sequence.v_call.join(', '),
-      d_call: sequence.d_call.join(', '),
+      d_call: hasD? sequence.d_call.join(', ') : '',
       j_call: sequence.j_call.join(', '),
       productive: sequence.productive ? 'true' : 'false',
       v_likelihoods: sequence.v_likelihoods.join(', '),
-      d_likelihoods: sequence.d_likelihoods.join(', '),
+      d_likelihoods: hasD? sequence.d_likelihoods.join(', '):'',
       j_likelihoods: sequence.j_likelihoods.join(', '),
       mutation_rate: sequence.mutation_rate,
       sequence_alignment: sequence.sequence.substring(sequence.v_sequence_start, sequence.j_sequence_end + 1),
       v_sequence_start: sequence.v_sequence_start,
       v_sequence_end: sequence.v_sequence_end,
-      d_sequence_start: sequence.d_sequence_start,
-      d_sequence_end: sequence.d_sequence_end,
+      d_sequence_start: hasD? sequence.d_sequence_start: '',
+      d_sequence_end: hasD? sequence.d_sequence_end: '',
       j_sequence_start: sequence.j_sequence_start,
       j_sequence_end: sequence.j_sequence_end,
       ar_indels: sequence.ar_indels,
@@ -597,15 +886,30 @@ interface DownloadResultsTableProps {
 }
 
 export function DownloadResultsTable({ results }: DownloadResultsTableProps) {
-  const data: { [key: string]: any }[] = ResultsTSVTable({ results });
-  const headers = Object.keys(data[0]);
-  const tsv = data.map(row => headers.map(header => row[header]).join('\t')).join('\n');
-  const blob = new Blob([tsv], { type: 'text/tsv' });
-  const url = URL.createObjectURL(blob);
+  const handleDownload = () => {
+    const data: { [key: string]: any }[] = ResultsTSVTable({ results });
+    const headers = Object.keys(data[0]);
+    const tsvContent = [
+      headers.join('\t'), // Join headers with tab
+      ...data.map(row => headers.map(header => row[header]).join('\t')) // Map each row to TSV format
+    ].join('\n'); // Join all rows with newline
+  
+    const blob = new Blob([tsvContent], { type: 'text/tsv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'results.tsv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <a href={url} download="results.tsv">
-      Download Results
-    </a>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-8">
+      <button className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" onClick={handleDownload}>
+        Download Results
+      </button>
+    </div>
   );
 }
 

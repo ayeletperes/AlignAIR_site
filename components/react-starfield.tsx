@@ -125,11 +125,11 @@ export default function Starfield(props: Props) {
                 requestAnimationFrame(init);
 
                 // add window resize listener:
-                window.addEventListener('resize', function () {
-                    w = window.innerWidth;
-                    h = window.innerHeight;
-                    setCanvasExtents();
-                });
+                // window.addEventListener('resize', function () {
+                //     w = window.innerWidth;
+                //     h = window.innerHeight;
+                //     setCanvasExtents();
+                // });
             } else {
                 console.error('Could not get 2d context from canvas element');
             }
@@ -148,7 +148,7 @@ export default function Starfield(props: Props) {
             style={{
                 padding: 0,
                 margin: 0,
-                position: 'fixed',
+                position: 'relative',
                 top: 0,
                 right: 0,
                 bottom: 0,
