@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
+    "@tensorflow/tfjs-core": "^0.12.8",
     "@tensorflow/tfjs-node": "^0.1.11",
     "@types/node": "^20.10.4",
     "@types/react": "^18.2.42",
