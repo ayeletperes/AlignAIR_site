@@ -48,12 +48,13 @@ interface LoadModelComponentProps {
 
 const model_urls: { [key: string]: string } = {
     Heavy: 'tfjs/AlignAIRR/model.json',
-    Light: 'tfjs/AlignAIRR/model.json', // replace the model URL if necessary
+    Light: 'tfjs/AlignAIRR_LightChain/model.json', // replace the model URL if necessary
   };
 
 const LoadModelComponent: React.FC<LoadModelComponentProps> = ({ setSelectedChain, selectedChain, setModel, setOutputIndices, setIsLoading }) => {
     const [selectedModel, setSelectedModel] = useState<string>('tfjs/AlignAIRR/model.json');
-
+    console.log(selectedModel);
+    console.log(selectedChain);
     const maxSeqLength = 576;
   
     const fetchModel = async () => {
@@ -65,12 +66,15 @@ const LoadModelComponent: React.FC<LoadModelComponentProps> = ({ setSelectedChai
         try {
             const response = await fetch(selectedModel);
             const arrayBuffer = await response.arrayBuffer();
-    
-            if (arrayBuffer.byteLength % 4 !== 0) {
-            throw new Error('Buffer length is not a multiple of 4');
+            console.log(arrayBuffer);
+            if (arrayBuffer.byteLength % 4 !== 0 && selectedChain === 'Heavy') {
+              throw new Error('Buffer length is not a multiple of 4');
             }
         
             const { model, indices } = await loadModel(selectedModel);
+            if (process.env.NODE_ENV === 'development') {
+              console.log('Model loaded:', model);
+            }
             setModel(model);
             setOutputIndices(indices);
             setIsLoading(false);
@@ -91,7 +95,7 @@ const LoadModelComponent: React.FC<LoadModelComponentProps> = ({ setSelectedChai
   
     const selectButton = (buttonId: string) => {
       setSelectedChain(buttonId);
-      setSelectedModel(model_urls[selectedChain]);
+      setSelectedModel(model_urls[buttonId]);
     };
   
     return (

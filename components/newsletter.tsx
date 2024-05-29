@@ -1,4 +1,34 @@
+'use client';
+
+import React, { useState } from 'react';
+import emailjs from 'emailjs-com';
+
 export default function Newsletter() {
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  
+  const sendEmail = (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
+    const templateParams = {
+      message: email,
+    };
+
+    emailjs.send(
+      'service_gkr51qc',
+      'template_e0g1izm', // Replace with your EmailJS template ID
+      templateParams,
+      'D02_Q9aV0tx-apL_F', // Replace with your EmailJS user ID,
+    ).then((response) => {
+      console.log('SUCCESS!', response.status, response.text);
+      setMessage('Thanks for subscribing!');
+    }).catch((err) => {
+      console.error('FAILED...', err);
+      setMessage('Failed to subscribe. Please try again.');
+    });
+
+    setEmail('');
+  };
+
   return (
     <section>
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -23,18 +53,26 @@ export default function Newsletter() {
 
             {/* CTA content */}
             <div className="mb-6 lg:mr-16 lg:mb-0 text-center lg:text-left lg:w-1/2">
-              <h3 className="h3 text-white mb-2">Stay in the loop</h3>
-              <p className="text-purple-200 text-lg">Join our newsletter to get top news before anyone else.</p>
+              <h3 className="h3 text-white mb-2">Stay Updated!</h3>
+              <p className="text-purple-200 text-lg">Join our user list to get latest AlignAIR news and updates.</p>
             </div>
 
             {/* CTA form */}
-            <form className="w-full lg:w-1/2">
+            <form className="w-full lg:w-1/2" onSubmit={sendEmail}>
               <div className="flex flex-col sm:flex-row justify-center max-w-xs mx-auto sm:max-w-md lg:max-w-none">
-                <input type="email" className="w-full appearance-none bg-purple-700 border border-purple-500 focus:border-purple-300 rounded-sm px-4 py-3 mb-2 sm:mb-0 sm:mr-2 text-white placeholder-purple-400" placeholder="Your best email…" aria-label="Your best email…" />
-                <a className="btn text-purple-600 bg-purple-100 hover:bg-white shadow" href="#0">Subscribe</a>
+                <input
+                  type="email"
+                  className="w-full appearance-none bg-purple-700 border border-purple-500 focus:border-purple-300 rounded-sm px-4 py-3 mb-2 sm:mb-0 sm:mr-2 text-white placeholder-purple-400"
+                  placeholder="Your best email…"
+                  aria-label="Your best email…"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <button type="submit" onClick={sendEmail} className="btn text-purple-600 bg-purple-100 hover:bg-white shadow">Keep Me Updated</button>
               </div>
               {/* Success message */}
-              {/* <p className="text-center lg:text-left lg:absolute mt-2 opacity-75 text-sm">Thanks for subscribing!</p> */}
+              {message && <p className="text-center lg:text-left lg:absolute mt-2 opacity-75 text-sm">{message}</p>}
             </form>
 
           </div>
@@ -43,5 +81,5 @@ export default function Newsletter() {
 
       </div>
     </section>
-  )
+  );
 }

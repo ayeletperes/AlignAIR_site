@@ -1,12 +1,41 @@
+'use client';
+
 import Image from 'next/image'
 import LandingImg01 from '@/public/images/landing_page.jpg'
+import Starfield from './react-starfield';
+
+import React, { useRef, useEffect, useState } from 'react';
+
+
+
 
 // Template for the hero section of the landing page
 export default function Hero() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [sectionSize, setSectionSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    if (sectionRef.current) {
+      setSectionSize({
+        width: sectionRef.current.clientWidth,
+        height: sectionRef.current.clientHeight
+      });
+      console.log(sectionRef.current);
+      console.log(window.innerWidth);
+    }
+  }, []);
+  
   return (
     <section>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
-
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative"  ref={sectionRef}>
+          <Starfield
+            starCount={300}
+            starColor={[255, 255, 255]}
+            speedFactor={0.05}
+            backgroundColor="black"
+            sectionW={sectionSize.width}
+            sectionH={sectionSize.height}
+          />
         {/* Illustration behind hero content */}
         <div className="absolute left-0 bottom-0 -ml-20 hidden lg:block pointer-events-none" aria-hidden="true" data-aos="fade-up" data-aos-delay="400">
           <svg className="max-w-full" width="564" height="552" viewBox="0 0 564 552" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -24,8 +53,9 @@ export default function Hero() {
 
         {/* Hero content */}
         <div className="relative pt-32 pb-10 md:pt-40 md:pb-16">
-
-          {/* Section header */}
+          {/* <div className="absolute inset-0 opacity-10 w-full h-full" style={{zIndex: "-1", top:"100px"}}>
+            <Image className="w-full h-full object-cover" src={LandingImg01} alt="Computer screen with dna" priority />
+          </div> */}
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
             <h1 className="h1 mb-4" data-aos="fade-up">AlignAIR</h1>
             <p className="text-xl text-gray-400 mb-8" data-aos="fade-up" data-aos-delay="200">Improving immunoglobulin sequence alignment.</p>
@@ -34,12 +64,9 @@ export default function Hero() {
                 <a className="btn text-white bg-purple-600 hover:bg-purple-700 w-full mb-4 sm:w-auto sm:mb-0" href="/alignair">Start aligning</a>
               </div>
               <div data-aos="fade-up" data-aos-delay="600">
-                <a className="btn text-white bg-gray-700 hover:bg-gray-800 w-full sm:w-auto sm:ml-4" href="#0">Learn more</a>
+                <a className="btn text-white bg-gray-700 hover:bg-gray-800 w-full sm:w-auto sm:ml-4" href="/about">Learn more</a>
               </div>
             </div>
-          </div>
-          <div className="max-w-xl md:max-w-none md:w-full mx-auto md:col-span-5 lg:col-span-6 mb-8 md:mb-0 md:order-1" data-aos="fade-up">
-            <Image className="max-w-full mx-auto md:max-w-none h-auto" src={LandingImg01} width={1024} height={576} style={{ width: '100%', height: 'auto' }} alt="Computer screen with dna" priority/>
           </div>
         </div>
       </div>

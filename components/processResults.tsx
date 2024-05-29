@@ -4,7 +4,7 @@ import { extractGermline } from './postProcessing';
 interface ResultsHTMLTableProps {
   results: any;
 }
-
+// Number(likelihoods[index].toFixed(3))
 export function ResultsHTMLTable({ results }: ResultsHTMLTableProps) {
   return (
     <div className="relative overflow-x-auto ">
@@ -37,11 +37,11 @@ export function ResultsHTMLTable({ results }: ResultsHTMLTableProps) {
             <td className="px-4 py-2">{results.v_call.join(', ')}</td>
             <td className="px-4 py-2">{results.d_call.join(', ')}</td>
             <td className="px-4 py-2">{results.j_call.join(', ')}</td>
-            <td className="px-4 py-2">{results.v_likelihoods.join(', ')}</td>
-            <td className="px-4 py-2">{results.d_likelihoods.join(', ')}</td>
-            <td className="px-4 py-2">{results.j_likelihoods.join(', ')}</td>
+            <td className="px-4 py-2">{results.v_likelihoods.map((value: number) => value.toFixed(5)).join(',')}</td>
+            <td className="px-4 py-2">{results.d_likelihoods.map((value: number) => value.toFixed(5)).join(',')}</td>
+            <td className="px-4 py-2">{results.j_likelihoods.map((value: number) => value.toFixed(5)).join(',')}</td>
             <td className="px-4 py-2">{results.productive ? 'True' : 'False'}</td>
-            <td className="px-4 py-2">{results.mutation_rate}</td>
+            <td className="px-4 py-2">{Number(results.mutation_rate.toFixed(5))}</td>
             <td className="px-4 py-2">{results.ar_indels}</td>
             <td className="px-4 py-2">{results.v_sequence_start}</td>
             <td className="px-4 py-2">{results.v_sequence_end}</td>

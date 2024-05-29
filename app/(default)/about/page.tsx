@@ -1,15 +1,14 @@
 export const metadata = {
-  title: 'Page 2 - Open PRO',
-  description: 'Page description',
+  title: 'About',
+  description: 'About AlignAIT',
 }
 import Link from 'next/link'
+import About from '@/components/about'
 
-import Hero from '@/components/hero'
-
-export default function About() {
+export default function AboutPage() {
   return (
     <>
-      <Hero />
+      <About />
     </>
   )
 }
