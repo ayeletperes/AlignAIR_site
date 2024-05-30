@@ -27,7 +27,7 @@ export default function Footer() {
             </div>
 
             {/* 2nd, 3rd and 4th blocks */}
-            <div className="md:col-span-8 lg:col-span-7 grid sm:grid-cols-3 gap-8">
+            <div className="md:col-span-8 lg:col-span-7 grid sm:grid-cols-2 gap-8">
 
               {/* 2nd block */}
               <div className="text-sm">

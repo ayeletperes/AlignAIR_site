@@ -34,7 +34,7 @@ const ParamInput: React.FC<ParamInputProps> = ({ setParams, params, isDisabled }
         <div className="relative z-0 w-full mb-5 group">
           <InputCounter id={"vCap"} label={'V cap'} steps="1" min="1" max="100" defaultValue={params.vCap.toString()} onChange={handleInputChange}/>
         </div>
-        <div className="relative z-0 w-full mb-5 group">
+        <div className={`'relative z-0 w-full mb-5 group' ${isDisabled ? 'hidden' : ''}`}>
           <InputCounter id={"dCap"} label={'D cap'} steps="1" min="1" max="100" isDisabled={isDisabled} defaultValue={params.dCap.toString()} onChange={handleInputChange}/>
         </div>
         <div className="relative z-0 w-full mb-5 group">
@@ -46,7 +46,7 @@ const ParamInput: React.FC<ParamInputProps> = ({ setParams, params, isDisabled }
         <div className="relative z-0 w-full mb-5 group">
           <InputCounter id={"vConf"} label={'V confidence'} steps="0.1" min="0" max="1" defaultValue={params.vConf.toString()} onChange={handleInputChange}/>
         </div>
-        <div className="relative z-0 w-full mb-5 group">
+        <div className={`'relative z-0 w-full mb-5 group' ${isDisabled ? 'hidden' : ''}`}>
           <InputCounter id={"dConf"} label={'D confidence'} steps="0.1" min="0" max="1" isDisabled={isDisabled} defaultValue={params.dConf.toString()} onChange={handleInputChange}/>
         </div>
         <div className="relative z-0 w-full mb-5 group">

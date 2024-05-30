@@ -32,7 +32,7 @@ export default function About() {
               <div className="text-center">
                 <h3 className="h3 mb-3">Comprehensive Sequence Analysis</h3>
                 <p className="text-xl text-gray-400 mb-4">
-                  AlignAIR integrates a deep residual convolutional architecture with a novel loss function and training regime, enabling effective modeling of Ig sequences. Using the immune receptor sequence simulator, GenAIRR, we generated high-quality training and validation datasets.
+                  AlignAIR integrates a deep residual convolutional architecture with a novel loss function and training regime, enabling effective modeling of Ig sequences. Using the immune receptor sequence simulator, <a className="font-medium hover:underline text-emerald-400" target="_blank" href="https://github.com/MuteJester/GenAIRR/">GenAIRR</a>, we generated high-quality training and validation datasets.
                 </p>
               </div>
 

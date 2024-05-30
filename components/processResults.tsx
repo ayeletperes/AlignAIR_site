@@ -416,7 +416,7 @@ const AlignmentBrowser: React.FC<AlignmentBrowserProps> = ({ results, referenceA
               {selectedAlleleD}
             </div>
           )}
-          <div className="sequence" style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + rows.v), marginLeft: `${d_left_margin-(results.v_sequence_end+1)}ch`}}>
+          <div className="sequence" style={{ gridRow: (index * 2) + ((splitedSequenceV.length*2) + rows.v), marginLeft: `${d_left_margin-(results.v_sequence_end)}ch`}}>
             <span className={`allele d_call-${index}`}>{chunk}</span>
           </div>
         </React.Fragment>
