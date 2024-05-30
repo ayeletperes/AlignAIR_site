@@ -26,7 +26,7 @@ const InputCounter: React.FC<InputCounterProps> = ({
     const handleIncrement = () => {
         let val = parseFloat(value);
         if (val < parseFloat(max)) {
-            let newVal = parseFloat((parseFloat(value) + parseFloat(steps)).toFixed(1));
+            let newVal = parseFloat((parseFloat(value) + parseFloat(steps)).toFixed(2));
             setValue(newVal.toString());
             onChange(id, newVal);
         }
@@ -35,7 +35,7 @@ const InputCounter: React.FC<InputCounterProps> = ({
     const handleDecrement = () => {
         let val = parseFloat(value);
         if (val > parseFloat(min)) {
-            let newVal = parseFloat((parseFloat(value) - parseFloat(steps)).toFixed(1));
+            let newVal = parseFloat((parseFloat(value) - parseFloat(steps)).toFixed(2));
             setValue(newVal.toString());
             onChange(id, newVal);
         }
@@ -43,7 +43,11 @@ const InputCounter: React.FC<InputCounterProps> = ({
   
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
       const { id, value } = e.target;
-      onChange(id, parseFloat(value));
+      if (value === '' || (parseFloat(value) >= parseFloat(min) && parseFloat(value) <= parseFloat(max))) {
+        onChange(id, parseFloat(value));
+        setValue(value);
+      }
+      
     };
 
   return (

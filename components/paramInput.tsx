@@ -44,13 +44,13 @@ const ParamInput: React.FC<ParamInputProps> = ({ setParams, params, isDisabled }
       <label className="block mb-2 text-base font-large text-white-900 dark:text-white">Select the confidence threshold for each call</label>
       <div className="grid md:grid-cols-3 md:gap-6">
         <div className="relative z-0 w-full mb-5 group">
-          <InputCounter id={"vConf"} label={'V confidence'} steps="0.1" min="0" max="1" defaultValue={params.vConf.toString()} onChange={handleInputChange}/>
+          <InputCounter id={"vConf"} label={'V confidence'} steps="0.01" min="0" max="1" defaultValue={params.vConf.toString()} onChange={handleInputChange}/>
         </div>
         <div className={`'relative z-0 w-full mb-5 group' ${isDisabled ? 'hidden' : ''}`}>
-          <InputCounter id={"dConf"} label={'D confidence'} steps="0.1" min="0" max="1" isDisabled={isDisabled} defaultValue={params.dConf.toString()} onChange={handleInputChange}/>
+          <InputCounter id={"dConf"} label={'D confidence'} steps="0.01" min="0" max="1" isDisabled={isDisabled} defaultValue={params.dConf.toString()} onChange={handleInputChange}/>
         </div>
         <div className="relative z-0 w-full mb-5 group">
-          <InputCounter id={"jConf"} label={'J confidence'} steps="0.1" min="0" max="1" defaultValue={params.jConf.toString()} onChange={handleInputChange}/>
+          <InputCounter id={"jConf"} label={'J confidence'} steps="0.01" min="0" max="1" defaultValue={params.jConf.toString()} onChange={handleInputChange}/>
         </div>
       </div>
     </>
