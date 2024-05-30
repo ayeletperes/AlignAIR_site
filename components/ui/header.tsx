@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import MobileMenu from './mobile-menu'
 import Image from 'next/image'
-import Logo from '@/public/images/alignair_logo4.jpeg'
+import Logo from '@/public/images/logo_alignair14bw.svg'
 
 // The header component. TODO: add the logo and the navigation links.
 
