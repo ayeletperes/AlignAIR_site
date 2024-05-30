@@ -100,13 +100,17 @@ export async function processBatch(
           dataDict[key][feature] = element.index;
           dataDict[key][feature.charAt(0) + '_likelihoods'] = element.prob;
         } else {
-          if (['mutation_rate', 'ar_indels'].includes(feature)) {
+          if (feature === 'mutation_rate') {
             dataDict[key][feature] = element;
           } else {
             if (feature === 'productive') {
               dataDict[key][feature] = element;
             } else {
-              dataDict[key][feature] = element;
+              if (feature === 'ar_indels') {
+                dataDict[key][feature] = Math.round(element);
+              } else{
+                dataDict[key][feature] = element;
+              }
             }
           }
         }

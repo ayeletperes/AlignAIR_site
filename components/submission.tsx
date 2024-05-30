@@ -96,7 +96,6 @@ const Submission: React.FC<SubmissionProps> = ({
   outputIndices,
   setResults,
 }) => {
-  const [submissionStatus, setSubmissionStatus] = useState(false);
   const [time, setTime] = useState(0);
 
   const handleClick = async () => {
@@ -110,13 +109,11 @@ const Submission: React.FC<SubmissionProps> = ({
         setTime((endTime - startTime) / 1000);
       });
       setSubmission(false);
-      setSubmissionStatus(true);
     }
   };
 
   const handleReset = () => {
-    setSubmission(false);
-    setSubmissionStatus(false);
+    setSubmission(true);
     setResults(null);
   };
 
@@ -125,7 +122,7 @@ const Submission: React.FC<SubmissionProps> = ({
       <div className="relative pt-8 pb-10 md:pt-12 md:pb-16">
         <div className="flex items-center justify-center">
           {/* <button type="button" id="submitButton" className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg px-5 py-3 text-center me-2 mb-2" onClick={handleClick} disabled={modelReady}>Submit</button> */}
-          {submissionStatus && !submission ? (
+          {!submission ? (
               <button
                 id="resetButton"
                 className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
@@ -139,13 +136,13 @@ const Submission: React.FC<SubmissionProps> = ({
                 id="submitButton"
                 className="text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded-lg px-5 py-3 text-center me-2 mb-2"
                 onClick={handleClick}
-                disabled={modelReady || submission}
+                disabled={modelReady || !submission}
               >
-                {submission ? 'Submitting' : 'Submit'}
+                {submission ? 'Submit' : 'Submitting'}
               </button>
             )}
         </div>
-        {submissionStatus && !submission && (
+        {!submission && (
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             {/* <button id="resetButton" className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" onClick={handleReset}>Reset results</button> */}
             <p>

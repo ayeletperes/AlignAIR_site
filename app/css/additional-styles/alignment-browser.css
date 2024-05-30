@@ -40,12 +40,12 @@ background: #888;
 background: #555;
 }
 .alignment-browser {
-@apply whitespace-nowrap relative font-sans overflow-x-auto shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(100px,auto)] grid grid-cols-[150px_200px_auto] gap-2.5;
+@apply whitespace-nowrap relative font-sans overflow-x-auto shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(100px,auto)] grid grid-cols-[300px_auto] gap-2.5;
 
 /* Added position relative for alignment */
 }
 .vertical-view {
-@apply relative overflow-x-auto font-sans whitespace-nowrap shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(100px,auto)] grid grid-cols-[150px_200px_200ch] gap-2.5;
+@apply relative overflow-x-auto font-sans whitespace-nowrap shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(100px,auto)] grid grid-cols-[300px_200ch] gap-2.5;
 }
 .alignment-label {
 @apply col-[1] font-[bold] font-sans text-black text-lg;

@@ -1,0 +1,17 @@
+.scrollbar-custom::-webkit-scrollbar {
+    height: 8px; /* Adjust the height of the scrollbar */
+    width: 8px; /* Adjust the width of the scrollbar */
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Background color of the scrollbar track */
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background-color:  rgb(93 93 255); /* Tailwind CSS color: purple-600 */
+    border-radius: 10px; /* Rounded corners of the scrollbar thumb */
+  }
+  
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background: rgb(93 93 255); /* Slightly darker shade for hover effect */
+  }

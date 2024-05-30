@@ -8,6 +8,7 @@
 @import 'additional-styles/theme.css';
 @import 'additional-styles/sequence-input.css';
 @import 'additional-styles/alignment-browser.css';
+@import 'additional-styles/scrollbar-custom.css';
 
 @import 'tailwindcss/utilities';
 

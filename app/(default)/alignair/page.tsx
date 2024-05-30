@@ -18,7 +18,7 @@ interface Params {
 
 
 export default function App() {
-  const [submission, setSubmission] = useState<boolean>(false);
+  const [submission, setSubmission] = useState<boolean>(true);
   const [file, setFile] = useState<File | null>(null);
   const [sequence, setSequence] = useState<string>('');
   const [selectedChain, setSelectedChain] = useState<string>('IGH');
@@ -54,6 +54,8 @@ export default function App() {
         setIsLoading={setModelReady as Dispatch<SetStateAction<boolean>>}
         params={params}
         setParams={setParams as Dispatch<SetStateAction<Params>>}
+        setResults={setResults}
+        setSubmission={setSubmission}
       />
       <Submission
         selectedChain={selectedChain} 
@@ -65,7 +67,7 @@ export default function App() {
         params={params}
         model={model}
         outputIndices={outputIndices}
-        setResults={setResults} 
+        setResults={setResults}
       />
       {results && 
         <Results results={results} selectedChain={selectedChain}/>

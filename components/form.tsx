@@ -28,6 +28,8 @@ interface FormProps {
   setIsLoading: Dispatch<SetStateAction<boolean>>;
   params: Params;
   setParams: Dispatch<SetStateAction<Params>>;
+  setResults: any;
+  setSubmission: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Form: React.FC<FormProps> = ({
@@ -42,6 +44,8 @@ const Form: React.FC<FormProps> = ({
   setIsLoading,
   params,
   setParams,
+  setResults,
+  setSubmission,
 }) => {
   return (
     <section>
@@ -71,7 +75,11 @@ const Form: React.FC<FormProps> = ({
             selectedChain={selectedChain} 
             setModel={setModel} 
             setOutputIndices={setOutputIndices} 
-            setIsLoading={setIsLoading} 
+            setIsLoading={setIsLoading}
+            setResults={setResults} 
+            setSubmission={setSubmission}
+            setFile={setFile}
+            setSequence={setSequence}
           />
           <ParamInput params={params} setParams={setParams} isDisabled={selectedChain==='Light'}/>
         </div>

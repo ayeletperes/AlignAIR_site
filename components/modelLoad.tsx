@@ -51,6 +51,10 @@ interface LoadModelComponentProps {
   setModel: React.Dispatch<React.SetStateAction<tf.GraphModel | null>>;
   setOutputIndices: React.Dispatch<React.SetStateAction<Record<string, number> | null>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setResults: any;
+  setSubmission: React.Dispatch<React.SetStateAction<boolean>>;
+  setFile: React.Dispatch<React.SetStateAction<File | null>>;
+  setSequence: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const model_urls: { [key: string]: string } = {
@@ -58,7 +62,7 @@ const model_urls: { [key: string]: string } = {
     Light: 'tfjs/AlignAIRR_LightChain/model.json', // replace the model URL if necessary
   };
 
-const LoadModelComponent: React.FC<LoadModelComponentProps> = ({ setSelectedChain, selectedChain, setModel, setOutputIndices, setIsLoading }) => {
+const LoadModelComponent: React.FC<LoadModelComponentProps> = ({ setSelectedChain, selectedChain, setModel, setOutputIndices, setIsLoading, setResults, setSubmission, setFile, setSequence }) => {
     const [selectedModel, setSelectedModel] = useState<string>('tfjs/AlignAIRR/model.json');
     const maxSeqLength = 576;
   
@@ -132,6 +136,10 @@ const LoadModelComponent: React.FC<LoadModelComponentProps> = ({ setSelectedChai
     }, [selectedChain, selectedModel]);
   
     const selectButton = (buttonId: string) => {
+      setResults(null);
+      setSequence('');
+      setFile(null);
+      setSubmission(true);
       setSelectedChain(buttonId);
       setSelectedModel(model_urls[buttonId]);
     };
