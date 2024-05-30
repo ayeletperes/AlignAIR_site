@@ -8,6 +8,7 @@ interface InputCounterProps {
   max: string;
   defaultValue: string;
   onChange: (id: string, value: number) => void;
+  isDisabled?: boolean;
 }
 
 const InputCounter: React.FC<InputCounterProps> = ({
@@ -18,6 +19,7 @@ const InputCounter: React.FC<InputCounterProps> = ({
   max,
   defaultValue,
   onChange,
+  isDisabled,
 }) => {
     const [value, setValue] = useState<string>(defaultValue);
 
@@ -52,6 +54,7 @@ const InputCounter: React.FC<InputCounterProps> = ({
         data-input-counter-decrement={id}
         className="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none"
         onClick={handleDecrement}
+        disabled={isDisabled}
       >
         <svg className="w-3 h-3 text-gray-900 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 2">
           <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 1h16"/>
@@ -69,6 +72,7 @@ const InputCounter: React.FC<InputCounterProps> = ({
         value={value}
         required
         onChange={handleInputChange}
+        disabled={isDisabled}
       />
       <div className="absolute bottom-1 start-1/2 -translate-x-1/2 rtl:translate-x-1/2 flex items-center text-xs text-gray-400 space-x-1 rtl:space-x-reverse">
         <span>{label}</span>
@@ -79,6 +83,7 @@ const InputCounter: React.FC<InputCounterProps> = ({
         data-input-counter-increment={id}
         className="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-e-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none"
         onClick={handleIncrement}
+        disabled={isDisabled}
       >
         <svg className="w-3 h-3 text-gray-900 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
           <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 1v16M1 9h16"/>

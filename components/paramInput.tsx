@@ -13,11 +13,12 @@ interface Params {
 interface ParamInputProps {
   setParams: React.Dispatch<React.SetStateAction<Params>>;
   params: Params;
+  isDisabled?: boolean;
 }
 
 type InputChangeHandler = (id: string, value: number) => void;
 
-const ParamInput: React.FC<ParamInputProps> = ({ setParams, params }) => {
+const ParamInput: React.FC<ParamInputProps> = ({ setParams, params, isDisabled }) => {
 
   const handleInputChange: InputChangeHandler = (id, value) => {
     setParams((prevInputs) => ({
@@ -34,7 +35,7 @@ const ParamInput: React.FC<ParamInputProps> = ({ setParams, params }) => {
           <InputCounter id={"vCap"} label={'V cap'} steps="1" min="1" max="100" defaultValue={params.vCap.toString()} onChange={handleInputChange}/>
         </div>
         <div className="relative z-0 w-full mb-5 group">
-          <InputCounter id={"dCap"} label={'D cap'} steps="1" min="1" max="100" defaultValue={params.dCap.toString()} onChange={handleInputChange}/>
+          <InputCounter id={"dCap"} label={'D cap'} steps="1" min="1" max="100" isDisabled={isDisabled} defaultValue={params.dCap.toString()} onChange={handleInputChange}/>
         </div>
         <div className="relative z-0 w-full mb-5 group">
           <InputCounter id={"jCap"} label={'J cap'} steps="1" min="1" max="100" defaultValue={params.jCap.toString()} onChange={handleInputChange}/>
@@ -46,7 +47,7 @@ const ParamInput: React.FC<ParamInputProps> = ({ setParams, params }) => {
           <InputCounter id={"vConf"} label={'V confidence'} steps="0.1" min="0" max="1" defaultValue={params.vConf.toString()} onChange={handleInputChange}/>
         </div>
         <div className="relative z-0 w-full mb-5 group">
-          <InputCounter id={"dConf"} label={'D confidence'} steps="0.1" min="0" max="1" defaultValue={params.dConf.toString()} onChange={handleInputChange}/>
+          <InputCounter id={"dConf"} label={'D confidence'} steps="0.1" min="0" max="1" isDisabled={isDisabled} defaultValue={params.dConf.toString()} onChange={handleInputChange}/>
         </div>
         <div className="relative z-0 w-full mb-5 group">
           <InputCounter id={"jConf"} label={'J confidence'} steps="0.1" min="0" max="1" defaultValue={params.jConf.toString()} onChange={handleInputChange}/>

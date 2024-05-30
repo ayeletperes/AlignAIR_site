@@ -73,7 +73,7 @@ const Form: React.FC<FormProps> = ({
             setOutputIndices={setOutputIndices} 
             setIsLoading={setIsLoading} 
           />
-          <ParamInput params={params} setParams={setParams} />
+          <ParamInput params={params} setParams={setParams} isDisabled={selectedChain==='Light'}/>
         </div>
       </div>
     </section>
