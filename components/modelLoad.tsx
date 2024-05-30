@@ -139,13 +139,35 @@ const LoadModelComponent: React.FC<LoadModelComponentProps> = ({ setSelectedChai
     return (
       <div>
         <p>Immunoglobulin Chain</p>
-        <div className="flex items-center mb-4">
+        <div className="inline-flex rounded-md shadow-sm" role="group">
+          <button 
+            id="Heavy"
+            value="Heavy"
+            name="immunoglobulin-chain"
+            onClick={() => selectButton('Heavy')}
+            type="button" 
+            className={`px-4 py-2 text-sm font-medium text-gray-900  border border-gray-300 rounded-s-lg hover:bg-blue-400 hover:text-white focus:z-10 focus:ring-2 focus:ring-gray-500 focus:blue-400 focus:text-white dark:border-white dark:text-white dark:hover:text-white dark:hover:bg-blue-400 dark:focus:bg-blue-400 ${selectedChain === 'Heavy' ? 'bg-blue-400 text-white' : 'bg-white'}`}>
+            Heavy
+          </button>
+          <button 
+            id="Light"
+            value="Light"
+            name="immunoglobulin-chain"
+            onClick={() => selectButton('Light')}
+            type="button" 
+            className={`px-4 py-2 text-sm font-medium text-gray-900  border rounded-e-lg border-gray-300 hover:bg-blue-400 hover:text-white focus:z-10 focus:ring-2 focus:ring-gray-500 focus:blue-400 focus:text-white dark:border-white dark:text-white dark:hover:text-white dark:hover:bg-blue-400 dark:focus:bg-blue-400 ${selectedChain === 'Light' ? 'bg-blue-400 text-white' : 'bg-white'}`}>
+            Light
+          </button>
+        </div>
+
+
+        {/* <div className="flex items-center mb-4">
         <input
             id="Heavy"
             type="radio"
             value="Heavy"
             name="immunoglobulin-chain"
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            className="w-4 h-4 text-blue-400 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-400 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             checked={selectedChain === 'Heavy'}
             onChange={() => selectButton('Heavy')}
         />
@@ -157,12 +179,12 @@ const LoadModelComponent: React.FC<LoadModelComponentProps> = ({ setSelectedChai
             type="radio"
             value="Light"
             name="immunoglobulin-chain"
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            className="w-4 h-4 text-blue-400 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-400 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             checked={selectedChain === 'Light'}
             onChange={() => selectButton('Light')}
         />
         <label htmlFor="Light" className="text-white ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Light</label>
-        </div>
+        </div> */}
     </div>
     );
 };
