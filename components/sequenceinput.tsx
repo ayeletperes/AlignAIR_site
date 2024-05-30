@@ -47,7 +47,7 @@ const SequenceInput: React.FC<SequenceInputProps> = ({ selectedChain, setSequenc
         <div className="relative z-0 w-full mb-5 group flex justify-end">
             <button 
               disabled={!selectedChain} 
-              className={`text-white ${selectedChain ? 'bg-blue-400 hover:bg-blue-800' : 'bg-gray-300 cursor-not-allowed'} focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-lg w-full sm:w-auto px-3 py-2 text-xs font-medium text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800`} 
+              className={`text-white ${selectedChain ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-300 cursor-not-allowed'} focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-lg w-full sm:w-auto px-3 py-2 text-xs font-medium text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800`} 
               onClick={handleExample}>
                 Example Sequence
             </button>
@@ -55,7 +55,7 @@ const SequenceInput: React.FC<SequenceInputProps> = ({ selectedChain, setSequenc
       </div>
       <div className="mb-12">
         <textarea
-          className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-purple-600 focus:border-purple-600 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-600 dark:focus:border-purple-600"
           rows={4}
           id="sequenceInput"
           ref={sequenceInputRef}

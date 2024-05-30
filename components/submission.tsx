@@ -137,7 +137,7 @@ const Submission: React.FC<SubmissionProps> = ({
               <button
                 type="button"
                 id="submitButton"
-                className="text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg px-5 py-3 text-center me-2 mb-2"
+                className="text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded-lg px-5 py-3 text-center me-2 mb-2"
                 onClick={handleClick}
                 disabled={modelReady || submission}
               >

@@ -48,7 +48,7 @@ const Form: React.FC<FormProps> = ({
       <div className="relative pt-32 pb-10 md:pt-40 md:pb-16">
         <div className="max-w-6xl mx-auto px-2 sm:px-2">
         <h1 className="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-600">
+          <span className="text-white">
             AlignAIR <sub className="text-white text-sm align-baseline">beta</sub>
           </span>
         </h1>
