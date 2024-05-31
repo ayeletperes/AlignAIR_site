@@ -16,7 +16,8 @@ export const AlignmentBrowserLight: React.FC<AlignmentBrowserProps> = ({ results
       return (
         <>
         <div className="flex items-center space-x-3 bg-purple-100 p-4 rounded-md">
-        <svg
+        <span role="img" aria-label="building" style={{fontSize: '24px'}}>🏗️</span>
+        {/* <svg
           width="24"
           height="24"
           viewBox="0 0 24 24"
@@ -27,7 +28,7 @@ export const AlignmentBrowserLight: React.FC<AlignmentBrowserProps> = ({ results
             d="M17 8.75C17 8.33579 16.6642 8 16.25 8H14.5V5.75C14.5 5.33579 14.1642 5 13.75 5H10.25C9.83579 5 9.5 5.33579 9.5 5.75V8H7.75C7.33579 8 7 8.33579 7 8.75V21.25C7 21.6642 7.33579 22 7.75 22H16.25C16.6642 22 17 21.6642 17 21.25V8.75ZM9.5 19.25C9.5 18.8358 9.83579 18.5 10.25 18.5H13.75C14.1642 18.5 14.5 18.8358 14.5 19.25V20H9.5V19.25ZM11 15.25C11 14.8358 11.3358 14.5 11.75 14.5H12.25C12.6642 14.5 13 14.8358 13 15.25V18.5H11V15.25ZM16 13H8V10.75C8 10.3358 8.33579 10 8.75 10H15.25C15.6642 10 16 10.3358 16 10.75V13Z"
             fill="currentColor"
           />
-        </svg>
+        </svg> */}
           <div>
             <p className="text-lg font-semibold text-black">Work in progress!</p>
             <p className="text-sm text-black">
