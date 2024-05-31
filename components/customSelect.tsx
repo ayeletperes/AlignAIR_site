@@ -2,7 +2,29 @@ import React, { useState } from 'react';
 import { extractGermline } from './postProcessing';
 
 
-function getColor(likelihood: number): string {
+export const GetSequenceMismatchIdx = (sequence: string, germline: string, maxCharsPerRow: number) => {
+  let mismatch: { [key: number]: number[] } = {}; // Initialize mismatch as a dictionary
+
+  for (let i = 0; i < sequence.length; i++) {
+    if(!['N', '-', '.'].includes(sequence[i])){
+      if (sequence[i] !== germline[i]) {
+        const row = Math.floor(i / maxCharsPerRow); // Calculate the row
+        const col = i % maxCharsPerRow; // Calculate the column
+
+        // If the row doesn't exist in the mismatch dictionary, initialize it as an empty array
+        if (!mismatch[row]) {
+          mismatch[row] = [];
+        }
+
+        mismatch[row].push(col); // Push the column index into the corresponding row array
+      }
+  }
+  }
+
+  return mismatch;
+};
+
+export function getColor(likelihood: number): string {
   if (likelihood > 0.9) {
     return '#baffc9';
   } else if (likelihood > 0.8) {
@@ -19,22 +41,22 @@ function getColor(likelihood: number): string {
 }
 
 
-function splitSequence(sequence: string, maxCharsPerRow: number){
-  const numRows = Math.ceil(sequence.length / maxCharsPerRow)
-  const chunkSize = Math.ceil(sequence.length / numRows);
+export function splitSequence(sequence: string, maxCharsPerRow: number){
+  // const numRows = Math.ceil(sequence.length / maxCharsPerRow)
+  // const chunkSize = Math.ceil(sequence.length / numRows);
   
   const chunks = [];
-  for (let i = 0; i < sequence.length; i += chunkSize) {
-    chunks.push(sequence.slice(i, i + chunkSize));
+  for (let i = 0; i < sequence.length; i += maxCharsPerRow) {
+    chunks.push(sequence.slice(i, i + maxCharsPerRow));
   }
   return chunks;
 };
 const SmallPillWithText: React.FC<{ text: string; color: string }> = ({ text, color }) => (
-  <svg width="60" height="40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <svg width="30" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
     {/* Square Shape */}
     <rect x="0" y="0" width="60" height="40" fill={color} />
     {/* Text on Square */}
-    <text x="20" y="20" fontFamily="sans" fontSize="16" fill="white" textAnchor="middle" alignmentBaseline="middle">
+    <text x="5" y="20" fontFamily="sans" fontSize="18" fill="black" textAnchor="start" alignmentBaseline="middle">
       {text}
     </text>
   </svg>
@@ -62,6 +84,8 @@ interface SelectWidgetVerticalProps {
   selectedAllele: string;
   setSelectedAllele: (allele: string) => void;
   setSplitedSeq: (splitedSeq: string[]) => void;
+  maxCharsPerRow: number;
+  setMismatch: (mismatch: { [key: number]: number[] }) => void;
 }
 
 export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
@@ -73,6 +97,8 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
   selectedAllele,
   setSelectedAllele,
   setSplitedSeq,
+  maxCharsPerRow,
+  setMismatch,
 }) => {
     const alleles: string[] = results[call];
     const likelihoods: number[] = results[`${call.charAt(0)}_likelihoods`];
@@ -91,7 +117,9 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
       k: k,
     });
     setSelected(seq);
-    const splitedSeq = splitSequence(seq, 70);
+    const mismatch = GetSequenceMismatchIdx(results.sequence.slice(0,results[call.charAt(0) + "_sequence_end"]), seq, maxCharsPerRow);
+    setMismatch(mismatch);
+    const splitedSeq = splitSequence(seq, maxCharsPerRow);
     setSplitedSeq(splitedSeq);
     splitedSeq.forEach((seq, index) => {
       const alleleElement = document.querySelector(`.allele.${call}-${index}`) as HTMLElement;
@@ -125,7 +153,7 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
         aria-haspopup="listbox"
         aria-expanded={open}
         className="cursor-default relative w-full rounded-md border border-gray-300 bg-white pl-3 pr-10 py-2 text-left focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition ease-in-out duration-150 sm:text-sm sm:leading-5"
-        style={{ fontSize: '18px' }}
+        style={{ fontSize: '16px' }}
       >
         <div className="flex items-center space-x-3">
           {selected ? (
@@ -134,7 +162,7 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
               color={getColor(likelihoods[alleles.indexOf(selectedAllele)])} // Example color
             />
           ) : null}
-          <span className="block truncate">{selectedAllele}</span>
+          <span className="block truncate" style={{fontSize:'12px'}}>{selectedAllele}</span>
         </div>
         <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
           <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">

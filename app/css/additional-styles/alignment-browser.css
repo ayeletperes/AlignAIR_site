@@ -40,12 +40,12 @@ background: #888;
 background: #555;
 }
 .alignment-browser {
-@apply whitespace-nowrap relative font-sans overflow-x-auto shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(100px,auto)] grid grid-cols-[300px_auto] gap-2.5;
+@apply whitespace-nowrap relative font-sans overflow-x-auto shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(50px,auto)] grid grid-cols-[300px_auto] gap-x-[10px] gap-y-[0.5px];
 
 /* Added position relative for alignment */
 }
 .vertical-view {
-@apply relative overflow-x-auto font-sans whitespace-nowrap shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(100px,auto)] grid grid-cols-[300px_200ch] gap-2.5;
+@apply relative overflow-x-auto font-sans whitespace-nowrap shadow-[rgba(0,0,0,0.15)_0px_5px_15px_0px] auto-rows-[minmax(50px,auto)] grid grid-cols-[200px_200ch] gap-x-[50px] gap-y-[0.5px];
 }
 .alignment-label {
 @apply col-[1] font-[bold] font-sans text-black text-lg;
@@ -75,3 +75,33 @@ background: #555;
 .alignment-btn {
 @apply bg-[#68c4af] text-white cursor-pointer px-2.5 py-0.5 rounded-[10px] border-[none];
 }
+.alignment-container {
+    display: grid;
+    grid-template-rows: auto auto;
+    grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
+    width: fit-content;
+  }
+  
+  .alignment-row {
+    display: flex;
+  }
+  .alignment-char {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10px;
+    height: 20px;
+    font-size: 12px;
+    /* border: 1px solid black; */
+  }
+  .alignment-hidden {
+    visibility: hidden;
+  }
+  .alignment-mismatch {
+    color: #f00;
+    /* border: 1px solid black; */
+  }
+  .alignment-np {
+    color: rgb(117, 116, 116);
+    /* border: 1px solid black; */
+  }

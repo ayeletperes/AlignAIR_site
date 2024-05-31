@@ -1,5 +1,6 @@
 import React from 'react';
-import { TabSetResults, DownloadResultsTable } from './processResults'; // ResultsTable TabSetResults,
+import { TabSetResults } from './tabsetView';
+import { DownloadResultsTable } from './downloadResults';
 import {IGType, IGHVConverted, sortedIGHD, sortedIGHJ, LightJ, LightV} from './reference';
 
 
