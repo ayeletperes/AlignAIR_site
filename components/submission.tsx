@@ -134,7 +134,7 @@ const Submission: React.FC<SubmissionProps> = ({
               <button
                 type="button"
                 id="submitButton"
-                className="text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded-lg px-5 py-3 text-center me-2 mb-2"
+                className={`text-white ${modelReady || !submission ? 'bg-gray-700' : 'bg-purple-600'} hover:bg-purple-700 focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded-lg px-5 py-3 text-center me-2 mb-2`}
                 onClick={handleClick}
                 disabled={modelReady || !submission}
               >

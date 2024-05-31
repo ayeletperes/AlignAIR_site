@@ -94,7 +94,7 @@ export const AlignmentBrowserLight: React.FC<AlignmentBrowserProps> = ({ results
     const j_left_margin = results.j_sequence_start ;
     if(selectedSequenceV){
         const renderVerticalView = () => (
-        <div className="alignment-browser vertical-view">
+        <div className="alignment-browser vertical-view scrollbar-custom">
             <div className="alignment-label" style={{ gridRow: 1 }}>Allele</div>
             
             

@@ -130,7 +130,7 @@ export const AlignmentBrowserHeavyDshort: React.FC<AlignmentBrowserProps> = ({ r
     
     if(selectedSequenceV){
         const renderVerticalView = () => (
-        <div className="alignment-browser vertical-view">
+        <div className="alignment-browser vertical-view scrollbar-custom">
             {splitV.map((chunk, index) => (
             <React.Fragment key={`input-sequence-v-${index}`}>
                 <div className={`alignment-label`} style={{ gridRow: (index * 2) + 2, gridColumn:1 }}>
