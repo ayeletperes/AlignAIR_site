@@ -117,7 +117,7 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
       k: k,
     });
     setSelected(seq);
-    const mismatch = GetSequenceMismatchIdx(results.sequence.slice(0,results[call.charAt(0) + "_sequence_end"]), seq, maxCharsPerRow);
+    const mismatch = GetSequenceMismatchIdx(results.sequence.slice(results[call.charAt(0) + "_sequence_start"],results[call.charAt(0) + "_sequence_end"]), seq, maxCharsPerRow);
     setMismatch(mismatch);
     const splitedSeq = splitSequence(seq, maxCharsPerRow);
     setSplitedSeq(splitedSeq);

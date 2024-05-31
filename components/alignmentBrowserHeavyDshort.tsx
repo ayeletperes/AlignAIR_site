@@ -9,10 +9,10 @@ interface AlignmentBrowserProps {
   }
 
   
-export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results, referenceAlleles }) => {
+export const AlignmentBrowserHeavyDshort: React.FC<AlignmentBrowserProps> = ({ results, referenceAlleles }) => {
     
     // if the germline does not start from 0, or there are indels in the sequence. then susspend the alignment view
-    if (results.v_germline_start !== 0 || results.ar_indels > 0) {//results.v_germline_start !== 0 || 
+    if (results.v_germline_start !== 0 || results.ar_indels > 0) {//
       return (
         <>
         <div className="flex items-center space-x-3 bg-purple-100 p-4 rounded-md">
@@ -69,12 +69,12 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
     
     let vSeqStart = results.v_sequence_start;
     const vSeqEnd = results.v_sequence_end - vSeqStart;
-    const dSeqStart = results.d_sequence_start - vSeqStart;
-    const dSeqEnd = results.d_sequence_end - vSeqStart;
+    const dSeqStart = results.v_sequence_end - vSeqStart;
+    const dSeqEnd = results.j_sequence_start - vSeqStart;
     const jSeqStart = results.j_sequence_start - vSeqStart;
     const jSeqEnd = results.j_sequence_end - vSeqStart;
     vSeqStart = vSeqStart-results.v_sequence_start;
-
+    
     const vAAIndex: number = Math.floor(vSeqEnd / 3);
     const jAAIndex: number = Math.floor(jSeqStart / 3);
     
@@ -99,10 +99,6 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
         referenceAlleles['v_call'][results.v_call[0]].slice(results.v_germline_start, results.v_germline_end)
       );
   
-      setSelectedSequenceD(
-        referenceAlleles['d_call'][results.d_call[0]].slice(results.d_germline_start, results.d_germline_end)
-      );
-
       setSelectedSequenceJ(
         referenceAlleles['j_call'][results.j_call[0]].slice(results.j_germline_start, results.j_germline_end)
       );
@@ -110,15 +106,13 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
     
     useEffect(() => {
       setSplitedSequenceV(splitSequence(selectedSequenceV, maxCharsPerRow));
-      setSplitedSequenceD(splitSequence(selectedSequenceD, maxCharsPerRow));
       setSplitedSequenceJ(splitSequence(selectedSequenceJ, maxCharsPerRow));
-    }, [selectedSequenceV, selectedSequenceD, selectedSequenceJ]);
+    }, [selectedSequenceV, selectedSequenceJ]);
     
     useEffect(() => {
         setMismatchV(GetSequenceMismatchIdx(sequence.slice(vSeqStart,vSeqEnd), selectedSequenceV, maxCharsPerRow));
-        setMismatchD(GetSequenceMismatchIdx(sequence.slice(dSeqStart,dSeqEnd), selectedSequenceD, maxCharsPerRow));
         setMismatchJ(GetSequenceMismatchIdx(sequence.slice(jSeqStart), selectedSequenceJ, maxCharsPerRow));
-    }, [results, selectedSequenceV, selectedSequenceD, selectedSequenceJ]);
+    }, [results, selectedSequenceV, selectedSequenceJ]);
   
  
     const rows = {
@@ -131,9 +125,9 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
     const vrow = ((splitedSequenceV.length*2) + rows.v -1)
     const drow = (index: number) => (index * 2) + vrow
     const drowG = (index: number) => drow(index) + 1
-    const jrow = (index: number) => (index * 2) + (vrow + (splitedSequenceD.length*2))
+    const jrow = (index: number) => (index * 2) + (vrow + 2)
     const jrowG = (index: number) => jrow(index) + 1
-    console.log(splitedSequenceD)
+    
     if(selectedSequenceV){
         const renderVerticalView = () => (
         <div className="alignment-browser vertical-view">
@@ -196,41 +190,15 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
                   <div className={`alignment-label`} style={{ gridRow: drow(index), gridColumn:1 }}>
                   <span className={`alignment-label d_input-${index}`} style={{fontSize:'12px'}}>D</span>
                   </div>
-                  
                   <div className="sequence input-sequence-d" style={{ gridRow: drow(index), gridColumn: 2 }}>
-                      <AlignedSequence sequence={chunk} aasequence={splitDAA[index]} mismatch={mismatchD[index]} np1={np1} np2={np2} remainingNuc={reamningV}/>
+                      <div className="alignment-np">
+                        <AlignedSequence sequence={chunk} aasequence={splitDAA[index]} mismatch={mismatchD[index]} remainingNuc={reamningV}/>
+                      </div>
                   </div>
               </React.Fragment>
             ))}
     
-            <div className="alignment-label" style={{ gridRow: vrow + 1 }}>
-            <SelectWidgetVertical2
-                call='d_call'
-                results={results}
-                reference={referenceAlleles}
-                setSelected={setSelectedSequenceJ}
-                selected={selectedSequenceD}
-                selectedAllele={selectedAlleleD}
-                setSelectedAllele={setSelectedAlleleD}
-                setSplitedSeq={setSplitedSequenceD}
-                maxCharsPerRow={maxCharsPerRow}
-                setMismatch={setMismatchD}
-            />
-            </div>
             
-            {splitedSequenceD.map((chunk, index) => (
-            <React.Fragment key={`d-sequence-${index}`}>
-                {index > 0 && (
-                <div className={`alignment-label d_call-${index}`} style={{ gridRow: drowG(index), gridColumn:1, fontSize:'12px' }}>
-                    {selectedAlleleD}
-                </div>
-                )}
-                <div className="sequence" style={{ gridRow: drowG(index), gridColumn: 2}}>
-                    <AlignedGermlineSequence sequence={chunk} np1={np1}/>
-                </div>
-            </React.Fragment>
-            ))}
-
             {splitJ.map((chunk, index) => (
             <React.Fragment key={`input-sequence-j-${index}`}>
                 <div className={`alignment-label`} style={{ gridRow: jrow(index), gridColumn:1 }}>
@@ -243,7 +211,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
             </React.Fragment>
             ))}
     
-            <div className="alignment-label" style={{ gridRow: (vrow + (splitedSequenceD.length*2) + 1) }}>
+            <div className="alignment-label" style={{ gridRow: (vrow + 2 + 1) }}>
             <SelectWidgetVertical2
                 call='j_call'
                 results={results}
