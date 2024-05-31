@@ -4,6 +4,7 @@ import { metadata } from './metadata';
 import './css/style.css'
 
 import { Inter, Architects_Daughter } from 'next/font/google'
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 import Head from 'next/head'
 
@@ -42,6 +43,7 @@ export default function RootLayout({
           <Banner />
         </div>
       </body>
+      <GoogleAnalytics gaId="G-W94F4SGX8B" />
     </html>
   )
 }

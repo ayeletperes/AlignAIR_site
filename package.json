@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
+    "@next/third-parties": "^14.2.3",
     "@tensorflow/tfjs-core": "^4.19.0",
     "@tensorflow/tfjs-node": "^4.19.0",
     "@types/node": "^20.10.4",
