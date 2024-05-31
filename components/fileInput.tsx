@@ -56,15 +56,39 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence 
       const reader = new FileReader();
       reader.onload = function (e) {
         const content = e.target?.result as string;
-        const sequenceCount = countSequences(content);
-        console.log(sequenceCount);
-        setFileName(file.name);
-        setSequenceCount(sequenceCount);
-        displayFileInfo();
+        const valid = validateSequences(content);
+        if (valid){
+          const sequenceCount = countSequences(content);
+          setFileName(file.name);
+          setSequenceCount(sequenceCount);
+          displayFileInfo();
+        }else{
+          clearFile();
+        }
       };
       reader.readAsText(file);
     };
   
+    const validateSequences = (content: string) => {
+      const lines = content.split('\n');
+
+      // if more then 1k sequence, validate until first unvalid sequence
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.startsWith('>')) {
+          continue;
+        }
+        const seq = line.replace(/\n/g, '').toUpperCase()
+        const testSeq = /^[ACGTNacgtn]*$/.test(seq);
+        if (testSeq) {
+          window.alert(`'Invalid characters in sequences. Please use only A, C, G, T, or N.'`);
+          return false;
+        }else{
+          return true;
+        }
+      }
+    }
     const countSequences = (content: string) => {
       const lines = content.split('\n');
       let count = 0;
@@ -87,7 +111,7 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence 
         fileInputRef.current.value = '';
         
       }
-      console.log(fileInfoRef.current);
+      
       // dragAreaRef.current!.style.display = 'flex';
       fileInputRef.current!.style.display = 'flex';
       fileInfoRef.current!.style.display = 'none';

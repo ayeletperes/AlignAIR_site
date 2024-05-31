@@ -26,6 +26,15 @@ const SequenceInput: React.FC<SequenceInputProps> = ({ selectedChain, setSequenc
     }
   };
 
+  const validateSequence = (sequence: string) => {
+    const seq = sequence.replace(/\n/g, '').toUpperCase()
+    const testSeq = /^[ACGTNacgtn]*$/.test(seq);
+    if (!testSeq) {
+      window.alert('Invalid characters in sequence. Please use only A, C, G, T, or N.');
+    }else{
+      setSequence(seq);
+    }
+  }
 //   const clear = () => {
 //     if (sequenceInputRef.current) {
 //       sequenceInputRef.current.value = '';
@@ -60,7 +69,7 @@ const SequenceInput: React.FC<SequenceInputProps> = ({ selectedChain, setSequenc
           id="sequenceInput"
           ref={sequenceInputRef}
           value={sequence}
-          onChange={e => setSequence(e.target.value)}
+          onChange={e => validateSequence(e.target.value)}
           disabled={isDisabled}
         />
       </div>
