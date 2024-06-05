@@ -11,7 +11,7 @@ import Results from '@/components/results';
 import { metadata } from './metadata';
 
 
-export function logGroup(type: string, data: any) {
+function logGroup(type: string, data: any) {
   console.groupCollapsed(type);
   console.log(data);
   console.groupEnd();
