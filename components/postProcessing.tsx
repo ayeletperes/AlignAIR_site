@@ -196,7 +196,12 @@ static HeuristicReferenceMatcher({
         const { [`${segment}_germline_start`]: refStart = 0, [`${segment}_germline_end`]: refEnd = 0 } = this.HeuristicReferenceMatcher({ results, segment, referenceAlleles, call_id, k, s }) || {};
         const call = results[`${segment}_call`][call_id];
         const referenceSequence = referenceAlleles[call];
-        return referenceSequence.slice(refStart, refEnd);
+        if(segment === 'V'){
+          return referenceSequence.slice(0, refEnd);
+        }else{
+          return referenceSequence.slice(refStart, refEnd);
+        }
+        
     }
 }
     

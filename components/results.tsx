@@ -34,7 +34,10 @@ const Results: React.FC<{ results: any, selectedChain: string }> = ({ results, s
       );
     } else {
       
-      return null;
+      return(
+        <div>
+        </div>
+      );
     }
   }
 };

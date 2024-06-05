@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {ResultsHTMLTable} from './resultsHTMLTable';
-import { AlignmentBrowserHeavy } from './alignmentBrowserHeavy';
-import { AlignmentBrowserLight } from './alignmentBrowserLight';
+import { AlignmentBrowserHeavy } from './alignmentBrowserHeavy2';
+import { AlignmentBrowserLight } from './alignmentBrowserLight2';
 import { AlignmentBrowserHeavyDshort } from './alignmentBrowserHeavyDshort';
 
 interface TabSetResultsProps {
@@ -15,7 +15,7 @@ const TabView: React.FC<{ item: any; hasD: boolean; referenceAlleles: any }> = (
       <AlignmentBrowserLight results={item} referenceAlleles={referenceAlleles} />
     )
   } else {
-    console.log(item.d_call[0])
+    
     if (item.d_call[0] === 'Short-D') {
       return (<AlignmentBrowserHeavyDshort results={item} referenceAlleles={referenceAlleles} />)
     } else {

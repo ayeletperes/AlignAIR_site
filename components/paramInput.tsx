@@ -30,7 +30,7 @@ const ParamInput: React.FC<ParamInputProps> = ({ setParams, params, isDisabled }
   return (
     <>
       <label className="block mb-2 text-base font-large text-white-900 dark:text-white">Select the max number of assignments for each call</label>
-      <div className="grid md:grid-cols-3 md:gap-6">
+      <div id="capButtons" className="grid md:grid-cols-3 md:gap-6">
         <div className="relative z-0 w-full mb-5 group">
           <InputCounter id={"vCap"} label={'V cap'} steps="1" min="1" max="100" defaultValue={params.vCap.toString()} onChange={handleInputChange}/>
         </div>
@@ -42,7 +42,7 @@ const ParamInput: React.FC<ParamInputProps> = ({ setParams, params, isDisabled }
         </div>
       </div>
       <label className="block mb-2 text-base font-large text-white-900 dark:text-white">Select the confidence threshold for each call</label>
-      <div className="grid md:grid-cols-3 md:gap-6">
+      <div id="confButton" className="grid md:grid-cols-3 md:gap-6">
         <div className="relative z-0 w-full mb-5 group">
           <InputCounter id={"vConf"} label={'V confidence'} steps="0.01" min="0" max="1" defaultValue={params.vConf.toString()} onChange={handleInputChange}/>
         </div>

@@ -47,21 +47,21 @@ export function ResultsHTMLTable({ results }: ResultsHTMLTableProps) {
             <tr>
               <td className="px-4 py-2">{results.name}</td>
               {hasD? <td className="px-4 py-2">{'IGH'}</td> : <td className="px-4 py-2">{results.type}</td>}
-              <td className="px-4 py-2">{results.v_call.join(', ')}</td>
-              {hasD? <td className="px-4 py-2">{results.d_call.join(', ')}</td> : <td className="px-4 py-2">{''}</td>}
-              <td className="px-4 py-2">{results.j_call.join(', ')}</td>
-              <td className="px-4 py-2">{results.v_likelihoods.map((value: number) => formatLikelihood(value)).join(', ')}</td>
-              {hasD? <td className="px-4 py-2">{results.d_likelihoods.map((value: number) => formatLikelihood(value)).join(', ')}</td> : <td className="px-4 py-2">{''}</td>}
-              <td className="px-4 py-2">{results.j_likelihoods.map((value: number) => formatLikelihood(value)).join(', ')}</td>
+              {results.v_call.length>0? <td className="px-4 py-2">{results.v_call.join(', ')}</td>:<td className="px-4 py-2">{''}</td>}
+              {hasD && results.d_call.length>0 ? <td className="px-4 py-2">{results.d_call.join(', ')}</td> : <td className="px-4 py-2">{''}</td>}
+              {results.j_call.length>0? <td className="px-4 py-2">{results.j_call.join(', ')}</td>:<td className="px-4 py-2">{''}</td>}
+              {results.v_likelihoods!=null? <td className="px-4 py-2">{results.v_likelihoods.map((value: number) => formatLikelihood(value)).join(', ')}</td>:<td className="px-4 py-2">{''}</td>}
+              {hasD && results.d_likelihoods!=null? <td className="px-4 py-2">{results.d_likelihoods.map((value: number) => formatLikelihood(value)).join(', ')}</td> : <td className="px-4 py-2">{''}</td>}
+              {results.j_likelihoods!=null? <td className="px-4 py-2">{results.j_likelihoods.map((value: number) => formatLikelihood(value)).join(', ')}</td>:<td className="px-4 py-2">{''}</td>}
               <td className="px-4 py-2">{results.productive ? 'True' : 'False'}</td>
               <td className="px-4 py-2">{formatLikelihood(Number(results.mutation_rate))}</td>
               <td className="px-4 py-2">{results.ar_indels}</td>
-              <td className="px-4 py-2">{results.v_sequence_start}</td>
-              <td className="px-4 py-2">{results.v_sequence_end}</td>
-              {hasD? <td className="px-4 py-2">{results.d_sequence_start}</td> : <td className="px-4 py-2">{''}</td>}
-              {hasD? <td className="px-4 py-2">{results.d_sequence_end}</td> : <td className="px-4 py-2">{''}</td>}
-              <td className="px-4 py-2">{results.j_sequence_start}</td>
-              <td className="px-4 py-2">{results.j_sequence_end}</td>
+              {results.v_sequence_start!=null? <td className="px-4 py-2">{results.v_sequence_start}</td>: <td className="px-4 py-2">{''}</td>}
+              {results.v_sequence_end!=null? <td className="px-4 py-2">{results.v_sequence_end}</td>: <td className="px-4 py-2">{''}</td>}
+              {hasD && results.d_sequence_start!=null? <td className="px-4 py-2">{results.d_sequence_start}</td> : <td className="px-4 py-2">{''}</td>}
+              {hasD && results.d_sequence_end!=null? <td className="px-4 py-2">{results.d_sequence_end}</td> : <td className="px-4 py-2">{''}</td>}
+              {results.j_sequence_start!=null?<td className="px-4 py-2">{results.j_sequence_start}</td>:<td className="px-4 py-2">{''}</td>}
+              {results.j_sequence_end!=null?<td className="px-4 py-2">{results.j_sequence_end}</td>:<td className="px-4 py-2">{''}</td>}
             </tr>
           </tbody>
         </table>

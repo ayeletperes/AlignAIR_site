@@ -1,10 +1,41 @@
 "use client";
 
 import React, { useState, Dispatch, SetStateAction, useEffect} from 'react';
+import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
+import Modal from 'react-modal';
+import { useMount, usePrevious, useSetState } from 'react-use';
+
 import Form from '@/components/form';
 import Submission from '@/components/submission';
 import Results from '@/components/results';
 import { metadata } from './metadata';
+
+export function getScreenSize() {
+  const { innerWidth } = window;
+  let breakpoint = 'xs';
+
+  if (innerWidth >= 1024) {
+    breakpoint = 'lg';
+  } else if (innerWidth >= 768) {
+    breakpoint = 'md';
+  } else if (innerWidth >= 400) {
+    breakpoint = 'sm';
+  }
+
+  return breakpoint;
+}
+
+export function logGroup(type: string, data: any) {
+  console.groupCollapsed(type);
+  console.log(data);
+  console.groupEnd();
+}
+
+interface State {
+  modalIsOpen: boolean;
+  run: boolean;
+  steps: Step[];
+}
 
 // Define types for the params object
 interface Params {
@@ -18,6 +49,7 @@ interface Params {
 
 
 export default function App() {
+  const [isClient, setIsClient] = useState(false); // Track if we are on the client side
   const [submission, setSubmission] = useState<boolean>(true);
   const [file, setFile] = useState<File | null>(null);
   const [sequence, setSequence] = useState<string>('');
@@ -38,10 +70,184 @@ export default function App() {
   useEffect(() => {
       // Set the default value to "Heavy" when the component mounts
       setSelectedChain('Heavy');
+      setIsClient(true); // Indicate that we are on the client side
+
   }, []); // Empty dependency array ensures this effect runs only once
+
+  const [{ modalIsOpen, run, steps }, setState] = useSetState<State>({
+    modalIsOpen: true,
+    run: true,
+    steps: [
+      {
+        content: (
+          <div>
+            This is AlignAIR beta version.<br />
+            Let's get to know our interface and start aligning! 😎.<br />
+            You can exit anytime using skip.
+          </div>
+        ),
+        placement: 'bottom',
+        target: '#alignair',
+        spotlightClicks: true,
+      },
+      {
+        content: (
+          <div>
+            Let's start by loading our IGH example sequence.<br />
+            Click the example Sequence button.
+          </div>
+        ),
+        placement: 'bottom',
+        target: '#exampleSequence',
+        spotlightClicks: true,
+      },
+      {
+        content: (
+          <div>
+            The immunoglobulin chain buttons allows you to switch between models.<br />
+            We can keep the heavy chain for now.<br/>
+            But you can switch 🔀 to the light chain with it's own example sequence!
+          </div>
+        ),
+        placement: 'bottom',
+        target: '#modelButtons',
+        spotlightClicks: true,
+      },
+      {
+        content: (
+          <div>
+            The cap spin buttons allow us to determine what is the maximum nuber of allele we want to display 🎛️.
+          </div>
+        ),
+        placement: 'bottom',
+        target: '#capButtons',
+        spotlightClicks: true,
+      },
+      {
+        content: (
+          <div>
+            The confidence spin buttons determine the confidence level allowed for the prediction 🔮.<br/>
+            The higher the value the more lowly confidence alleles will be included.
+          </div>
+        ),
+        placement: 'bottom',
+        target: '#confButton',
+        spotlightClicks: true,
+      },
+      {
+        content: (
+          <div>
+            Finaly we can press submit! And view the alignment 🧬
+          </div>
+        ),
+        placement: 'bottom',
+        target: '#submitButton',
+        spotlightClicks: true,
+      },
+      // {
+      //   content: (
+      //     <div>
+      //       You can either align a sequence.<br />
+      //       Or even multiple using fasta formating.
+      //     </div>
+      //   ),
+      //   placement: 'bottom',
+      //   target: '#ininputSeqputSeq',
+      //   textAlign: 'center',
+      // },
+      // {
+      //   content: (
+      //     <div>
+      //       Or upload and align an entire fasta file!.<br />
+      //     </div>
+      //   ),
+      //   placement: 'bottom',
+      //   target: '#fileinput',
+      //   textAlign: 'center',
+      // },
+      // {
+      //   content: "A button! That's rare on the web",
+      //   placement: 'bottom',
+      //   target: '.ReactModal__Content [data-component-name="SpacerItem"]:nth-of-type(3) button',
+      // },
+      // {
+      //   content: "Sometimes I wonder what's inside my mind",
+      //   placement: 'bottom',
+      //   target: '.ReactModal__Content [data-component-name="SpacerItem"]:nth-of-type(4) button',
+      // },
+      // {
+      //   content: 'Modal, Portal, Quintal!',
+      //   placement: 'bottom',
+      //   target: '.ReactModal__Content [data-component-name="SpacerItem"]:nth-of-type(5) button',
+      // },
+    ] as Step[],
+  });
+  const previousModalIsOpen = usePrevious(modalIsOpen);
+
+  useEffect(() => {
+    if (!previousModalIsOpen && modalIsOpen) {
+      setState({
+        run: true,
+      });
+    }
+  });
+
+  const handleJoyrideCallback = (data: CallBackProps) => {
+    const { status, type } = data;
+
+    if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
+      setState({ run: false });
+    }
+
+    logGroup(type, data);
+  };
+
+  // const openModal = () => {
+  //   setState({
+  //     modalIsOpen: true,
+  //   });
+  // };
+
+  // const closeModal = () => {
+  //   setState({
+  //     modalIsOpen: false,
+  //     run: false,
+  //   });
+  // };
+
+  // const afterOpenModal = () => {
+  //   setState({
+  //     run: true,
+  //   });
+  // };
+
+  // const customStyles = {
+  //   content: {
+  //     maxHeight: '70%',
+  //     textAlign: 'center' as const,
+  //   },
+  // };
 
   return (
     <>
+      {isClient && (
+        <Joyride
+          callback={handleJoyrideCallback}
+          continuous
+          run={run}
+          showSkipButton
+          steps={steps}
+          styles={{
+            options: {
+              arrowColor: "rgb(93,93,255)",
+              backgroundColor: "rgb(93,93,255)",
+              primaryColor: "rgb(93,93,255)",
+              textColor: 'white',
+            },
+          }}
+        />
+      )}
+
       <Form
         setFile={setFile as Dispatch<SetStateAction<File | null>>}
         file={file}
@@ -69,9 +275,8 @@ export default function App() {
         outputIndices={outputIndices}
         setResults={setResults}
       />
-      {results && 
-        <Results results={results} selectedChain={selectedChain}/>
-      }
+      
+      <Results results={results} selectedChain={selectedChain}/>
     </>
   )
 }

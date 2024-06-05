@@ -27,9 +27,10 @@ export const translateDNAtoAA = (dna: string): string => {
     // Iterate over the DNA sequence in steps of 3 (codon length)
     for (let i = 0; i < dna.length; i += 3) {
       const codon = dna.substr(i, 3);
-  
+      
       // Ensure the codon length is 3 before translation
       if (codon.length === 3) {
+        
         const aa = codonTable[codon] || 'X'; // Use '?' for unknown codons
         aaSequence += aa;
       }

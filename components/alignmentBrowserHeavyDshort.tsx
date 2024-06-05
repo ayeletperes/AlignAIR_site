@@ -1,7 +1,9 @@
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SelectWidgetVertical2, splitSequence, GetSequenceMismatchIdx } from './customSelect';
-import {AlignedSequence, AlignedGermlineSequence} from './alignedSequence';
+import {AlignedBlock} from './alignedSequence';
 import {translateDNAtoAA} from './translateDNA';
+import {numberIghv, splitRegions, findRegionIndicesForNtChunks} from './regions';
+import {anchorIGHJ} from './reference'
 
 interface AlignmentBrowserProps {
     results: any;
@@ -53,17 +55,23 @@ export const AlignmentBrowserHeavyDshort: React.FC<AlignmentBrowserProps> = ({ r
     const [mismatchV, setMismatchV] = useState<{ [key: number]: number[] }>({});
     const [mismatchD, setMismatchD] = useState<{ [key: number]: number[] }>({});
     const [mismatchJ, setMismatchJ] = useState<{ [key: number]: number[] }>({});
+    const [splitedGVAA, setSplitedGVAA] = useState<string[]>([]);
+    const [splitedGDAA, setSplitedGDAA] = useState<string[]>([]);
+    const [splitedGJAA, setSplitedGJAA] = useState<string[]>([]);
+    const [germline, setGermline] = useState<{ [key: string]: string }>({});
+    const [germlineAA, setGermlineAA] = useState<string>('');
 
-    const sequence = results.sequence.slice(results.v_sequence_start);
+    let sequence = results.sequence.slice(results.v_sequence_start);
 
     // if the sequence is short on the 5' padd with N for the translation, and then remove.
+    
     let sequenceAA = translateDNAtoAA(sequence);
+    let paddSize = 0;
     if(results.v_germline_start>0){
-        const padding = 'N'.repeat(results.v_germline_start);
-        const sequencePad = padding + sequence;
-        sequenceAA = translateDNAtoAA(sequencePad);
-        // remove all the padding 'X'
-        sequenceAA = sequenceAA.replace(/X/g, '');
+        paddSize = results.v_germline_start;
+        const padding = '.'.repeat(paddSize);
+        sequence = padding + sequence;
+        sequenceAA = translateDNAtoAA(sequence);
     }
     
     
@@ -75,25 +83,113 @@ export const AlignmentBrowserHeavyDshort: React.FC<AlignmentBrowserProps> = ({ r
     const jSeqEnd = results.j_sequence_end - vSeqStart;
     vSeqStart = vSeqStart-results.v_sequence_start;
     
-    const vAAIndex: number = Math.floor(vSeqEnd / 3);
-    const jAAIndex: number = Math.floor(jSeqStart / 3);
+    let vAAIndex: number = Math.floor(vSeqEnd / 3);
+    let jAAIndex: number = Math.floor(jSeqStart / 3);
     
-    const sequenceV: string = sequenceAA.slice(0, vAAIndex);
-    const sequenceD: string = sequenceAA.slice(vAAIndex, jAAIndex);
-    const sequenceJ: string = sequenceAA.slice(jAAIndex);
+    let sequenceV: string = sequenceAA.slice(0, vAAIndex);
+    let sequenceD: string = sequenceAA.slice(vAAIndex, jAAIndex);
+    let sequenceJ: string = sequenceAA.slice(jAAIndex);
 
+    let remainingV = vSeqEnd-(sequenceV.length*3);
+    let remainingD = jSeqStart-((sequenceV.length+sequenceD.length)*3);
+    
+    let splitGAA = false;
+    
+    if(remainingV==2){
+      // add the aa to the V. else add it to the D
+      vAAIndex = vAAIndex+1;
+      sequenceV = sequenceAA.slice(0, vAAIndex);
+      
+      // remainingV = 1;
+      if(remainingD==2){
+        // add the aa to the D. else add it to the J
+        jAAIndex = jAAIndex+1;
+        
+        sequenceD = sequenceAA.slice(vAAIndex, jAAIndex);
+        sequenceJ = sequenceAA.slice(jAAIndex)
+        
+        // remainingD = 1;
+      }else{
+        sequenceD = sequenceAA.slice(vAAIndex, jAAIndex);
+        sequenceJ = sequenceAA.slice(jAAIndex)
+      }
+      splitGAA = true;
+    }else{
+      sequenceV = sequenceAA.slice(0, vAAIndex);
+      if(remainingD==2){
+        jAAIndex = jAAIndex+1;
+        // add the aa to the D. else add it to the J
+        sequenceD = sequenceAA.slice(vAAIndex, jAAIndex);
+        
+        sequenceJ = sequenceAA.slice(jAAIndex)
+
+        // remainingD = 1;
+      }else{
+        sequenceD = sequenceAA.slice(vAAIndex, jAAIndex);
+        sequenceJ = sequenceAA.slice(jAAIndex)
+      }
+      splitGAA = true;
+    }
+    
+    
+    
+    
+
+    
+    console.log(sequence.length/maxCharsPerRow, vSeqStart)
     const splitV = splitSequence(sequence.slice(vSeqStart,vSeqEnd), maxCharsPerRow)
+    console.log(splitV)
     const splitVAA = splitSequence(sequenceV, maxCharsPerRow/3)
     const splitD = splitSequence(sequence.slice(vSeqEnd,jSeqStart), maxCharsPerRow)
     const splitDAA = splitSequence(sequenceD, maxCharsPerRow/3)
     const splitJ = splitSequence(sequence.slice(jSeqStart), maxCharsPerRow)
     const splitJAA = splitSequence(sequenceJ, maxCharsPerRow/3)
-
     const np1 = dSeqStart - (vSeqEnd);
     const np2 = jSeqStart - (dSeqEnd);
-    const reamningV = vSeqEnd-sequenceV.length*3;
-    const reamningD = jSeqStart-(sequenceV.length+sequenceD.length)*3;
 
+    const [gappedAA, gappNotes] = numberIghv(sequenceV);
+    console.log(gappedAA)
+    let Vregions = null;
+    let Jregions = null;
+    let Dregions = null;
+    if(gappNotes===''){
+      const regionGappedAA = gappedAA? splitRegions(gappedAA): {'':""};
+      Vregions = findRegionIndicesForNtChunks(regionGappedAA, splitVAA, splitV)
+
+      Dregions = [
+        {
+          ntChunk: splitD[0],
+          regions: [
+            {
+              region:'CDR3',
+              ntIndices: [0, splitD[0].length]
+            }
+          ]
+        }
+      ]
+      // get the end of the cdr3
+      const anchor = results.j_call[0]?anchorIGHJ[results.j_call[0]]:null;
+      if(anchor){
+        const janchoridx = anchor - results.j_germline_start
+        Jregions = [
+          {
+            ntChunk: splitJ[0],
+            regions: [
+              {
+                region:'CDR3',
+                ntIndices: [0, janchoridx]
+              },
+              {
+                region:'FR4',
+                ntIndices: [janchoridx, splitJ[0].length]
+              },
+            ]
+          }
+        ]
+      }
+
+      
+    }
     useEffect(() => {
       setSelectedSequenceV(
         referenceAlleles['v_call'][results.v_call[0]].slice(results.v_germline_start, results.v_germline_end)
@@ -115,6 +211,36 @@ export const AlignmentBrowserHeavyDshort: React.FC<AlignmentBrowserProps> = ({ r
     }, [results, selectedSequenceV, selectedSequenceJ]);
   
  
+    useEffect(() => {
+      if(selectedSequenceV && selectedSequenceD && selectedSequenceJ&& splitGAA){
+        const gr = {
+          v_call: selectedSequenceV,
+          j_call: selectedSequenceJ,
+          np1: sequence.slice(vSeqEnd, dSeqStart),
+          np2: sequence.slice(dSeqEnd, jSeqStart),
+        }
+        setGermline(gr);
+        
+        const sequenceGermline = gr['v_call'] + gr['np1'] + gr['np2'] + gr['j_call'];
+        
+        let germlineAAPad = translateDNAtoAA(sequenceGermline);
+        setGermlineAA(germlineAAPad)
+  
+        if(results.v_germline_start>0){
+            const padding = 'N'.repeat(results.v_germline_start);
+            const sequencePad = padding + sequenceGermline;
+            germlineAAPad = translateDNAtoAA(sequencePad);
+            // remove all the padding 'X'
+            germlineAAPad = germlineAAPad.replace(/X/g, '');
+            setGermlineAA(germlineAAPad);
+        }
+        
+        setSplitedGVAA(splitSequence(germlineAAPad.slice(0, vAAIndex), maxCharsPerRow/3));
+        setSplitedGDAA(splitSequence(germlineAAPad.slice(vAAIndex, jAAIndex), maxCharsPerRow/3));
+        setSplitedGJAA(splitSequence(germlineAAPad.slice(jAAIndex), maxCharsPerRow/3));
+      }
+    }, [selectedSequenceV, selectedSequenceD, selectedSequenceJ, splitGAA]);
+
     const rows = {
       header: 1,
       seq: 2,
@@ -128,127 +254,153 @@ export const AlignmentBrowserHeavyDshort: React.FC<AlignmentBrowserProps> = ({ r
     const jrow = (index: number) => (index * 2) + (vrow + 2)
     const jrowG = (index: number) => jrow(index) + 1
     
-    if(selectedSequenceV){
-        const renderVerticalView = () => (
-        <div className="alignment-browser vertical-view scrollbar-custom">
+    const renderVerticalView = () => (
+      <div className="alignment-grid scrollbar-custom" style={{gridTemplateRows:`'${splitV.length*75}"px" ${splitD.length*75}"px" ${splitJ.length*75}"px"'`}}>
+
+          <div className="subgrid-col1" style={{gridColumn:1}}>
             {splitV.map((chunk, index) => (
-            <React.Fragment key={`input-sequence-v-${index}`}>
-                <div className={`alignment-label`} style={{ gridRow: (index * 2) + 2, gridColumn:1 }}>
-                <span className={`alignment-label v_input-${index}`} style={{fontSize:'12px'}}>V</span>
-                </div>
-                <div className="sequence input-sequence-v" style={{ gridRow: (index * 2) + 2, gridColumn: 2 }}>
-                <AlignedSequence sequence={chunk} aasequence={splitVAA[index]} mismatch={mismatchV[index]}/>
-                </div>
-            </React.Fragment>
-            ))}
-
-            
-            <div className="alignment-label" style={{ gridRow: rows.v }}>
-                <SelectWidgetVertical2
-                call='v_call'
-                results={results}
-                reference={referenceAlleles}
-                setSelected={setSelectedSequenceV}
-                selected={selectedSequenceV}
-                selectedAllele={selectedAlleleV}
-                setSelectedAllele={setSelectedAlleleV}
-                setSplitedSeq={setSplitedSequenceV}
-                maxCharsPerRow={maxCharsPerRow}
-                setMismatch={setMismatchV}
-                />
-            </div>
-    
-            
-            {splitedSequenceV.map((chunk, index) => (
-            <React.Fragment key={`v-sequence-${index}`}>
-                {index > 0 && (
-                <div className={`alignment-label`} style={{ gridRow: (index * 2) + rows.v, gridColumn:1 }}>
-                    <span className={`alignment-label v_call-${index}`} style={{fontSize:'12px'}}>{selectedAlleleV}</span>
-                </div>
-                )}
-                <div className="sequence" style={{ gridRow: (index * 2) + rows.v, gridColumn: 2 }}>
-                {/* <span className={`allele v_call-${index}`}>{chunk}</span> */}
-
-                <div className="alignment-container">
-                <div className="alignment-row" style={{gridRow:1}}>
-                    {chunk.split('').map((char, index) => (
-                        <span key={index} className="alignment-char" style={{gridRow:1, gridColumn:index}}>
-                        {char}
-                        </span>
-                    ))}
+                <React.Fragment key={`input-allele-v-${index}`}>
+                  {index === 0 && (
+                    <div className="subgrid-col1-row" style={{gridRow:1}}>
+                      <SelectWidgetVertical2
+                          call='v_call'
+                          chain='IGH'
+                          results={results}
+                          reference={referenceAlleles}
+                          setSelected={setSelectedSequenceV}
+                          selected={selectedSequenceV}
+                          selectedAllele={selectedAlleleV}
+                          setSelectedAllele={setSelectedAlleleV}
+                          setSplitedSeq={setSplitedSequenceV}
+                          maxCharsPerRow={maxCharsPerRow}
+                          setMismatch={setMismatchV}
+                          setGermline={setGermline}
+                          germline={germline}
+                          setGermlineAA={setGermlineAA}
+                          setSplittedGAA={setSplitedGVAA}
+                          splitStart={0}
+                          splitEnd={vAAIndex}
+                      />
+                    
                     </div>
-                </div>
-
-
-                </div>
-            </React.Fragment>
+                    )
+                  }
+                  {index > 0 && (
+                    <div className="subgrid-col1-row" style={{gridRow:index+1, color:"black"}}>
+                    {selectedAlleleV}
+                    </div>
+                  )}
+                </React.Fragment>
             ))}
+            
+            
+            
+              
+          </div>
+          <div className="subgrid-col2" style={{gridColumn:2, gridTemplateRows:`repeat(${splitV.length},"20px")`, gridTemplateColumns:`repeat(${maxCharsPerRow},"15px")`}}>
+            {splitV.map((chunk, index) => (
+                <React.Fragment key={`input-sequence-v-${index}`}>
+                    
+                    {Vregions?
+                      <AlignedBlock sequence={chunk} regions={Vregions[index]} aasequence={splitVAA[index]} germline={splitedSequenceV[index]} aagermline={splitedGVAA[index]} mismatch={mismatchV[index]} />:
+                      <AlignedBlock sequence={chunk} regions={Vregions} aasequence={splitVAA[index]} germline={splitedSequenceV[index]} aagermline={splitedGVAA[index]} mismatch={mismatchV[index]} />}
+                    
+                </React.Fragment>
+            ))}
+          </div>
 
-
+          <div className="subgrid-col2" style={{gridColumn:2, height:`${splitD.length*75}"px"`,gridTemplateRows:`repeat(${splitD.length},"20px")`, gridTemplateColumns:`repeat(${maxCharsPerRow},"15px")`}}>
             {splitD.map((chunk, index) => (
               <React.Fragment key={`input-sequence-d-${index}`}>
-                  <div className={`alignment-label`} style={{ gridRow: drow(index), gridColumn:1 }}>
-                  <span className={`alignment-label d_input-${index}`} style={{fontSize:'12px'}}>D</span>
-                  </div>
-                  <div className="sequence input-sequence-d" style={{ gridRow: drow(index), gridColumn: 2 }}>
-                      <div className="alignment-np">
-                        <AlignedSequence sequence={chunk} aasequence={splitDAA[index]} mismatch={mismatchD[index]} remainingNuc={reamningV}/>
-                      </div>
-                  </div>
+              {splitD.length === 1 ? (
+                      <AlignedBlock sequence={chunk} regions={Dregions ? Dregions[index] : Dregions} aasequence={splitDAA[index]} germline={splitedSequenceD[index]} aagermline={splitedGDAA[index]} mismatch={mismatchD[index]} np1={np1} np2={np2} remainingNucPrev={remainingV} remainingNucCur={remainingD}/>
+                  ) : splitD.length > 1 && index === 0 ? (
+                      <AlignedBlock sequence={chunk} regions={Dregions ? Dregions[index] : Dregions} aasequence={splitDAA[index]} germline={splitedSequenceD[index]} aagermline={splitedGDAA[index]} mismatch={mismatchD[index]} np1={np1} remainingNucPrev={remainingV} />
+                  ) : splitD.length > 1 && (splitD.length - 1) === index ? (
+                      <AlignedBlock sequence={chunk} regions={Dregions ? Dregions[index] : Dregions} aasequence={splitDAA[index]} germline={splitedSequenceD[index]} aagermline={splitedGDAA[index]} mismatch={mismatchD[index]} np2={np2} remainingNucCur={remainingD}/>
+                  ) : splitD.length > 1 && splitD.length < index && index > 0 ? (
+                      <AlignedBlock sequence={chunk} regions={Dregions ? Dregions[index] : Dregions} aasequence={splitDAA[index]} germline={splitedSequenceD[index]} aagermline={splitedGDAA[index]} mismatch={mismatchD[index]} />
+                  ) : null}
+
               </React.Fragment>
             ))}
-    
-            
+          </div>
+
+          <div className="subgrid-col1" style={{gridColumn:1}}>
             {splitJ.map((chunk, index) => (
-            <React.Fragment key={`input-sequence-j-${index}`}>
-                <div className={`alignment-label`} style={{ gridRow: jrow(index), gridColumn:1 }}>
-                <span className={`alignment-label j_input-${index}`} style={{fontSize:'12px'}}>J</span>
-                </div>
-                
-                <div className="sequence input-sequence-j" style={{ gridRow: jrow(index), gridColumn: 2 }}>
-                    <AlignedSequence sequence={chunk} aasequence={splitJAA[index]} mismatch={mismatchJ[index]} remainingNuc={reamningD}/>
-                </div>
-            </React.Fragment>
-            ))}
-    
-            <div className="alignment-label" style={{ gridRow: (vrow + 2 + 1) }}>
-            <SelectWidgetVertical2
-                call='j_call'
-                results={results}
-                reference={referenceAlleles}
-                setSelected={setSelectedSequenceJ}
-                selected={selectedSequenceJ}
-                selectedAllele={selectedAlleleJ}
-                setSelectedAllele={setSelectedAlleleJ}
-                setSplitedSeq={setSplitedSequenceJ}
-                maxCharsPerRow={maxCharsPerRow}
-                setMismatch={setMismatchJ}
-            />
-            </div>
-            
-            {splitedSequenceJ.map((chunk, index) => (
-            <React.Fragment key={`j-sequence-${index}`}>
-                {index > 0 && (
-                <div className={`alignment-label j_call-${index}`} style={{ gridRow: jrowG(index), gridColumn:1 , fontSize:'12px'}}>
+                <React.Fragment key={`input-allele-j-${index}`}>
+                  {index === 0 && (
+                    <div className="subgrid-col1-row" style={{gridRow:1}}>
+                      <SelectWidgetVertical2
+                          call='j_call'
+                          chain='IGH'
+                          results={results}
+                          reference={referenceAlleles}
+                          setSelected={setSelectedSequenceJ}
+                          selected={selectedSequenceJ}
+                          selectedAllele={selectedAlleleJ}
+                          setSelectedAllele={setSelectedAlleleJ}
+                          setSplitedSeq={setSplitedSequenceJ}
+                          maxCharsPerRow={maxCharsPerRow}
+                          setMismatch={setMismatchJ}
+                          setGermline={setGermline}
+                          germline={germline}
+                          setGermlineAA={setGermlineAA}
+                          setSplittedGAA={setSplitedGJAA}
+                          splitStart={jAAIndex}
+                          splitEnd={sequenceJ.length}
+                      />
+                    
+                    </div>
+                    )
+                  }
+                  {index > 0 && (
+                    <div className="subgrid-col1-row" style={{gridRow:index+1, color:"black"}}>
                     {selectedAlleleJ}
-                </div>
-                )}
-                <div className="sequence" style={{ gridRow: jrowG(index), gridColumn: 2}}>
-                    <AlignedGermlineSequence sequence={chunk}/>
-                </div>
-            </React.Fragment>
+                    </div>
+                  )}
+                </React.Fragment>
             ))}
-        </div>
-        );
-    
-        return (
-        <div>
-            <div className='bg-white relative overflow-x-auto'>
-            {renderVerticalView()}
+          </div>
+          <div className="subgrid-col2" style={{gridColumn:2, gridTemplateRows:`repeat(${splitJ.length},"20px")`, gridTemplateColumns:`repeat(${maxCharsPerRow},"15px")`}}>
+            {splitJ.map((chunk, index) => (
+                <React.Fragment key={`input-sequence-v-${index}`}>
+                    
+                    <AlignedBlock sequence={chunk} regions={Jregions ? Jregions[index] : Dregions} aasequence={splitJAA[index]} germline={splitedSequenceJ[index]} aagermline={splitedGJAA[index]} mismatch={mismatchJ[index]} remainingNucPrev={remainingD}/>
+                    
+                </React.Fragment>
+            ))}
+          </div>
+      </div>
+      
+  );
+
+if(selectedSequenceV && selectedSequenceD && selectedSequenceJ && splitedGVAA.length>0 && splitedGDAA.length>0 && splitedGJAA.length>0 && sequenceJ!="" && sequenceD!="" && sequenceV!="" && sequence!="" && sequenceAA!="" && germlineAA!="" && splitDAA.length>0 && splitVAA.length>0 && splitJAA.length>0){  
+      
+      return (
+      <div>
+          <div className='bg-white relative overflow-x-auto'>
+          {renderVerticalView()}
+          </div>
+          <div className='alignment-legend'>
+              <div style={{backgroundColor:'#F09EA7', gridRow:1}}>''</div>
+              <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>FR1</div>
+              <div style={{backgroundColor:'#F6CA94', gridRow:1}}>''</div>
+              <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>CDR1</div>
+              <div style={{backgroundColor:'#FAFABE', gridRow:1}}>''</div>
+              <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>FR2</div>
+              <div style={{backgroundColor:'#C1EBC0', gridRow:1}}>''</div>
+              <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>CDR2</div>
+              <div style={{backgroundColor:'#C7CAFF', gridRow:1}}>''</div>
+              <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>FR3</div>
+              <div style={{backgroundColor:'#CDABEB', gridRow:1}}>''</div>
+              <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>CDR3</div>
+              <div style={{backgroundColor:'#F6C2F3', gridRow:1}}>''</div>
+              <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>FR4</div>
             </div>
-        </div>
-        );
-    }
+      </div>
+      );
+  }
   }
   
   

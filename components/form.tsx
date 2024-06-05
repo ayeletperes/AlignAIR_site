@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import LoadModelComponent from './modelLoad';
 import FileInput from './fileInput';
 import SequenceInput from './sequenceinput';
@@ -47,12 +47,14 @@ const Form: React.FC<FormProps> = ({
   setResults,
   setSubmission,
 }) => {
+
+
   return (
     <section>
       <div className="relative pt-32 pb-10 md:pt-40 md:pb-16">
         <div className="max-w-6xl mx-auto px-2 sm:px-2">
         <h1 className="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
-          <span className="text-white">
+          <span id="alignair" className="text-white">
             AlignAIR <sub className="text-white text-sm align-baseline">beta</sub>
           </span>
         </h1>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { extractGermline } from './postProcessing';
-
+import { translateDNAtoAA } from './translateDNA';
 
 export const GetSequenceMismatchIdx = (sequence: string, germline: string, maxCharsPerRow: number) => {
   let mismatch: { [key: number]: number[] } = {}; // Initialize mismatch as a dictionary
@@ -20,9 +20,9 @@ export const GetSequenceMismatchIdx = (sequence: string, germline: string, maxCh
       }
   }
   }
-
   return mismatch;
 };
+
 
 export function getColor(likelihood: number): string {
   if (likelihood > 0.9) {
@@ -77,6 +77,7 @@ const SmallPillWithText2: React.FC<{ text: string; color: string }> = ({ text, c
 // Define the type for results and reference based on your actual data structure
 interface SelectWidgetVerticalProps {
   call: string;
+  chain: string;
   results: any;
   reference: any;
   setSelected: (seq: string) => void;
@@ -86,10 +87,17 @@ interface SelectWidgetVerticalProps {
   setSplitedSeq: (splitedSeq: string[]) => void;
   maxCharsPerRow: number;
   setMismatch: (mismatch: { [key: number]: number[] }) => void;
+  setGermline: (germline: { [key: string]: string}) => void;
+  germline: { [key: string]: string};
+  setGermlineAA: (germlineAA: string) => void;
+  setSplittedGAA: (splittedGAA: string[]) => void;
+  splitStart: number;
+  splitEnd: number;
 }
 
 export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
   call,
+  chain,
   results,
   reference,
   setSelected,
@@ -99,6 +107,12 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
   setSplitedSeq,
   maxCharsPerRow,
   setMismatch,
+  setGermline,
+  germline,
+  setGermlineAA,
+  setSplittedGAA,
+  splitStart,
+  splitEnd
 }) => {
     const alleles: string[] = results[call];
     const likelihoods: number[] = results[`${call.charAt(0)}_likelihoods`];
@@ -117,6 +131,7 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
       k: k,
     });
     setSelected(seq);
+    setGermline({[call]: seq});
     const mismatch = GetSequenceMismatchIdx(results.sequence.slice(results[call.charAt(0) + "_sequence_start"],results[call.charAt(0) + "_sequence_end"]), seq, maxCharsPerRow);
     setMismatch(mismatch);
     const splitedSeq = splitSequence(seq, maxCharsPerRow);
@@ -127,7 +142,25 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
         alleleElement.textContent = seq;
       }
     });
+    let sequenceGermline = '' 
+    if(chain==='IGH'){
+      sequenceGermline = germline['v_call'] + germline['np1'] + germline['d_call'] + germline['np2'] + germline['j_call'];
+    }else{
+      sequenceGermline = germline['v_call'] + germline['np1'] + germline['j_call'];
+    }
 
+    let seqAA = translateDNAtoAA(sequenceGermline);
+    setGermlineAA(seqAA)
+
+    if(results.v_germline_start>0){
+        const padding = 'N'.repeat(results.v_germline_start);
+        const sequencePad = padding + sequenceGermline;
+        seqAA = translateDNAtoAA(sequencePad);
+        // remove all the padding 'X'
+        seqAA = seqAA.replace(/X/g, '');
+        setGermlineAA(seqAA);
+    }
+    setSplittedGAA(splitSequence(seqAA.slice(splitStart, splitEnd), maxCharsPerRow/3));
     // const likelihoodElement = document.querySelector(`.likelihood.${call}`) as HTMLElement;
     // if (likelihoodElement) {
     //   likelihoodElement.textContent = Number(likelihoods[index].toFixed(3)).toString();
@@ -162,7 +195,7 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
               color={getColor(likelihoods[alleles.indexOf(selectedAllele)])} // Example color
             />
           ) : null}
-          <span className="block truncate" style={{fontSize:'12px'}}>{selectedAllele}</span>
+          <span className="block truncate" style={{fontSize:'14px', color:"black"}}>{selectedAllele}</span>
         </div>
         <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
           <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">

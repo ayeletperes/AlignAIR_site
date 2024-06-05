@@ -2,6 +2,9 @@ import * as tf from '@tensorflow/tfjs';
 import { SequenceTokenizer, SequenceTokenizerLight } from './processSequence';
 import { extractAllele, extratSegmentation, extratProductivity, extractGermline, extratType } from './postProcessing';
 
+
+
+
 export async function processBatch(
   batchKeys: string[],
   dataDict: { [key: string]: any },
@@ -37,6 +40,17 @@ export async function processBatch(
   });
 
   
+  let entropyValid: { [key: string]: boolean } = {
+    v_call: false,
+    d_call: false,
+    j_call: false,
+  }
+
+  const entropyThreshold: { [key: string]: number } = {
+    v_call: 2,
+    d_call: 2,
+    j_call: 1,
+  };
 
   await Promise.all(
     features.map(async feature => {
@@ -56,9 +70,27 @@ export async function processBatch(
       const processedData = await Promise.all(
         tensorArray.map(async (tensor: tf.Tensor<tf.Rank>, index: number) => {
           if (['v_call', 'd_call', 'j_call'].includes(feature)) {
-            const alleles = extractAllele.dynamicCumulativeConfidenceThreshold(tensor, confidences[feature], caps[feature], AlleleCallOHE[feature]);
-            tensorsToDispose.push(tensor);
-            return alleles;
+
+            const array = await tensor.array() as number[][];
+            const flattenedArray = array.flat();
+            const sumProb = flattenedArray.reduce((a, b) => a + b, 0);
+            const entropy = sumProb * Math.log(sumProb) || 0;
+
+            const thresh = entropyThreshold[feature] || 0;
+
+          
+            if(entropy < thresh){
+              entropyValid[feature] = true;
+              const alleles = extractAllele.dynamicCumulativeConfidenceThreshold(tensor, confidences[feature], caps[feature], AlleleCallOHE[feature]);
+              tensorsToDispose.push(tensor);
+              return alleles;
+            }else{
+              tensorsToDispose.push(tensor);
+              const allelesempty = {index: [], prob: null};
+              return allelesempty;
+            }
+
+            
           } else {
             if (['mutation_rate', 'ar_indels'].includes(feature)) {
               const array = tensor.arraySync()
@@ -97,8 +129,13 @@ export async function processBatch(
           dataDict[key] = {};
         }
         if (['v_call', 'd_call', 'j_call'].includes(feature)) {
-          dataDict[key][feature] = element.index;
-          dataDict[key][feature.charAt(0) + '_likelihoods'] = element.prob;
+          if (entropyValid[feature]) {
+            dataDict[key][feature] = element.index;
+            dataDict[key][feature.charAt(0) + '_likelihoods'] = element.prob;
+          } else {
+            dataDict[key][feature] = '';
+            dataDict[key][feature.charAt(0) + '_likelihoods'] = null;
+          }
         } else {
           if (feature === 'mutation_rate') {
             dataDict[key][feature] = element;
@@ -115,6 +152,8 @@ export async function processBatch(
           }
         }
       });
+
+      
     })
   );
 
@@ -125,13 +164,23 @@ export async function processBatch(
     const alleles = chain==='Heavy' ? ['v', 'd', 'j'] : ['v', 'j'];
     alleles.forEach((allele: string) => {
       const k = allele === 'd' ? 5 : 15;
-      const segments = extractGermline.HeuristicReferenceMatcher({
-        results: item,
-        segment: allele,
-        referenceAlleles: AlleleCallOHE[`${allele}_call`],
-        k: k,
-      });
-      dataDict[key] = { ...dataDict[key], ...segments };
+      
+      if (entropyValid[allele+'_call']) {
+        const segments = extractGermline.HeuristicReferenceMatcher({
+          results: item,
+          segment: allele,
+          referenceAlleles: AlleleCallOHE[`${allele}_call`],
+          k: k,
+        });
+        dataDict[key] = { ...dataDict[key], ...segments };
+      }else{
+        dataDict[key][allele + '_germline_start'] = null;
+        dataDict[key][allele + '_germline_end'] = null;
+        dataDict[key][allele + '_sequence_start'] = null;
+        dataDict[key][allele + '_sequence_end'] = null;
+        
+    }
+      
     });
   });
 

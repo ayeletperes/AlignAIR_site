@@ -140,7 +140,7 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence 
                 <button id="clearFile" className="text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-lg w-full sm:w-auto px-3 py-2 text-xs font-medium text-center dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800" onClick={clearFile}>Remove file</button>
                 </div>
         </div>
-        <div className="flex items-center justify-center w-full relative z-10">
+        <div id="fileinput" className="flex items-center justify-center w-full relative z-10">
           <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" 
           onChange={handleFileUpload} 
           ref={setRefs}

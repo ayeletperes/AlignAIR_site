@@ -147,7 +147,7 @@ const LoadModelComponent: React.FC<LoadModelComponentProps> = ({ setSelectedChai
     return (
       <div>
         <p>Immunoglobulin Chain</p>
-        <div className="inline-flex rounded-md shadow-sm" role="group">
+        <div id="modelButtons" className="inline-flex rounded-md shadow-sm" role="group">
           <button 
             id="Heavy"
             value="Heavy"
