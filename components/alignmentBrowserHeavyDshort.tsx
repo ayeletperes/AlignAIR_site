@@ -136,9 +136,9 @@ export const AlignmentBrowserHeavyDshort: React.FC<AlignmentBrowserProps> = ({ r
     
 
     
-    console.log(sequence.length/maxCharsPerRow, vSeqStart)
+    
     const splitV = splitSequence(sequence.slice(vSeqStart,vSeqEnd), maxCharsPerRow)
-    console.log(splitV)
+    
     const splitVAA = splitSequence(sequenceV, maxCharsPerRow/3)
     const splitD = splitSequence(sequence.slice(vSeqEnd,jSeqStart), maxCharsPerRow)
     const splitDAA = splitSequence(sequenceD, maxCharsPerRow/3)
@@ -148,7 +148,7 @@ export const AlignmentBrowserHeavyDshort: React.FC<AlignmentBrowserProps> = ({ r
     const np2 = jSeqStart - (dSeqEnd);
 
     const [gappedAA, gappNotes] = numberIghv(sequenceV);
-    console.log(gappedAA)
+    
     let Vregions = null;
     let Jregions = null;
     let Dregions = null;

@@ -101,7 +101,7 @@ export const AlignmentBrowserLight: React.FC<AlignmentBrowserProps> = ({ results
     const np1 = jSeqStart - (vSeqEnd);
 
     const [gappedAA, gappNotes] = numberIghv(sequenceV);
-    console.log(gappedAA)
+    
     let Vregions = null;
     let Jregions = null;
     if(gappNotes===''){
