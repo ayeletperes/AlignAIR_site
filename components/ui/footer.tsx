@@ -24,21 +24,24 @@ export default function Footer() {
             </div>
 
             {/* 2nd, 3rd and 4th blocks */}
-            <div className="md:col-span-8 lg:col-span-7 grid sm:grid-cols-2 gap-8">
+            <div className="md:col-span-8 lg:col-span-7 grid sm:grid-cols-3 gap-8">
 
               {/* 2nd block */}
               <div className="text-sm">
                 <h6 className="text-gray-200 font-medium mb-1">Products</h6>
                 <ul>
                   <li className="mb-1">
-                    <Link href="/" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">AlignAIR Web Interface</Link>
+                    <Link href="/alignair" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">AlignAIR Web Interface</Link>
                   </li>
                   <li className="mb-1">
+                    <Link href="https://pypi.org/project/GenAIRR/" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">GenAIRR: AIRR Sequence Simulator</Link>
+                  </li>
+                  {/* <li className="mb-1">
                     <Link href="/" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">AlignAIR Protable Docker</Link>
                   </li>
                   <li className="mb-1">
                     <Link href="/" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">Docker Parameter Editor</Link>
-                  </li>
+                  </li> */}
                 </ul>
               </div>
 
@@ -50,6 +53,27 @@ export default function Footer() {
                     <Link href="https://github.com/MuteJester/GenAIRR" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">GenAIRR Github</Link>
                   </li>
                   <li className="mb-1">
+                    <Link href="https://github.com/muteJester/AlignAIRR/" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">AlignAIR Github</Link>
+                  </li>
+                  {/* <li className="mb-1">
+                    <Link href="/" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">Aligner Benchmarking</Link>
+                  </li>
+                  <li className="mb-1">
+                    <Link href="/" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">Manuscript</Link>
+                  </li> */}
+                  {/* <li className="mb-1">
+                    <Link href="/" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">Buy us a Coffee</Link>
+                  </li> */}
+                </ul>
+              </div>
+
+              <div className="text-sm">
+                <h6 className="text-gray-200 font-medium mb-1">Help</h6>
+                <ul>
+                  <li className="mb-1">
+                    <Link href="mailto::support@alignair.ai" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">Support</Link>
+                  </li>
+                  {/* <li className="mb-1">
                     <Link href="/" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">AlignAIR Github</Link>
                   </li>
                   <li className="mb-1">
@@ -57,7 +81,7 @@ export default function Footer() {
                   </li>
                   <li className="mb-1">
                     <Link href="/" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">Manuscript</Link>
-                  </li>
+                  </li> */}
                   {/* <li className="mb-1">
                     <Link href="/" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">Buy us a Coffee</Link>
                   </li> */}

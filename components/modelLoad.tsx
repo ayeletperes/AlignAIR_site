@@ -140,6 +140,7 @@ const LoadModelComponent: React.FC<LoadModelComponentProps> = ({ setSelectedChai
       setSequence('');
       setFile(null);
       setSubmission(true);
+      setIsLoading(true);
       setSelectedChain(buttonId);
       setSelectedModel(model_urls[buttonId]);
     };

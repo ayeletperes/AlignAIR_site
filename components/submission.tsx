@@ -138,7 +138,7 @@ const Submission: React.FC<SubmissionProps> = ({
                 onClick={handleClick}
                 disabled={modelReady || !submission}
               >
-                {submission ? 'Submit' : 'Submitting'}
+                {modelReady? 'Loading model': submission ? 'Submit' : 'Submitting'}
               </button>
             )}
         </div>
