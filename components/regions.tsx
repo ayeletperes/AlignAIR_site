@@ -1,4 +1,5 @@
 import React from 'react';
+import {translateDNAtoAA} from './translateDNA';
 // Copyright (c) 2021 William Lees
 
 // This source code, and any executable file compiled or derived from it, is governed by the European Union Public License v. 1.2,
@@ -283,47 +284,39 @@ function checkConservedResidues(aa: string): string {
     return notes.join(', ');
   }
   
-function gapAlign(seq: string, ref: string): string {
-    const seqI = seq[Symbol.iterator]();
-    let res = '';
-    let started = false;
-  
-    for (const r of ref) {
-      if (r !== '.') {
-        started = true;
-        try {
-          res += seqI.next().value;
-        } catch {
-          res += '.';
+  function gapNtFromAa(nucleotideSeq: string, peptideSeq: string): string {
+    // Helper function to split a string into chunks of a specified size
+    function chunks(str: string, size: number): string[] {
+        const result = [];
+        for (let i = 0; i < str.length; i += size) {
+            result.push(str.slice(i, i + size));
         }
-      } else {
-        if (started) {
-          res += '.';
+        return result;
+    }
+
+    const codons: string[] = chunks(nucleotideSeq, 3);  // Splits nucleotides into codons (triplets)
+    const remains: string = nucleotideSeq.length % 3 !== 0 ? nucleotideSeq.slice(3 * codons.length) : '';
+    const gappedCodons: string[] = [];
+    let codonCount: number = 0;
+
+    for (const aa of peptideSeq) {  // Adds '---' gaps to nucleotide seq corresponding to peptide
+        if (aa !== '-' && aa !== '.') {
+            gappedCodons.push(codons[codonCount]);
+            codonCount++;
         } else {
-          try {
-            res += seqI.next().value;
-          } catch {
-            res += '.';
-          }
+            gappedCodons.push('...');
         }
-      }
     }
-  
-    while (true) {
-      try {
-        res += seqI.next().value;
-      } catch {
-        break;
-      }
+
+    // Account for trailing nt, eg fragment of a codon
+    while (codonCount < codons.length) {
+        gappedCodons.push(codons[codonCount]);
+        codonCount++;
     }
-  
-    let i = res.length - 1;
-    while (i >= 0 && res[i] === '.') {
-      i -= 1;
-    }
-  
-    return res.slice(0, i + 1);
-  }
+
+    return gappedCodons.join('') + remains;
+}
+
   
 function gapAlignAa(seq: string, ref: string): string {
     const seqI = seq[Symbol.iterator]();
@@ -368,27 +361,14 @@ function gapAlignAaFromNt(aaSeq: string, ntGapped: string): string {
     return aaGapped;
   }
   
-function numberIghvFromNt(ntSeq: string): [string | null, string] {
-    const aaSeq = ntSeq.match(/.{3}|.{1,2}$/g)!.map(codon => {
-      const lookup: {[key: string]: string} = {
-        'AAA': 'K', 'AAC': 'N', 'AAG': 'K', 'AAT': 'N', 'ACA': 'T', 'ACC': 'T', 'ACG': 'T', 'ACT': 'T',
-        'AGA': 'R', 'AGC': 'S', 'AGG': 'R', 'AGT': 'S', 'ATA': 'I', 'ATC': 'I', 'ATG': 'M', 'ATT': 'I',
-        'CAA': 'Q', 'CAC': 'H', 'CAG': 'Q', 'CAT': 'H', 'CCA': 'P', 'CCC': 'P', 'CCG': 'P', 'CCT': 'P',
-        'CGA': 'R', 'CGC': 'R', 'CGG': 'R', 'CGT': 'R', 'CTA': 'L', 'CTC': 'L', 'CTG': 'L', 'CTT': 'L',
-        'GAA': 'E', 'GAC': 'D', 'GAG': 'E', 'GAT': 'D', 'GCA': 'A', 'GCC': 'A', 'GCG': 'A', 'GCT': 'A',
-        'GGA': 'G', 'GGC': 'G', 'GGG': 'G', 'GGT': 'G', 'GTA': 'V', 'GTC': 'V', 'GTG': 'V', 'GTT': 'V',
-        'TAA': '*', 'TAC': 'Y', 'TAG': '*', 'TAT': 'Y', 'TCA': 'S', 'TCC': 'S', 'TCG': 'S', 'TCT': 'S',
-        'TGA': '*', 'TGC': 'C', 'TGG': 'W', 'TGT': 'C', 'TTA': 'L', 'TTC': 'F', 'TTG': 'L', 'TTT': 'F',
-      };
-      return lookup[codon] || 'X';
-    }).join('');
-  
+function numberIghvFromNt(ntSeq: string): string | null {
+    const aaSeq = translateDNAtoAA(ntSeq);
     const [aaGapped, status] = numberIghv(aaSeq);
     if (aaGapped) {
-      const ntGapped = gapAlign(ntSeq, aaGapped);
-      return [ntGapped, status];
+      const ntGapped = gapNtFromAa(ntSeq, aaGapped);
+      return ntGapped;
     } else {
-      return [null, status];
+      return null;
     }
   }
   
@@ -402,7 +382,7 @@ export {
     prettyHeader, 
     prettyGapped, 
     checkConservedResidues, 
-    gapAlign, 
+    gapNtFromAa, 
     gapAlignAa, 
     gapAlignAaFromNt, 
     numberIghvFromNt,

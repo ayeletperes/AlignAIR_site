@@ -81,7 +81,8 @@ export async function processBatch(
           
             if(entropy < thresh){
               entropyValid[feature] = true;
-              const alleles = extractAllele.dynamicCumulativeConfidenceThreshold(tensor, confidences[feature], caps[feature], AlleleCallOHE[feature]);
+              const alleles = extractAllele
+              .dynamicCumulativeConfidenceThreshold(tensor, confidences[feature], caps[feature], AlleleCallOHE[feature]);
               tensorsToDispose.push(tensor);
               return alleles;
             }else{
@@ -152,6 +153,7 @@ export async function processBatch(
           }
         }
       });
+    
 
       
     })

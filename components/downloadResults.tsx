@@ -1,33 +1,49 @@
 // add a function that process the results into a downloadable table
 import React from 'react';
+import {numberIghvFromNt} from './regions';
 
+function formatLikelihood(value: number) {
+  // Adjust this condition as needed
+  if (value < 0.001) {
+    return value.toExponential(2);
+  } else {
+    return value.toFixed(3);
+  }
+}
 
 interface ResultsTSVTableProps {
     results: any;
   }
   
   export function ResultsTSVTable({ results }: ResultsTSVTableProps) {
-    const hasD = 'd_call' in results;
     const data = Object.entries(results).map(([index, sequence]: [string, any]) => { // Add type annotation for 'sequence'
+      const sequenceAlignment = numberIghvFromNt(sequence.sequence.substring(sequence.v_sequence_start, sequence.j_sequence_end + 1));
+      
       return {
         sequence_id: (sequence as { name: string }).name,
         sequence: sequence.sequence,
-        type: hasD? 'IGH' : sequence.type,
+        type: sequence.type? sequence.type : 'IGH',
         v_call: sequence.v_call.join(', '),
-        d_call: hasD? sequence.d_call.join(', ') : '',
-        j_call: sequence.j_call.join(', '),
+        d_call: sequence.d_call? sequence.d_call.join(', '): null,
+        j_call: sequence.j_call.join(', '), 
         productive: sequence.productive ? 'true' : 'false',
-        v_likelihoods: sequence.v_likelihoods.join(', '),
-        d_likelihoods: hasD? sequence.d_likelihoods.join(', '):'',
-        j_likelihoods: sequence.j_likelihoods.join(', '),
+        v_likelihoods: sequence.v_likelihoods.map((value: number) => formatLikelihood(value)).join(', '),
+        d_likelihoods: sequence.d_likelihoods? sequence.d_likelihoods.map((value: number) => formatLikelihood(value)).join(', ') : null,
+        j_likelihoods: sequence.j_likelihoods.map((value: number) => formatLikelihood(value)).join(', '),
         mutation_rate: sequence.mutation_rate,
-        sequence_alignment: sequence.sequence.substring(sequence.v_sequence_start, sequence.j_sequence_end + 1),
+        sequence_alignment: sequenceAlignment ? sequenceAlignment : null,
         v_sequence_start: sequence.v_sequence_start,
         v_sequence_end: sequence.v_sequence_end,
-        d_sequence_start: hasD? sequence.d_sequence_start: '',
-        d_sequence_end: hasD? sequence.d_sequence_end: '',
+        v_germline_start: sequence.v_germline_start,
+        v_germline_end: sequence.v_germline_end,
+        d_sequence_start: sequence.d_sequence_start? sequence.d_sequence_start : null,
+        d_sequence_end: sequence.d_sequence_end? sequence.d_sequence_end : null,
+        d_germline_start: sequence.d_germline_start? sequence.d_germline_start : null,
+        d_germline_end: sequence.d_germline_end? sequence.d_germline_end : null,
         j_sequence_start: sequence.j_sequence_start,
         j_sequence_end: sequence.j_sequence_end,
+        j_germline_start: sequence.j_germline_start,
+        j_germline_end: sequence.j_germline_end,
         ar_indels: sequence.ar_indels,
       };
     });
