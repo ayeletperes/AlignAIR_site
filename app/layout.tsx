@@ -35,6 +35,9 @@ export default function RootLayout({
     <html lang="en">
       <Head>
         <link rel="icon" href="/icon.ico" />
+        <title>{metadata.title}</title>
+        <meta name="description" content={metadata.description} />
+        <meta name="keywords" content={metadata.keywords.join(', ')} />
       </Head>
       <body className={`${inter.variable} ${architects_daughter.variable} font-inter antialiased bg-gray-900 text-gray-200 tracking-tight`}>
         <div className="flex flex-col min-h-screen overflow-hidden">
