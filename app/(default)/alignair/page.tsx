@@ -58,6 +58,12 @@ export default function App() {
       setSelectedChain('Heavy');
       setIsClient(true); // Indicate that we are on the client side
 
+      if (window.gtag) {
+        window.gtag('config', 'G-W94F4SGX8B', {
+          'page_title': metadata.title,
+          'page_path': window.location.pathname,
+        });
+      }
   }, []); // Empty dependency array ensures this effect runs only once
 
   const [{ modalIsOpen, run, steps }, setState] = useSetState<State>({
