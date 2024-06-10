@@ -187,7 +187,7 @@ export const AlignedBlock: React.FC<AlignedBlockProps> = ({ sequence, regions, a
 
     for (let i = remainingNucPrev, j = aaStart; i < (sequence.length); i++) {
         if ((i - 1) % 3 === 0 && j <= aasequence.length) {
-            if(aasequence[j] === aagermline[j] && aasequence[j] !== "X"){
+            if(aasequence[j] === aagermline[j] || aasequence[j] === "X"){
                 modifiedAasequence.push(<span key={i} className="alignment-char" style={{gridRow:2}}>{aasequence[j]}</span>);
             }else{
                 modifiedAasequence.push(<span key={i} className="alignment-mismatch" style={{gridRow:2}}>{aasequence[j]}</span>);
@@ -203,7 +203,7 @@ export const AlignedBlock: React.FC<AlignedBlockProps> = ({ sequence, regions, a
         let i = sequence.length-1;
         let j = aasequence.length-1;
         
-        if(aasequence[j] === aagermline[j]){
+        if(aasequence[j] === aagermline[j] || aasequence[j] === "X"){
                 modifiedAasequence.push(<span key={"AA" + i} className="alignment-hidden" style={{gridRow:2}}>{sequence[i]}</span>);
                 modifiedAasequence.push(<span key={i} className="alignment-char" style={{gridRow:2}}>{aasequence[j]}</span>);
         }else{
