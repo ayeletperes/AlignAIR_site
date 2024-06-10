@@ -172,11 +172,27 @@ export const AlignedBlock: React.FC<AlignedBlockProps> = ({ sequence, regions, a
                 
                 
                 for (let j = region.ntIndices[0]; j < region.ntIndices[1]; j++) {
-                        
-                        modifiedRegions.push(
-                                <span key={j} className="alignment-char" style={{gridRow:1, backgroundColor:regionColors[region.region]}}>{''}</span>
-                        
-                        );
+                        if(region.region.startsWith("CDR")){
+                                modifiedRegions.push(
+                                        <span
+                                                key={j}
+                                                className="alignment-char"
+                                                style={{
+                                                        gridRow: 1,
+                                                        backgroundColor: regionColors[region.region],
+                                                        color: `${regionColors[region.region]}`,
+                                                        textShadow: "1px 1px 2px rgba(0, 0, 0, 0.8)",
+                                                }}
+                                        >
+                                                /
+                                        </span>
+                                );
+                        }else{
+                                modifiedRegions.push(
+                                        <span key={j} className="alignment-char" style={{gridRow:1, backgroundColor:regionColors[region.region]}}>{''}</span>
+                                
+                                );
+                        }
                 }
         }
     }else{
