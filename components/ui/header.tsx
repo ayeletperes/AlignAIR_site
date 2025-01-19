@@ -1,7 +1,9 @@
+import React from "react"
 import Link from 'next/link'
 import MobileMenu from './mobile-menu'
 import Image from 'next/image'
 import Logo from '@/public/images/logo_alignair14bw.svg'
+import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button} from "@nextui-org/react";
 
 // The header component. TODO: add the logo and the navigation links.
 
@@ -30,9 +32,33 @@ export default function Header() {
                 </Link>
               </li>
               <li>
-                <Link href="/alignair" className="btn-sm text-white bg-purple-600 hover:bg-purple-700 ml-3">
+                {/* <Link href="/alignair" className="btn-sm text-white bg-purple-600 hover:bg-purple-700 ml-3">
                   AlignAIR
-                </Link>
+                </Link> */}
+                <Dropdown>
+                  <DropdownTrigger>
+                    <Button className="btn-sm text-white bg-purple-600 hover:bg-purple-700 ml-3">
+                      AlignAIR
+                    </Button>
+                  </DropdownTrigger>
+                  <DropdownMenu>
+                    <DropdownItem key="web" className="custom-dropdown-text">
+                      <Link href="/alignair">
+                        AlignAIR Web
+                      </Link>
+                    </DropdownItem>
+                    <DropdownItem key="cli" className="custom-dropdown-text">
+                      <Link href="/cli">
+                        AlignAIR CLI
+                      </Link>
+                    </DropdownItem>
+                    <DropdownItem key="yaml" className="custom-dropdown-text">
+                      <Link href="/yaml">
+                        Generate CLI yaml
+                      </Link>
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
               </li>
             </ul>
           </nav>

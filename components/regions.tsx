@@ -1,6 +1,6 @@
 import React from 'react';
 import {translateDNAtoAA} from './translateDNA';
-// Copyright (c) 2021 William Lees
+// Copyright (c) 2021 William Lees. receptor_utils
 
 // This source code, and any executable file compiled or derived from it, is governed by the European Union Public License v. 1.2,
 // the English version of which is available here: https://perma.cc/DK5U-NDVE

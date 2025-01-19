@@ -1,0 +1,7 @@
+.custom-dropdown-text {
+    color: #8D8DFF; /* Custom purple color */
+  }
+  
+.custom-dropdown-text:hover {
+    color: #5D5DFF; /* Darker on hover */
+}
