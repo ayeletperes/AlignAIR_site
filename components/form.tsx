@@ -1,10 +1,10 @@
 "use client";
 
 import React, { Dispatch, SetStateAction, useEffect } from 'react';
-import LoadModelComponent from './modelLoad';
-import FileInput from './fileInput';
-import SequenceInput from './sequenceinput';
-import ParamInput from './paramInput';
+import LoadModelComponent from './functional/modelLoad';
+import FileInput from './ui/fileInput';
+import SequenceInput from './functional/sequenceinput';
+import ParamInput from './functional/paramInput';
 
 // Define types for the params object
 interface Params {

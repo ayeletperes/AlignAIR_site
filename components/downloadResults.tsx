@@ -1,6 +1,6 @@
 // add a function that process the results into a downloadable table
 import React from 'react';
-import {numberIghvFromNt} from './regions';
+import {numberIghvFromNt} from './pages/regions';
 
 function formatLikelihood(value: number) {
   // Adjust this condition as needed

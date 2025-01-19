@@ -1,5 +1,5 @@
 import React from 'react';
-import {translateDNAtoAA} from './translateDNA';
+import {translateDNAtoAA} from '../functional/translateDNA';
 // Copyright (c) 2021 William Lees. receptor_utils
 
 // This source code, and any executable file compiled or derived from it, is governed by the European Union Public License v. 1.2,

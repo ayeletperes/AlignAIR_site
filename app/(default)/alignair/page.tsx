@@ -6,8 +6,8 @@ import Modal from 'react-modal';
 import { useMount, usePrevious, useSetState } from 'react-use';
 
 import Form from '@/components/form';
-import Submission from '@/components/submission';
-import Results from '@/components/results';
+import Submission from '@/components/pages/submission';
+import Results from '@/components/functional/results';
 import { metadata } from './metadata';
 
 

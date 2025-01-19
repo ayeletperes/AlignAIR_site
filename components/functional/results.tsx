@@ -1,7 +1,7 @@
 import React from 'react';
-import { TabSetResults } from './tabsetView';
-import { DownloadResultsTable } from './downloadResults';
-import {IGType, IGHVConverted, sortedIGHD, sortedIGHJ, LightJ, LightV} from './reference';
+import { TabSetResults } from '../ui/tabsetView';
+import { DownloadResultsTable } from '../downloadResults';
+import {IGType, IGHVConverted, sortedIGHD, sortedIGHJ, LightJ, LightV} from '../reference';
 
 
 type AlleleCallOHE = { [k: string]: IGType | null };

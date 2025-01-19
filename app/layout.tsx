@@ -9,7 +9,7 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import Head from 'next/head'
 
 import Header from '@/components/ui/header'
-import Banner from '@/components/banner'
+import Banner from '@/components/ui/banner'
 
 const inter = Inter({
   subsets: ['latin'],

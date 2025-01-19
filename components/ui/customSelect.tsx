@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { extractGermline } from './postProcessing';
-import { translateDNAtoAA } from './translateDNA';
+import { extractGermline } from '../functional/postProcessing';
+import { translateDNAtoAA } from '../functional/translateDNA';
 
 export const GetSequenceMismatchIdx = (sequence: string, germline: string, maxCharsPerRow: number) => {
   let mismatch: { [key: number]: number[] } = {}; // Initialize mismatch as a dictionary

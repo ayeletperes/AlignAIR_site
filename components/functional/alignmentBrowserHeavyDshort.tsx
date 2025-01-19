@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { SelectWidgetVertical2, splitSequence, GetSequenceMismatchIdx } from './customSelect';
+import { SelectWidgetVertical2, splitSequence, GetSequenceMismatchIdx } from '../ui/customSelect';
 import {AlignedBlock} from './alignedSequence';
 import {translateDNAtoAA} from './translateDNA';
-import {numberIghv, splitRegions, findRegionIndicesForNtChunks} from './regions';
-import {anchorIGHJ} from './reference'
+import {numberIghv, splitRegions, findRegionIndicesForNtChunks} from '../pages/regions';
+import {anchorIGHJ} from '../reference'
 
 interface AlignmentBrowserProps {
     results: any;

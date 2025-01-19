@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import LandingImg01 from '@/public/images/landing_page.jpg'
-import Starfield from './react-starfield';
+import Starfield from '../react-starfield';
 
 import React, { useRef, useEffect, useState } from 'react';
 

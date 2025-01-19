@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
-import { SequenceTokenizer, SequenceTokenizerLight } from './processSequence';
+import { SequenceTokenizer, SequenceTokenizerLight } from '../helpers/processSequence';
 import { extractAllele, extratSegmentation, extratProductivity, extractGermline, extratType } from './postProcessing';
 
 

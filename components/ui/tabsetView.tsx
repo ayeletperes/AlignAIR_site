@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import {ResultsHTMLTable} from './resultsHTMLTable';
-import { AlignmentBrowserHeavy } from './alignmentBrowserHeavy2';
-import { AlignmentBrowserLight } from './alignmentBrowserLight2';
-import { AlignmentBrowserHeavyDshort } from './alignmentBrowserHeavyDshort';
+import {ResultsHTMLTable} from '../functional/resultsHTMLTable';
+import { AlignmentBrowserHeavy } from '../functional/alignmentBrowserHeavy2';
+import { AlignmentBrowserLight } from '../functional/alignmentBrowserLight2';
+import { AlignmentBrowserHeavyDshort } from '../functional/alignmentBrowserHeavyDshort';
 
 interface TabSetResultsProps {
     results: any;

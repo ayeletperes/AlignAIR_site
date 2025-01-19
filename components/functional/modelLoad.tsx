@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
-import { SequenceTokenizer, SequenceTokenizerLight } from './processSequence';
+import { SequenceTokenizer, SequenceTokenizerLight } from '../helpers/processSequence';
 import React, { useEffect, useState } from 'react';
 
 export async function loadModel(model_url: string) {

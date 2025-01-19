@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import {IGType, IGHVConverted, sortedIGHD, sortedIGHJ, LightJ, LightV} from './reference';
-import { fastaReader } from './fastaReader';
-import { processAllBatches } from './predictAlignment';
-import { countTotalSequences } from './fileProcessor';
+import {IGType, IGHVConverted, sortedIGHD, sortedIGHJ, LightJ, LightV} from '../reference';
+import { fastaReader } from '../fastaReader';
+import { processAllBatches } from '../functional/predictAlignment';
+import { countTotalSequences } from '../helpers/fileProcessor';
 
 interface SubmissionProps {
   selectedChain: string;

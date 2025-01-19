@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react';
-import InputCounter from './inputcounter';
+import InputCounter from '../ui/inputcounter';
 
 interface Params {
   vCap: number;
