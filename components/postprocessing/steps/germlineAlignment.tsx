@@ -1,6 +1,6 @@
 import { HeuristicReferenceMatcher } from '@components/postprocessing/heuristicmatching/heuristicMatcher';
 import { Allele, Segment } from '@components/reference/utilities';
-
+import { logger } from '@components/utils/logger';
 
 class AlleleAlignmentStep {
   private name: string;
@@ -49,7 +49,7 @@ class AlleleAlignmentStep {
     referenceAllelesMap: Record<string, Segment>,
     sequences: string[],
 ): any {
-    console.log('Aligning with germline alleles...');
+    logger.log('Aligning with germline alleles...');
 
     // Extract start and end segments for V, D, and J genes
     const segments: Record<string, [number[], number[], string[]]> = {};

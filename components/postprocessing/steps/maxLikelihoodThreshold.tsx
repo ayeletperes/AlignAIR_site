@@ -4,6 +4,7 @@ import { getAlleles } from '@components/postprocessing/alleleselector/maxLikelih
 import { DEFAULT_MAX_LIKELIHOOD_CONFIG } from '@components/postprocessing/steps/config';
 import { CleanedPredictions } from '@components/postprocessing/steps/cleanAndArrange';
 import { Allele, Segment } from '@components/reference/utilities';
+import { logger } from '@components/utils/logger';
 
 interface extractLikelihoodParams {
   alleles: Record<string, any>;
@@ -69,7 +70,7 @@ export const applyMaxLikelihoodThresholds = async (params: maxLikelihoodParams):
     paramCaps = params.paramCaps ?? DEFAULT_MAX_LIKELIHOOD_CONFIG.caps!,
       } = params;
 
-  console.log("Applying Max Likelihood thresholds...");
+  logger.log("Applying Max Likelihood thresholds...");
 
   let alleles;
   if(chain === 'light') {

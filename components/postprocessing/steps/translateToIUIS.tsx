@@ -1,10 +1,11 @@
 import {Allele, Segment} from '@components/reference/utilities';
+import { logger } from '@components/utils/logger';
 
 export function translateVCallToIuisNames(
     vCall: string[][], // Nested array of alleles
     referenceMap: Segment // Reference map of alleles
   ): string[][] {
-    console.log('Translating allele to IUIS naming...');
+    logger.log('Translating allele to IUIS naming...');
 
     return vCall.map(alleleGroup =>
         alleleGroup.map(allele => {
