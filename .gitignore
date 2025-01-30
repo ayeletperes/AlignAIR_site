@@ -4,3 +4,5 @@ tensorflow_convert.sh
 .src
 /.next/
 /.src/
+archive_components/
+archive_public/

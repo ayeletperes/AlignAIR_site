@@ -3,7 +3,7 @@ export const metadata = {
   description: 'AlignAIR Guide',
 }
 import Link from 'next/link'
-import Guide from '@/components/pages/cliGuide'
+import Guide from '@components/pages/commandLineGuide'
   
 
 export default function GuidePage() {

@@ -1,0 +1,12 @@
+{
+    "Identity_8:0":"v_end",
+    "Identity_9:0":"v_start",
+    "Identity_3:0":"j_start",
+    "Identity_2:0":"j_end",
+    "Identity_6:0":"type",
+    "Identity_1:0":"j_allele",
+    "Identity:0":"indel_count",
+    "Identity_4:0":"mutation_rate",
+    "Identity_7:0":"v_allele",
+    "Identity_5:0":"productive"
+}

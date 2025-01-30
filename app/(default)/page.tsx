@@ -4,7 +4,7 @@ export const metadata = {
 }
 
 import Hero from '@/components/layouts/hero'
-import Features from '@/components/features'
+import Features from '@components/pages/features'
 import Newsletter from '@/components/layouts/newsletter'
 import Zigzag from '@/components/layouts/zigzag'
 //import Testimonials from '@/components/testimonials'

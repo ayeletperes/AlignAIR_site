@@ -6,9 +6,11 @@
       "dom.iterable",
       "esnext"
     ],
+    "typeRoots": ["./node_modules/@types", "./types"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
+    "noImplicitAny": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -24,10 +26,11 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".", // Base directory to resolve non-absolute module names
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@components/*": ["components/*"], // Alias for components
+      "@utilities/*": ["components/utilities/*"], // Alias for utilities
+      "@/*": ["./*"] // Existing catch-all alias
     }
   },
   "include": [
@@ -35,9 +38,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "tests/components/utilities/sequenceTokenizerWorker.test.tsx", "app/(default)/alignair/.archive_page"  ],
   "exclude": [
     "node_modules"
   ]
-  // "exclude": ["node_modules"]
 }

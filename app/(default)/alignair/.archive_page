@@ -1,0 +1,274 @@
+// "use client";
+
+// import React, { useState, Dispatch, SetStateAction, useEffect} from 'react';
+// import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
+// import Modal from 'react-modal';
+// import { useMount, usePrevious, useSetState } from 'react-use';
+
+// import Form from '@/components/form';
+// import Submission from '@/components/pages/submission';
+// import Results from '@/components/functional/results';
+// import { metadata } from './metadata';
+
+
+// function logGroup(type: string, data: any) {
+//   console.groupCollapsed(type);
+//   console.log(data);
+//   console.groupEnd();
+// }
+
+// interface State {
+//   modalIsOpen: boolean;
+//   run: boolean;
+//   steps: Step[];
+// }
+
+// // Define types for the params object
+// interface Params {
+//   vCap: number;
+//   dCap: number;
+//   jCap: number;
+//   vConf: number;
+//   dConf: number;
+//   jConf: number;
+// }
+
+
+// export default function App() {
+//   const [isClient, setIsClient] = useState(false); // Track if we are on the client side
+//   const [submission, setSubmission] = useState<boolean>(true);
+//   const [file, setFile] = useState<File | null>(null);
+//   const [sequence, setSequence] = useState<string>('');
+//   const [selectedChain, setSelectedChain] = useState<string>('IGH');
+//   const [model, setModel] = useState<any>(null); 
+//   const [outputIndices, setOutputIndices] = useState<any>(null); 
+//   const [modelReady, setModelReady] = useState<boolean>(true);
+//   const [results, setResults] = useState<any>(null); 
+//   const [params, setParams] = useState<Params>({
+//     vCap: 3,
+//     dCap: 3,
+//     jCap: 3,
+//     vConf: 0.9,
+//     dConf: 0.2,
+//     jConf: 0.8,
+//   });
+
+//   useEffect(() => {
+//       // Set the default value to "Heavy" when the component mounts
+//       setSelectedChain('Heavy');
+//       setIsClient(true); // Indicate that we are on the client side
+
+//       if (window.gtag) {
+//         window.gtag('config', 'G-W94F4SGX8B', {
+//           'page_title': metadata.title,
+//           'page_path': window.location.pathname,
+//         });
+//       }
+//   }, []); // Empty dependency array ensures this effect runs only once
+
+//   const [{ modalIsOpen, run, steps }, setState] = useSetState<State>({
+//     modalIsOpen: true,
+//     run: true,
+//     steps: [
+//       {
+//         content: (
+//           <div>
+//             This is AlignAIR beta version.<br />
+//             Let's get to know our interface and start aligning! 😎.<br />
+//             You can exit anytime using skip.
+//           </div>
+//         ),
+//         placement: 'bottom',
+//         target: '#alignair',
+//         spotlightClicks: true,
+//       },
+//       {
+//         content: (
+//           <div>
+//             Let's start by loading our IGH example sequence.<br />
+//             Click the example Sequence button.
+//           </div>
+//         ),
+//         placement: 'bottom',
+//         target: '#exampleSequence',
+//         spotlightClicks: true,
+//       },
+//       {
+//         content: (
+//           <div>
+//             The immunoglobulin chain buttons allows you to switch between models.<br />
+//             We can keep the heavy chain for now.<br/>
+//             But you can switch 🔀 to the light chain with it's own example sequence!
+//           </div>
+//         ),
+//         placement: 'bottom',
+//         target: '#modelButtons',
+//         spotlightClicks: true,
+//       },
+//       {
+//         content: (
+//           <div>
+//             The cap spin buttons allow us to determine what is the maximum nuber of allele we want to display 🎛️.
+//           </div>
+//         ),
+//         placement: 'bottom',
+//         target: '#capButtons',
+//         spotlightClicks: true,
+//       },
+//       {
+//         content: (
+//           <div>
+//             The confidence spin buttons determine the confidence level allowed for the prediction 🔮.<br/>
+//             The higher the value the more lowly confidence alleles will be included.
+//           </div>
+//         ),
+//         placement: 'bottom',
+//         target: '#confButton',
+//         spotlightClicks: true,
+//       },
+//       {
+//         content: (
+//           <div>
+//             Finaly we can press submit! And view the alignment 🧬
+//           </div>
+//         ),
+//         placement: 'bottom',
+//         target: '#submitButton',
+//         spotlightClicks: true,
+//       },
+//       // {
+//       //   content: (
+//       //     <div>
+//       //       You can either align a sequence.<br />
+//       //       Or even multiple using fasta formating.
+//       //     </div>
+//       //   ),
+//       //   placement: 'bottom',
+//       //   target: '#ininputSeqputSeq',
+//       //   textAlign: 'center',
+//       // },
+//       // {
+//       //   content: (
+//       //     <div>
+//       //       Or upload and align an entire fasta file!.<br />
+//       //     </div>
+//       //   ),
+//       //   placement: 'bottom',
+//       //   target: '#fileinput',
+//       //   textAlign: 'center',
+//       // },
+//       // {
+//       //   content: "A button! That's rare on the web",
+//       //   placement: 'bottom',
+//       //   target: '.ReactModal__Content [data-component-name="SpacerItem"]:nth-of-type(3) button',
+//       // },
+//       // {
+//       //   content: "Sometimes I wonder what's inside my mind",
+//       //   placement: 'bottom',
+//       //   target: '.ReactModal__Content [data-component-name="SpacerItem"]:nth-of-type(4) button',
+//       // },
+//       // {
+//       //   content: 'Modal, Portal, Quintal!',
+//       //   placement: 'bottom',
+//       //   target: '.ReactModal__Content [data-component-name="SpacerItem"]:nth-of-type(5) button',
+//       // },
+//     ] as Step[],
+//   });
+//   const previousModalIsOpen = usePrevious(modalIsOpen);
+
+//   useEffect(() => {
+//     if (!previousModalIsOpen && modalIsOpen) {
+//       setState({
+//         run: true,
+//       });
+//     }
+//   });
+
+//   const handleJoyrideCallback = (data: CallBackProps) => {
+//     const { status, type } = data;
+
+//     if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
+//       setState({ run: false });
+//     }
+
+//     logGroup(type, data);
+//   };
+
+//   // const openModal = () => {
+//   //   setState({
+//   //     modalIsOpen: true,
+//   //   });
+//   // };
+
+//   // const closeModal = () => {
+//   //   setState({
+//   //     modalIsOpen: false,
+//   //     run: false,
+//   //   });
+//   // };
+
+//   // const afterOpenModal = () => {
+//   //   setState({
+//   //     run: true,
+//   //   });
+//   // };
+
+//   // const customStyles = {
+//   //   content: {
+//   //     maxHeight: '70%',
+//   //     textAlign: 'center' as const,
+//   //   },
+//   // };
+
+//   return (
+//     <>
+//       {isClient && (
+//         <Joyride
+//           callback={handleJoyrideCallback}
+//           continuous
+//           run={run}
+//           showSkipButton
+//           steps={steps}
+//           styles={{
+//             options: {
+//               arrowColor: "rgb(93,93,255)",
+//               backgroundColor: "rgb(93,93,255)",
+//               primaryColor: "rgb(93,93,255)",
+//               textColor: 'white',
+//             },
+//           }}
+//         />
+//       )}
+
+//       <Form
+//         setFile={setFile as Dispatch<SetStateAction<File | null>>}
+//         file={file}
+//         setSequence={setSequence as Dispatch<SetStateAction<string>>}
+//         sequence={sequence}
+//         setSelectedChain={setSelectedChain as Dispatch<SetStateAction<string>>}
+//         selectedChain={selectedChain}
+//         setModel={setModel as Dispatch<SetStateAction<any>>}
+//         setOutputIndices={setOutputIndices as Dispatch<SetStateAction<any>>}
+//         setIsLoading={setModelReady as Dispatch<SetStateAction<boolean>>}
+//         params={params}
+//         setParams={setParams as Dispatch<SetStateAction<Params>>}
+//         setResults={setResults}
+//         setSubmission={setSubmission}
+//       />
+//       <Submission
+//         selectedChain={selectedChain} 
+//         modelReady={modelReady}
+//         setSubmission={setSubmission}
+//         submission={submission}
+//         sequence={sequence}
+//         file={file}
+//         params={params}
+//         model={model}
+//         outputIndices={outputIndices}
+//         setResults={setResults}
+//       />
+      
+//       <Results results={results} selectedChain={selectedChain}/>
+//     </>
+//   )
+// }

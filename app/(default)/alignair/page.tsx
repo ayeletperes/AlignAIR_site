@@ -1,15 +1,14 @@
-"use client";
-
-import React, { useState, Dispatch, SetStateAction, useEffect} from 'react';
+'use client';
+import React, { useState, Dispatch, SetStateAction, useEffect } from 'react';
 import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
 import Modal from 'react-modal';
 import { useMount, usePrevious, useSetState } from 'react-use';
 
-import Form from '@/components/form';
-import Submission from '@/components/pages/submission';
-import Results from '@/components/functional/results';
+import AlignmentForm from '@/components/form/form';
+import Submission from '@components/submission/submission';
+import Results from '@/components/results/Results';
+//import Results from '@/components/functional/results';
 import { metadata } from './metadata';
-
 
 function logGroup(type: string, data: any) {
   console.groupCollapsed(type);
@@ -23,49 +22,69 @@ interface State {
   steps: Step[];
 }
 
-// Define types for the params object
 interface Params {
   vCap: number;
   dCap: number;
   jCap: number;
-  vConf: number;
-  dConf: number;
-  jConf: number;
+  vThresh: number;
+  dThresh: number;
+  jThresh: number;
 }
-
 
 export default function App() {
   const [isClient, setIsClient] = useState(false); // Track if we are on the client side
   const [submission, setSubmission] = useState<boolean>(true);
   const [file, setFile] = useState<File | null>(null);
   const [sequence, setSequence] = useState<string>('');
-  const [selectedChain, setSelectedChain] = useState<string>('IGH');
-  const [model, setModel] = useState<any>(null); 
-  const [outputIndices, setOutputIndices] = useState<any>(null); 
-  const [modelReady, setModelReady] = useState<boolean>(true);
-  const [results, setResults] = useState<any>(null); 
+  const [selectedChain, setSelectedChain] = useState<'heavy' | 'light'>('heavy');
+  const [results, setResults] = useState<any>(null);
+  const [resultsReady, setResultsReady] = useState(false); // New state to track if results are ready
   const [params, setParams] = useState<Params>({
     vCap: 3,
     dCap: 3,
     jCap: 3,
-    vConf: 0.9,
-    dConf: 0.2,
-    jConf: 0.8,
+    vThresh: 0.75,
+    dThresh: 0.3,
+    jThresh: 0.8,
   });
 
+  // State for dynamic input and flag
+  const [input, setInput] = useState<string | File | null>(null);
+  const [flag, setFlag] = useState<'sequence' | 'file'>('sequence');
+
   useEffect(() => {
-      // Set the default value to "Heavy" when the component mounts
-      setSelectedChain('Heavy');
-      setIsClient(true); // Indicate that we are on the client side
+    // Dynamically set input and flag
+    if (file) {
+      setInput(file);
+      setFlag('file');
+    } else if (sequence) {
+      setInput(sequence);
+      setFlag('sequence');
+    }
+  }, [file, sequence]);
 
-      if (window.gtag) {
-        window.gtag('config', 'G-W94F4SGX8B', {
-          'page_title': metadata.title,
-          'page_path': window.location.pathname,
-        });
-      }
-  }, []); // Empty dependency array ensures this effect runs only once
+  useEffect(() => {
+    setSelectedChain('heavy');
+    setIsClient(true);
 
+    if (window.gtag) {
+      window.gtag('config', 'G-W94F4SGX8B', {
+        'page_title': metadata.title,
+        'page_path': window.location.pathname,
+      });
+    }
+  }, []);
+
+  // Watch for results being set and update resultsReady
+  useEffect(() => {
+    if (results) {
+      
+      setResultsReady(true); // Results are now fully ready
+    } else {
+      setResultsReady(false);
+    }
+  }, [results]);
+  
   const [{ modalIsOpen, run, steps }, setState] = useSetState<State>({
     modalIsOpen: true,
     run: true,
@@ -82,98 +101,10 @@ export default function App() {
         target: '#alignair',
         spotlightClicks: true,
       },
-      {
-        content: (
-          <div>
-            Let's start by loading our IGH example sequence.<br />
-            Click the example Sequence button.
-          </div>
-        ),
-        placement: 'bottom',
-        target: '#exampleSequence',
-        spotlightClicks: true,
-      },
-      {
-        content: (
-          <div>
-            The immunoglobulin chain buttons allows you to switch between models.<br />
-            We can keep the heavy chain for now.<br/>
-            But you can switch 🔀 to the light chain with it's own example sequence!
-          </div>
-        ),
-        placement: 'bottom',
-        target: '#modelButtons',
-        spotlightClicks: true,
-      },
-      {
-        content: (
-          <div>
-            The cap spin buttons allow us to determine what is the maximum nuber of allele we want to display 🎛️.
-          </div>
-        ),
-        placement: 'bottom',
-        target: '#capButtons',
-        spotlightClicks: true,
-      },
-      {
-        content: (
-          <div>
-            The confidence spin buttons determine the confidence level allowed for the prediction 🔮.<br/>
-            The higher the value the more lowly confidence alleles will be included.
-          </div>
-        ),
-        placement: 'bottom',
-        target: '#confButton',
-        spotlightClicks: true,
-      },
-      {
-        content: (
-          <div>
-            Finaly we can press submit! And view the alignment 🧬
-          </div>
-        ),
-        placement: 'bottom',
-        target: '#submitButton',
-        spotlightClicks: true,
-      },
-      // {
-      //   content: (
-      //     <div>
-      //       You can either align a sequence.<br />
-      //       Or even multiple using fasta formating.
-      //     </div>
-      //   ),
-      //   placement: 'bottom',
-      //   target: '#ininputSeqputSeq',
-      //   textAlign: 'center',
-      // },
-      // {
-      //   content: (
-      //     <div>
-      //       Or upload and align an entire fasta file!.<br />
-      //     </div>
-      //   ),
-      //   placement: 'bottom',
-      //   target: '#fileinput',
-      //   textAlign: 'center',
-      // },
-      // {
-      //   content: "A button! That's rare on the web",
-      //   placement: 'bottom',
-      //   target: '.ReactModal__Content [data-component-name="SpacerItem"]:nth-of-type(3) button',
-      // },
-      // {
-      //   content: "Sometimes I wonder what's inside my mind",
-      //   placement: 'bottom',
-      //   target: '.ReactModal__Content [data-component-name="SpacerItem"]:nth-of-type(4) button',
-      // },
-      // {
-      //   content: 'Modal, Portal, Quintal!',
-      //   placement: 'bottom',
-      //   target: '.ReactModal__Content [data-component-name="SpacerItem"]:nth-of-type(5) button',
-      // },
+      // Additional steps here
     ] as Step[],
   });
+
   const previousModalIsOpen = usePrevious(modalIsOpen);
 
   useEffect(() => {
@@ -193,32 +124,6 @@ export default function App() {
 
     logGroup(type, data);
   };
-
-  // const openModal = () => {
-  //   setState({
-  //     modalIsOpen: true,
-  //   });
-  // };
-
-  // const closeModal = () => {
-  //   setState({
-  //     modalIsOpen: false,
-  //     run: false,
-  //   });
-  // };
-
-  // const afterOpenModal = () => {
-  //   setState({
-  //     run: true,
-  //   });
-  // };
-
-  // const customStyles = {
-  //   content: {
-  //     maxHeight: '70%',
-  //     textAlign: 'center' as const,
-  //   },
-  // };
 
   return (
     <>
@@ -240,35 +145,27 @@ export default function App() {
         />
       )}
 
-      <Form
+      <AlignmentForm
         setFile={setFile as Dispatch<SetStateAction<File | null>>}
         file={file}
         setSequence={setSequence as Dispatch<SetStateAction<string>>}
         sequence={sequence}
         setSelectedChain={setSelectedChain as Dispatch<SetStateAction<string>>}
         selectedChain={selectedChain}
-        setModel={setModel as Dispatch<SetStateAction<any>>}
-        setOutputIndices={setOutputIndices as Dispatch<SetStateAction<any>>}
-        setIsLoading={setModelReady as Dispatch<SetStateAction<boolean>>}
         params={params}
         setParams={setParams as Dispatch<SetStateAction<Params>>}
-        setResults={setResults}
-        setSubmission={setSubmission}
       />
+
       <Submission
-        selectedChain={selectedChain} 
-        modelReady={modelReady}
-        setSubmission={setSubmission}
-        submission={submission}
-        sequence={sequence}
-        file={file}
+        chain={selectedChain}
+        input={input as string | null} // Dynamically set input
+        flag={flag} // Dynamically set flag
         params={params}
-        model={model}
-        outputIndices={outputIndices}
+        results={results}
         setResults={setResults}
       />
       
-      <Results results={results} selectedChain={selectedChain}/>
+      {resultsReady && <Results results={results} selectedChain={selectedChain} />}
     </>
-  )
+  );
 }
