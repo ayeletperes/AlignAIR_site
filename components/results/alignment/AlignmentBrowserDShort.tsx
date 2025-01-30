@@ -55,7 +55,7 @@ export const AlignmentBrowserHeavyDshort: React.FC<AlignmentBrowserProps> = ({ r
 
   referenceAlleles.D["Short-D"] = {sequence:""};
 
-  let sequence = results.sequence.slice(results.v_sequence_start);
+  let sequence = results.sequence.slice(results.v_sequence_start, results.j_sequence_end);
 
   // if the sequence is short on the 5' padd with N for the translation, and then remove.
   

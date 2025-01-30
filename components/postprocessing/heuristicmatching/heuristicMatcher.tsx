@@ -60,14 +60,17 @@ export class HeuristicReferenceMatcher {
       }
   
       const startWindow = shortSegment.slice(0, k);
-      let bestStartPos = bestEndPos - L_seg;
+      const endBasedStart = bestEndPos - L_seg;
+      let bestStartPos = endBasedStart;
+      
       minDifference = Infinity;
-  
-      for (let offset = -9; offset <= 9; offset++) {
-        const currentStart = Math.max(0, bestStartPos + offset);
-        const refWindow = refSeq.slice(currentStart, currentStart + k);
+      const start_search_range = Math.min(9, L_diff)
+      for (let offset = -start_search_range; offset <= start_search_range; offset++) {
+        const currentStart = Math.max(0, endBasedStart + offset);
+        const currentEnd = Math.min(currentStart + k, L_ref)
+        const refWindow = refSeq.slice(currentStart, currentEnd);
+        
         if (refWindow.length !== startWindow.length) continue;
-  
         const difference = this.AA_Score(startWindow, refWindow) + Math.abs(offset);
         if (difference < minDifference) {
           minDifference = difference;
@@ -75,7 +78,7 @@ export class HeuristicReferenceMatcher {
           if (difference === 0) break;
         }
       }
-  
+      
       return [bestStartPos, bestEndPos];
     }
   

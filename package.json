@@ -17,7 +17,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "jest",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
@@ -68,6 +70,7 @@
     "@types/react-modal": "^3.16.3",
     "autoprefixer": "^10.4.16",
     "express": "^4.21.2",
+    "gh-pages": "^6.3.0",
     "http-server": "^14.1.1",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",

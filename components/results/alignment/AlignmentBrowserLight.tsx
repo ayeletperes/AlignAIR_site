@@ -48,7 +48,7 @@ export const AlignmentBrowserLight: React.FC<AlignmentBrowserProps> = ({ results
     const [germline, setGermline] = useState<{ [key: string]: string }>({});
     const [germlineAA, setGermlineAA] = useState<string>('');
 
-    let sequence = results.sequence.slice(results.v_sequence_start);
+    let sequence = results.sequence.slice(results.v_sequence_start, results.j_sequence_end);
 
     // if the sequence is short on the 5' padd with N for the translation, and then remove.
     

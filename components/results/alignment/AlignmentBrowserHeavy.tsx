@@ -53,7 +53,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
 
     referenceAlleles.D["Short-D"] = {sequence:""};
     
-    let sequence = results.sequence.slice(results.v_sequence_start);
+    let sequence = results.sequence.slice(results.v_sequence_start, results.j_sequence_end);
 
     // if the sequence is short on the 5' padd with N for the translation, and then remove.
     
@@ -79,6 +79,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
 
     let vAAIndex: number = Math.floor(vSeqEnd / 3);
     let jAAIndex: number = Math.floor(jSeqStart / 3);
+    
     
     let sequenceV: string = sequenceAA.slice(0, vAAIndex); 
     let sequenceD: string = sequenceAA.slice(vAAIndex, jAAIndex) ;
@@ -137,6 +138,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
     const splitD = splitSequence(sequence.slice(vSeqEnd,jSeqStart), maxCharsPerRow)
     const splitDAA = splitSequence(sequenceD, maxCharsPerRow/3)
     const splitJ = splitSequence(sequence.slice(jSeqStart), maxCharsPerRow)
+    
     const splitJAA = splitSequence(sequenceJ, maxCharsPerRow/3)
     const np1 = dSeqStart - (vSeqEnd);
     const np2 = jSeqStart - (dSeqEnd);
@@ -197,7 +199,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
       setSelectedSequenceD(
         referenceAlleles.D[results.d_call[0]].sequence.slice(results.d_germline_start, results.d_germline_end)
       );
-
+      
       setSelectedSequenceJ(
         referenceAlleles.J[results.j_call[0]].sequence.slice(results.j_germline_start, results.j_germline_end)
       );
