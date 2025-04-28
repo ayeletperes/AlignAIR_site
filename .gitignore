@@ -6,3 +6,5 @@ tensorflow_convert.sh
 /.src/
 archive_components/
 archive_public/
+app/\(auth\)
+app/api
