@@ -32,6 +32,14 @@ export default function Header() {
                 </Link>
               </li>
               <li>
+                <Link
+                  href="/docs"
+                  className="btn-sm text-purple-600  hover:text-gray-200 px-4 py-3 flex items-center transition duration-150 ease-in-out"
+                >
+                  Docs
+                </Link>
+              </li>
+              <li>
                 {/* <Link href="/alignair" className="btn-sm text-white bg-purple-600 hover:bg-purple-700 ml-3">
                   AlignAIR
                 </Link> */}
@@ -47,11 +55,11 @@ export default function Header() {
                         AlignAIR Web
                       </Link>
                     </DropdownItem>
-                    <DropdownItem key="cli" className="custom-dropdown-text">
-                      <Link href="/cli">
-                        AlignAIR CLI
-                      </Link>
-                    </DropdownItem>
+                    {/*<DropdownItem key="cli" className="custom-dropdown-text">*/}
+                    {/*  <Link href="/cli">*/}
+                    {/*    AlignAIR CLI*/}
+                    {/*  </Link>*/}
+                    {/*</DropdownItem>*/}
                     <DropdownItem key="yaml" className="custom-dropdown-text">
                       <Link href="/yaml">
                         Generate CLI yaml
