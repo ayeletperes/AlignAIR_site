@@ -71,7 +71,7 @@ export default function Footer() {
                 <h6 className="text-gray-200 font-medium mb-1">Help</h6>
                 <ul>
                   <li className="mb-1">
-                    <Link href="mailto::support@alignair.ai" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">Support</Link>
+                    <Link href="mailto::thomas.konstat@gmail.com" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">Support</Link>
                   </li>
                   {/* <li className="mb-1">
                     <Link href="/" className="text-gray-400 hover:text-gray-100 transition duration-150 ease-in-out">AlignAIR Github</Link>
