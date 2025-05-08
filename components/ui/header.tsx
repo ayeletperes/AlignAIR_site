@@ -55,11 +55,16 @@ export default function Header() {
                         AlignAIR Web
                       </Link>
                     </DropdownItem>
-                    {/*<DropdownItem key="cli" className="custom-dropdown-text">*/}
-                    {/*  <Link href="/cli">*/}
-                    {/*    AlignAIR CLI*/}
-                    {/*  </Link>*/}
-                    {/*</DropdownItem>*/}
+                    <DropdownItem key="docs" className="custom-dropdown-text">
+                      <Link href="/docs">
+                        AlignAIR Docs
+                      </Link>
+                    </DropdownItem>
+                    <DropdownItem key="cli" className="custom-dropdown-text">
+                      <Link href="/cli">
+                        AlignAIR CLI
+                      </Link>
+                    </DropdownItem>
                     <DropdownItem key="yaml" className="custom-dropdown-text">
                       <Link href="/yaml">
                         Generate CLI yaml
