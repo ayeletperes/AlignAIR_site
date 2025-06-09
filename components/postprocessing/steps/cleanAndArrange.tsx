@@ -3,7 +3,7 @@ import * as tf from '@tensorflow/tfjs';
 export interface CleanAndArrangeParams {
   predictions: any;
   modelOutputNodes: Record<string, number>;
-  chain: 'heavy' | 'light';
+  chain: 'heavy' | 'light' | 'trb';
 }
 
 export interface CleanedPredictions {
@@ -60,12 +60,13 @@ export const cleanAndArrangePredictions = (params: CleanAndArrangeParams): Clean
 
   let dAllele = null, dStart = null, dEnd = null, type_ = null;
 
-  if (chain === 'heavy') {
+  if (chain === 'light') {
+    type_ = tf.tidy(() => extractValues('type').flatten().arraySync())[0] === 1 ? 'kappa' : 'lambda';
+  } else {
     dAllele = extractValues('d_allele');
     dStart = extractValues('d_start');
     dEnd = extractValues('d_end');
-  } else {
-    type_ = tf.tidy(() => extractValues('type').flatten().arraySync());
+    type_ = chain;
   }
 
   return {

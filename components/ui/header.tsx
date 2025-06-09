@@ -1,22 +1,34 @@
 import React from "react"
 import Link from 'next/link'
 import MobileMenu from './mobile-menu'
+import ThemeToggle from './theme-toggle'
 import Image from 'next/image'
-import Logo from '@/public/images/logo_alignair14bw.svg'
+import { useTheme } from './theme-provider';
+import LogoBW from '@/public/images/logo_alignair11bw.svg'
+import LogoWB from '@/public/images/logo_alignair11wb.svg'
 import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button} from "@nextui-org/react";
 
 // The header component. TODO: add the logo and the navigation links.
 
 export default function Header() {
+  const context = useTheme();
+  const theme = context?.theme || 'dark'; 
   return (
-    <header className="absolute w-full z-30">
+    <header className="absolute w-full z-30 transition-all duration-300">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-20">
           {/* Site branding */}
           <div className="shrink-0 mr-4">
-            {/* Logo */}
-            <Link href="/" className="block" aria-label="Cruip">
-              <Image className="shadow-md" src={Logo} width={200} height={100} alt="logo" />
+            {/* Logo - Clean conditional approach inspired by picture element */}
+            <Link href="/" className="block" aria-label="AlignAIR">
+              <Image 
+                src={theme === 'dark' ? LogoBW : LogoWB}
+                width={200} 
+                height={50} 
+                alt="AlignAIR Logo" 
+                priority
+                className="transition-opacity"
+              />
             </Link>
           </div>
           {/* Desktop navigation */}
@@ -26,7 +38,7 @@ export default function Header() {
               <li>
                 <Link
                   href="/about"
-                  className="font-medium text-purple-600 hover:text-gray-200 px-4 py-3 flex items-center transition duration-150 ease-in-out"
+                  className="font-medium text-purple-600 hover:text-gray-500 dark:hover:text-gray-200 px-4 py-3 flex items-center transition-all duration-300 ease-in-out"
                 >
                   About
                 </Link>
@@ -34,7 +46,7 @@ export default function Header() {
               <li>
                 <Link
                   href="/docs"
-                  className="btn-sm text-purple-600  hover:text-gray-200 px-4 py-3 flex items-center transition duration-150 ease-in-out"
+                  className="btn-sm text-purple-600 hover:text-gray-500 dark:hover:text-gray-200 px-4 py-3 flex items-center transition-all duration-300 ease-in-out"
                 >
                   Docs
                 </Link>
@@ -45,11 +57,11 @@ export default function Header() {
                 </Link> */}
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button className="btn-sm text-white bg-purple-600 hover:bg-purple-700 ml-3">
+                    <Button className="btn-sm text-white bg-purple-600 hover:bg-purple-700 ml-3 transition-all duration-300">
                       AlignAIR
                     </Button>
                   </DropdownTrigger>
-                  <DropdownMenu>
+                  <DropdownMenu className="dropdown-theme">
                     <DropdownItem key="web" className="custom-dropdown-text">
                       <Link href="/alignair">
                         AlignAIR Web
@@ -72,6 +84,9 @@ export default function Header() {
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
+              </li>
+              <li className="ml-3">
+                <ThemeToggle />
               </li>
             </ul>
           </nav>

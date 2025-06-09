@@ -1,3 +1,4 @@
+/* Form focus styles - theme aware */
 .form-input:focus,
 .form-textarea:focus,
 .form-multiselect:focus,
@@ -5,6 +6,26 @@
 .form-checkbox:focus,
 .form-radio:focus {
     @apply ring-0;
+}
+
+/* Dark mode form styles */
+.dark .form-input,
+.dark .form-textarea,
+.dark .form-multiselect,
+.dark .form-select {
+    @apply bg-gray-800 border-gray-600 text-gray-200;
+}
+
+.dark .form-input:focus,
+.dark .form-textarea:focus,
+.dark .form-multiselect:focus,
+.dark .form-select:focus {
+    @apply border-gray-400;
+}
+
+.dark .form-input::placeholder,
+.dark .form-textarea::placeholder {
+    @apply text-gray-400;
 }
 
 /* Hamburger button */
@@ -149,4 +170,235 @@
         -webkit-transform: translate3d(10px, 0, 0) scale(1.2);
         transform: translate3d(10px, 0, 0) scale(1.2);
     }
+}
+
+@layer components {
+
+  /* Custom theme */
+  .dropdown-theme {
+    @apply shadow-md bg-gray-100 dark:bg-gray-700;
+  }
+
+  /* Dark mode form */
+  .form-input-dark {
+    @apply bg-gray-900 border-gray-700 focus:border-purple-500;
+  }
+
+  .form-textarea-dark {
+    @apply bg-gray-900 border-gray-700 focus:border-purple-500;
+  }
+
+  .form-select-dark {
+    @apply bg-gray-900 border-gray-700 focus:border-purple-500;
+  }
+
+  .form-checkbox-dark {
+    @apply text-purple-600 bg-gray-900 border-gray-700 focus:ring-purple-500;
+  }
+
+  .form-radio-dark {
+    @apply text-purple-600 bg-gray-900 border-gray-700 focus:ring-purple-500;
+  }
+
+  /* Dark mode switch */
+  .form-switch-dark {
+    @apply bg-gray-600;
+  }
+
+  .form-switch-dark:checked {
+    @apply bg-purple-600;
+  }
+}
+
+/* Mobile menu hamburger */
+.hamburger {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+  text-transform: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+.hamburger-box {
+  position: relative;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+}
+.hamburger-inner {
+  top: 50%;
+  display: block;
+  margin-top: -2px;
+}
+.hamburger-inner,
+.hamburger-inner:after,
+.hamburger-inner:before {
+  position: absolute;
+  width: 24px;
+  height: 2px;
+  transition-timing-function: ease;
+  transition-duration: 0.15s;
+  transition-property: transform;
+  border-radius: 4px;
+  background: currentColor;
+}
+.hamburger-inner:after,
+.hamburger-inner:before {
+  display: block;
+  content: "";
+}
+.hamburger-inner:before {
+  top: -6px;
+}
+.hamburger-inner:after {
+  bottom: -6px;
+}
+
+/* Mobile menu animation */
+.hamburger.is-active .hamburger-inner {
+  transition: y 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55, 0.055, 0.675, 0.19), opacity 0.1s ease-in;
+  transform: rotate(225deg);
+}
+.hamburger.is-active .hamburger-inner:before {
+  transition: transform 0.22s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  transform: rotate(-90deg);
+  opacity: 0;
+}
+.hamburger.is-active .hamburger-inner:after {
+  transition: y 0.1s 0.25s ease-in, transform 0.22s cubic-bezier(0.55, 0.055, 0.675, 0.19), width 0.1s 0.25s ease-in;
+  transform: rotate(-180deg);
+}
+
+.hamburger:not(.is-active) .hamburger-inner {
+  transition: y 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1), opacity 0.1s 0.12s ease-out;
+  transform: rotate(0deg);
+}
+
+.hamburger:not(.is-active) .hamburger-inner:before {
+  transition: transform 0.22s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1);
+  transform: rotate(0deg);
+  opacity: 1;
+}
+
+.hamburger:not(.is-active) .hamburger-inner:after {
+  transition: y 0.1s ease-out, transform 0.22s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1), width 0.1s ease-out;
+  transform: rotate(0deg);
+}
+
+/* Global theme transition styles */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Prevent transitions on page load */
+.preload * {
+  transition: none !important;
+}
+
+/* Smooth transitions for common theme-switching elements */
+body, 
+html,
+header,
+nav,
+aside,
+main,
+footer,
+section,
+article,
+div,
+span,
+p,
+h1, h2, h3, h4, h5, h6,
+button,
+input,
+textarea,
+select,
+pre,
+code,
+table,
+th,
+td,
+img {
+  transition: background-color 0.3s ease, 
+              color 0.3s ease, 
+              border-color 0.3s ease,
+              box-shadow 0.3s ease,
+              opacity 0.3s ease;
+}
+
+/* Special handling for images to prevent flash */
+img {
+  transition: opacity 0.2s ease;
+}
+
+/* Prevent text selection flash during theme transition */
+.theme-transition {
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Custom overlay animations */
+@keyframes custom-fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes custom-fadeout {
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: black;
+  height: 100%;
+  width: 100%;
+  z-index: 9999;
+  display: none;
+  opacity: 0;
+}
+
+.overlay.shown {
+  opacity: 0.7;
+  display: block;
+  animation-name: custom-fadein;
+  animation-duration: 2s;
+}
+
+.overlay.hidden {
+  display: block;
+  animation-name: custom-fadeout;
+  animation-duration: 2s;
+}
+
+/* Theme-aware overlay variations */
+.dark .overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.overlay {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.dark .overlay.shown {
+  opacity: 0.8;
+}
+
+.overlay.shown {
+  opacity: 0.7;
 }

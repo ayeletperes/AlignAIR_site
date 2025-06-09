@@ -5,7 +5,7 @@ import { SequenceRecord } from '@components/preprocessing/utilities/sequenceRead
 import { logger } from '@components/utils/logger';
 
 export interface ProcessingParams {
-  chain: 'heavy' | 'light';
+  chain: 'heavy' | 'light' | 'trb';
   input: string | File;
   flag: 'file' | 'sequence';
   loader: any;

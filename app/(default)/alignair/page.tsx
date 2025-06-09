@@ -154,6 +154,7 @@ export default function App() {
         selectedChain={selectedChain}
         params={params}
         setParams={setParams as Dispatch<SetStateAction<Params>>}
+        setResults={setResults}
       />
 
       <Submission

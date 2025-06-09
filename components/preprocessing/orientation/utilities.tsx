@@ -31,8 +31,16 @@ export const runModel = async (
   const inputTensor = new onnx.Tensor('string', sequences, [sequences.length, 1]);
   const feeds = { string_input: inputTensor };
   try {
-    const results = await pipeline.run(feeds, ['label']);
-    return results.label.data as string[];
+    // Try 'label' first, then fallback to 'output_label'
+    let results;
+    try {
+      results = await pipeline.run(feeds, ['label']);
+      return results.label.data as string[];
+    } catch (labelError) {
+      console.log('Trying output_label instead of label...');
+      results = await pipeline.run(feeds, ['output_label']);
+      return results.output_label.data as string[];
+    }
   } catch (error) {
     console.error('Error during model inference. Reinitializing session...');
     throw error;

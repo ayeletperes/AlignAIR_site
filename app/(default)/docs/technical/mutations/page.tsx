@@ -10,13 +10,13 @@ export default function MutationModelsPage() {
         <div className="relative pt-32 pb-10 md:pt-40 md:pb-16">
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
             <h1 className="h1 mb-4">Mutation Models</h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
               AlignAIR was designed to be robust to somatic hypermutation (SHM). Central to this is the training of AlignAIR on synthetic repertoires generated under realistic SHM models, most notably the S5F model.
             </p>
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto text-gray-300 space-y-10">
+        <div className="max-w-4xl mx-auto text-gray-700 dark:text-gray-300 space-y-10">
 
           <div>
             <h2 className="h2 mb-4">What is the S5F Model?</h2>

@@ -10,14 +10,14 @@ export default function ThresholdingPage() {
         <div className="relative pt-32 pb-10 md:pt-40 md:pb-16">
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
             <h1 className="h1 mb-4">Thresholding Logic</h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
               AlignAIR uses a dynamic thresholding strategy to convert model likelihood outputs into final allele calls. This post-processing step ensures robustness while maintaining alignment accuracy.
             </p>
           </div>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <div className="text-gray-300 space-y-10">
+          <div className="text-gray-700 dark:text-gray-300 space-y-10">
             <div>
               <h2 className="h2 mb-4">Overview</h2>
               <p>
@@ -28,10 +28,10 @@ export default function ThresholdingPage() {
             <div>
               <h2 className="h2 mb-4">Algorithm</h2>
               <ol className="list-decimal list-inside space-y-2">
-                <li>For each segment (V, D, J), let the output vector be <code>p = [p_1, ..., p_n]</code>.</li>
-                <li>Compute the maximum likelihood: <code>p<sub>max</sub> = max(p)</code>.</li>
-                <li>Define a threshold: <code>threshold = Φ × p<sub>max</sub></code>, where <code>Φ</code> is a segment-specific parameter (e.g. 0.75 for V, 0.3 for D, 0.8 for J).</li>
-                <li>Filter alleles: keep all <code>p_i</code> such that <code>p_i ≥ threshold</code>.</li>
+                <li>For each segment (V, D, J), let the output vector be <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">p = [p_1, ..., p_n]</code>.</li>
+                <li>Compute the maximum likelihood: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">p<sub>max</sub> = max(p)</code>.</li>
+                <li>Define a threshold: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">threshold = Φ × p<sub>max</sub></code>, where <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">Φ</code> is a segment-specific parameter (e.g. 0.75 for V, 0.3 for D, 0.8 for J).</li>
+                <li>Filter alleles: keep all <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">p_i</code> such that <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">p_i ≥ threshold</code>.</li>
                 <li>Apply cap: if the number of alleles passing the threshold exceeds a predefined cap (e.g. 3), keep only the top scoring ones.</li>
               </ol>
             </div>
@@ -46,14 +46,14 @@ export default function ThresholdingPage() {
             <div>
               <h2 className="h2 mb-4">Optimization Strategy</h2>
               <p>
-                The optimal values of <code>Φ</code> and cap were selected via grid search to maximize agreement with ground truth labels while minimizing the number of alleles returned. This creates a balance between sensitivity (returning all plausible candidates) and specificity (not returning noise).
+                The optimal values of <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">Φ</code> and cap were selected via grid search to maximize agreement with ground truth labels while minimizing the number of alleles returned. This creates a balance between sensitivity (returning all plausible candidates) and specificity (not returning noise).
               </p>
             </div>
 
             <div>
               <h2 className="h2 mb-4">Special Case: D Region</h2>
               <p>
-                Due to the short and highly mutated nature of D segments, an additional label called <code>Short-D</code> is added to the likelihood vector. If this label receives high probability (&gt; 0.5), the model suppresses other D allele predictions using a penalty term. This ensures consistency between segmentation and classification, avoiding spurious allele calls when the D region is unreliable.
+                Due to the short and highly mutated nature of D segments, an additional label called <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">Short-D</code> is added to the likelihood vector. If this label receives high probability (&gt; 0.5), the model suppresses other D allele predictions using a penalty term. This ensures consistency between segmentation and classification, avoiding spurious allele calls when the D region is unreliable.
               </p>
             </div>
 

@@ -8,7 +8,7 @@ interface ResultsHTMLTableProps {
 }
 
 const ResultsHTMLTable: React.FC<ResultsHTMLTableProps> = ({ results, index, chain }) => {
-  const hasD = chain === 'heavy';
+  const hasD = chain !== 'light';
   return (
     <div className="relative overflow-x-auto scrollbar-custom">
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border-collapse my-6 font-sans min-w-[400px] shadow-md sm:rounded-lg">

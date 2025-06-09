@@ -10,13 +10,13 @@ export default function ArchitecturePage() {
         <div className="relative pt-32 pb-10 md:pt-40 md:pb-16">
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
             <h1 className="h1 mb-4">Model Architecture</h1>
-            <p className="text-xl text-gray-400 mb-8">
+            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
               AlignAIR leverages a multi-task deep residual convolutional architecture to simultaneously predict V, D, and J segmentation, allele classification, mutation rates, and productivity.
             </p>
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto text-gray-300 space-y-10">
+        <div className="max-w-4xl mx-auto text-gray-700 dark:text-gray-300 space-y-10">
           <div>
             <h2 className="h2 mb-4">Input Representation</h2>
             <p>

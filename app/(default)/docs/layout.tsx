@@ -28,11 +28,11 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <div className="min-h-screen bg-black text-gray-200 flex">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-200 flex">
 
       {/* Sidebar */}
-      <aside className="w-64 p-6 border-r border-gray-800 bg-black">
-        <h2 className="text-2xl font-bold mb-8 text-white">Docs</h2>
+      <aside className="w-64 p-6 border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-black">
+        <h2 className="text-2xl font-bold mb-8 text-gray-900 dark:text-white">Docs</h2>
         <nav className="flex flex-col space-y-2">
           {links.map((link) => {
             const expanded = isActiveOrChild(link.href, link.children || []);
@@ -44,7 +44,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                   className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     pathname === link.href
                       ? 'bg-purple-600 text-white'
-                      : 'hover:bg-gray-800 hover:text-white'
+                      : 'hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   {link.name}
@@ -58,8 +58,8 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                         href={child.href}
                         className={`block text-sm px-3 py-1 rounded-md ${
                           pathname === child.href
-                            ? 'text-purple-400 bg-gray-800'
-                            : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                            ? 'text-purple-600 dark:text-purple-400 bg-gray-100 dark:bg-gray-800'
+                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
                         }`}
                       >
                         {child.name}

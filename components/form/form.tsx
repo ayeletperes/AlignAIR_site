@@ -20,6 +20,7 @@ interface AlignmentFormProps {
     jThresh: number;
   };
   setParams: React.Dispatch<React.SetStateAction<any>>;
+  setResults: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const AlignmentForm: React.FC<AlignmentFormProps> = ({
@@ -31,6 +32,7 @@ const AlignmentForm: React.FC<AlignmentFormProps> = ({
   selectedChain,
   params,
   setParams,
+  setResults,
 }) => {
   const fileInfoRef = useRef<HTMLDivElement | null>(null);
 
@@ -39,8 +41,8 @@ const AlignmentForm: React.FC<AlignmentFormProps> = ({
       <div className="relative pt-32 pb-10 md:pt-40 md:pb-16">
         <div className="max-w-6xl mx-auto px-2 sm:px-2">
           <h1 className="mb-4 text-3xl font-extrabold text-gray-900 dark:text-white md:text-5xl lg:text-6xl">
-            <span id="alignair" className="text-white">
-              AlignAIR <sub className="text-white text-sm align-baseline">beta</sub>
+            <span id="alignair" className="text-black dark:text-white">
+              AlignAIR <sub className="text-black dark:text-white text-sm align-baseline">beta</sub>
             </span>
           </h1>
         </div>
@@ -51,12 +53,14 @@ const AlignmentForm: React.FC<AlignmentFormProps> = ({
             sequence={sequence}
             isDisabled={file != null}
             setFile={setFile} 
+            setResults={setResults}
           />
           <FileInput 
             setFile={setFile} 
             isDisabled={sequence !== ''} 
             setSequence={setSequence} 
             fileInfoRef={fileInfoRef} 
+            setResults={setResults}
           />
         </div>
         

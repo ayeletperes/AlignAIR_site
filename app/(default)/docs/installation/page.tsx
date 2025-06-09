@@ -13,34 +13,34 @@ export default function InstallationPage() {
         <div className="relative pt-32 pb-10 md:pt-40 md:pb-16">
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
             <h1 className="h1 mb-4" data-aos="fade-up">Installation</h1>
-            <p className="text-xl text-gray-400 mb-8" data-aos="fade-up" data-aos-delay="200">
+            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8" data-aos="fade-up" data-aos-delay="200">
               AlignAIR is easy to set up using Docker (recommended) or locally (advanced users).
             </p>
           </div>
         </div>
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="py-12 md:py-20 border-t border-gray-800">
+          <div className="py-12 md:py-20 border-t border-gray-300 dark:border-gray-800">
 
             {/* Section: Docker Installation */}
             <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
               <h2 className="h2 mb-4">Docker Installation (Recommended)</h2>
-              <p className="text-xl text-gray-400 mb-4">
+              <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
                 The easiest way to run AlignAIR is via Docker. No manual setup needed.
               </p>
               <div className="text-left">
-                <p className="text-gray-400 mb-2 font-semibold">1. Pull the Docker image:</p>
-                <pre className="bg-gray-800 text-green-400 p-4 rounded mb-6 overflow-x-auto">
+                <p className="text-gray-700 dark:text-gray-400 mb-2 font-semibold">1. Pull the Docker image:</p>
+                <pre className="bg-gray-100 dark:bg-gray-800 text-green-600 dark:text-green-400 p-4 rounded mb-6 overflow-x-auto">
                   <code>docker pull thomask90/alignair:latest</code>
                 </pre>
 
-                <p className="text-gray-400 mb-2 font-semibold">2. Run the container:</p>
-                <pre className="bg-gray-800 text-green-400 p-4 rounded mb-6 overflow-x-auto">
+                <p className="text-gray-700 dark:text-gray-400 mb-2 font-semibold">2. Run the container:</p>
+                <pre className="bg-gray-100 dark:bg-gray-800 text-green-600 dark:text-green-400 p-4 rounded mb-6 overflow-x-auto">
                   <code>docker run -it --rm -v /path/to/local/data:/data thomask90/alignair:latest</code>
                 </pre>
 
-                <p className="text-gray-400 mt-6">
-                  📦 <strong>Tip:</strong> Mount your local folder into <code className="bg-gray-700 px-1 rounded">/data</code> inside the container.
+                <p className="text-gray-600 dark:text-gray-400 mt-6">
+                  📦 <strong>Tip:</strong> Mount your local folder into <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">/data</code> inside the container.
                 </p>
               </div>
             </div>
@@ -48,10 +48,10 @@ export default function InstallationPage() {
             {/* Section: Prerequisites */}
             <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
               <h2 className="h2 mb-4">Prerequisites</h2>
-              <p className="text-xl text-gray-400 mb-4">
+              <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
                 🚀 For best performance, we recommend:
               </p>
-              <ul className="text-gray-400 text-left list-disc list-inside space-y-2">
+              <ul className="text-gray-600 dark:text-gray-400 text-left list-disc list-inside space-y-2">
                 <li>NVIDIA GPU with CUDA 11 support (CPU also works, but slower)</li>
                 <li>Docker installed and configured</li>
               </ul>
@@ -60,18 +60,18 @@ export default function InstallationPage() {
             {/* Section: Local Installation */}
             <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
               <h2 className="h2 mb-4">Local Installation (Advanced)</h2>
-              <p className="text-xl text-gray-400 mb-4">
+              <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
                 Prefer building from source? You can manually install AlignAIR locally:
               </p>
               <div className="text-left">
-                <pre className="bg-gray-800 text-green-400 p-4 rounded mb-6 overflow-x-auto">
+                <pre className="bg-gray-100 dark:bg-gray-800 text-green-600 dark:text-green-400 p-4 rounded mb-6 overflow-x-auto">
                   <code>git clone https://github.com/MuteJester/AlignAIR.git</code>
                 </pre>
-                <pre className="bg-gray-800 text-green-400 p-4 rounded overflow-x-auto">
+                <pre className="bg-gray-100 dark:bg-gray-800 text-green-600 dark:text-green-400 p-4 rounded overflow-x-auto">
                   <code>cd AlignAIR<br/>pip install -r requirements.txt</code>
                 </pre>
               </div>
-              <p className="text-gray-400 mt-6">
+              <p className="text-gray-600 dark:text-gray-400 mt-6">
                 🛠️ This method requires a properly configured Python environment and is recommended for developers only.
               </p>
             </div>

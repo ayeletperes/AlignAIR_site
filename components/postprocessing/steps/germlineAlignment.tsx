@@ -13,6 +13,7 @@ class AlleleAlignmentStep {
     segments: Record<string, [number[], number[], string[]]>,
     referenceAllelesMap: Record<string, Segment>,
     sequences: string[],
+    indelCounts: number[],
     k: number = 15,
     s: number = 30
   ): Record<string, any[]> {
@@ -32,6 +33,7 @@ class AlleleAlignmentStep {
         starts,
         ends,
         calls.map(allele => allele[0]), // Extract first allele for each
+        indelCounts,
         k,
         s,
         gene
@@ -53,7 +55,7 @@ class AlleleAlignmentStep {
 
     // Extract start and end segments for V, D, and J genes
     const segments: Record<string, [number[], number[], string[]]> = {};
-    const genes = chain=="heavy"? ['v', 'd', 'j']: ['v', 'j'];
+    const genes = chain=="light"? ['v', 'j'] : ['v', 'd', 'j'];
     for (const gene of genes) {
       segments[gene] = [
         processedPredictions[`${gene}_sequence_start`],
@@ -61,12 +63,14 @@ class AlleleAlignmentStep {
         processedPredictions[`${gene}_call`],
       ];
     }
+    const indelCounts = processedPredictions['indel_count'];
 
     // Align with germline alleles
     const germlineAlignments = this.alignWithGermline(
       segments,
       referenceAllelesMap,
-      sequences
+      sequences,
+      indelCounts
     );
 
     return germlineAlignments;
