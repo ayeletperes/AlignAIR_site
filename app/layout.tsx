@@ -5,12 +5,13 @@ import './css/style.css'
 
 import { Inter, Architects_Daughter } from 'next/font/google'
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { usePathname } from 'next/navigation'
 
 import Head from 'next/head'
 
 import Header from '@/components/ui/header'
 import Banner from '@/components/ui/banner'
-import { ThemeProvider } from '@/components/ui/theme-provider'
+import { ThemeProvider, ThemeScript } from '@/components/ui/theme-provider'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -32,7 +33,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <Head>
+      <head>
+        <ThemeScript />
         <link rel="icon" href="/icon.ico" />
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
@@ -57,18 +59,35 @@ export default function RootLayout({
             `,
           }}
         />
-      </Head>
+      </head>
       <body className={`${inter.variable} ${architects_daughter.variable} font-inter antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 tracking-tight transition-colors duration-300`}>
         <ThemeProvider>
-          <div className="flex flex-col min-h-screen overflow-hidden">
-            <Header />
+          <ConditionalLayout>
             {children}
-            <Banner />
-          </div>
+          </ConditionalLayout>
         </ThemeProvider>
+        <GoogleAnalytics gaId="G-W94F4SGX8B" />
       </body>
-      <GoogleAnalytics gaId="G-W94F4SGX8B" />
     </html>
+  )
+}
+
+function ConditionalLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const isDocsPage = pathname?.startsWith('/docs')
+
+  if (isDocsPage) {
+    // Docs pages: no header/banner, just content
+    return <>{children}</>
+  }
+
+  // Regular pages: include header and banner
+  return (
+    <div className="flex flex-col min-h-screen overflow-hidden">
+      <Header />
+      {children}
+      {/* <Banner /> */}
+    </div>
   )
 }
  

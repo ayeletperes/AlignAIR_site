@@ -39,8 +39,8 @@ export default function UsagePage() {
             </div>
 
             <p className="text-xl text-gray-400 mb-6">
-              After starting the AlignAIR Docker container, run the following command inside it:
-            </p>
+                After starting the AlignAIR Docker container, run the following command inside it:
+              </p>
 
             <div className="bg-black rounded-lg p-6 border border-gray-700 relative group">
               <pre className="text-green-400 text-sm font-mono overflow-x-auto">
@@ -135,18 +135,18 @@ python app.py run \
           <h2 className="h2 text-center mb-12 text-white">Complete Parameter Reference</h2>
 
           <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-gray-400 text-left">
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-gray-400 text-left">
                 <thead className="bg-gray-800">
-                  <tr>
+                    <tr>
                     <th className="py-4 px-6 border-b border-gray-700 text-white font-bold">Parameter</th>
                     <th className="py-4 px-6 border-b border-gray-700 text-white font-bold">Description</th>
                     <th className="py-4 px-6 border-b border-gray-700 text-white font-bold">Default</th>
-                  </tr>
-                </thead>
+                    </tr>
+                  </thead>
                 <tbody className="bg-gray-900">
 
-                  {/* Model Settings */}
+                    {/* Model Settings */}
                   <tr className="border-b border-gray-800">
                     <td className="py-4 px-6 font-semibold text-blue-400 bg-blue-900/20" colSpan={3}>
                       <div className="flex items-center">
@@ -186,7 +186,7 @@ python app.py run \
                     <td className="py-3 px-6 text-green-400">2048</td>
                   </tr>
 
-                  {/* Input and Output */}
+                    {/* Input and Output */}
                   <tr className="border-b border-gray-800">
                     <td className="py-4 px-6 font-semibold text-green-400 bg-green-900/20" colSpan={3}>
                       <div className="flex items-center">
@@ -219,7 +219,7 @@ python app.py run \
                     <td className="py-3 px-6 text-green-400">false</td>
                   </tr>
 
-                  {/* Thresholds */}
+                    {/* Thresholds */}
                   <tr className="border-b border-gray-800">
                     <td className="py-4 px-6 font-semibold text-purple-400 bg-purple-900/20" colSpan={3}>
                       <div className="flex items-center">
@@ -285,8 +285,8 @@ python app.py run \
                     <td className="py-3 px-6">Automatically correct reverse/complement orientations before alignment</td>
                     <td className="py-3 px-6 text-green-400">true</td>
                   </tr>
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
             </div>
           </div>
         </div>

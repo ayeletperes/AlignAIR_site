@@ -5,7 +5,7 @@ import { useState } from 'react'
 export default function ModelsPage() {
   const [copiedId, setCopiedId] = useState(null)
 
-  const copyToClipboard = (text, id) => {
+  const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text)
     setCopiedId(id)
     setTimeout(() => setCopiedId(null), 2000)
@@ -18,7 +18,7 @@ export default function ModelsPage() {
       checkpoint: '/app/pretrained_models/IGH_S5F_576',
       chainType: 'heavy',
       species: 'Human',
-      referenceSet: 'OGRDB',
+      referenceSet: 'OGRDB V8 extended',
       lastUpdated: 'February 2025',
       description: 'Immunoglobulin Heavy Chain model trained on S5F mutation patterns',
       features: ['V/D/J segmentation', 'Allele calling', 'Mutation prediction', 'Productivity assessment'],
@@ -31,7 +31,7 @@ export default function ModelsPage() {
       checkpoint: '/app/pretrained_models/IGL_S5F_576',
       chainType: 'light',
       species: 'Human',
-      referenceSet: 'OGRDB',
+      referenceSet: 'OGRDB V2 & V3 extended',
       lastUpdated: 'March 2025',
       description: 'Immunoglobulin Lambda Light Chain model with enhanced V/J prediction',
       features: ['V/J segmentation', 'Allele calling', 'Mutation prediction', 'Productivity assessment'],
@@ -44,7 +44,7 @@ export default function ModelsPage() {
       checkpoint: '/app/pretrained_models/TCRB_UNIFORM_576',
       chainType: 'tcrb',
       species: 'Human',
-      referenceSet: 'OGRDB',
+      referenceSet: 'IMGT 2022',
       lastUpdated: 'July 2025',
       description: 'T Cell Receptor Beta Chain model optimized for TCR repertoire analysis',
       features: ['V/D/J segmentation', 'Allele calling', 'Productivity assessment'],

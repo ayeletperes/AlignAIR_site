@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 
 import AOS from 'aos'
 import 'aos/dist/aos.css'
@@ -13,6 +14,8 @@ export default function DefaultLayout({
 }: {
   children: React.ReactNode
 }) {  
+  const pathname = usePathname()
+  const isHome = pathname?.endsWith('/')
 
   useEffect(() => {
     AOS.init({
@@ -33,7 +36,8 @@ export default function DefaultLayout({
 
       </main>
 
-      <Footer />
+      {/* Only show footer for non-docs pages */}
+      <Footer isHomePage={isHome}/>
     </>
   )
 }

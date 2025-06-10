@@ -2,9 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
+import ThemeToggle from '@/components/ui/theme-toggle';
+import { useTheme } from '@/components/ui/theme-provider';
+import LogoBW from '@/public/images/logo_alignair11bw.svg';
+import LogoWB from '@/public/images/logo_alignair11wb.svg';
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const context = useTheme();
+  const theme = context?.theme || 'dark';
 
   const links = [
     {
@@ -72,6 +79,16 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       ),
       description: 'Get help quickly'
     },
+    {
+      name: 'Terms & License',
+      href: '/docs/terms',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      ),
+      description: 'Legal information'
+    },
   ];
 
   // Utility to check if a section should be expanded
@@ -96,11 +113,76 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
     return { parent: 'Documentation', current: null };
   };
 
+  // Get navigation info for footer
+  const getNavigationInfo = () => {
+    const allPages: { name: string; href: string }[] = [];
+    
+    // Flatten all pages into a single array
+    links.forEach(link => {
+      allPages.push({ name: link.name, href: link.href });
+      if (link.children) {
+        link.children.forEach(child => {
+          allPages.push({ name: child.name, href: child.href });
+        });
+      }
+    });
+
+    const currentIndex = allPages.findIndex(page => page.href === pathname);
+    
+    return {
+      previous: currentIndex > 0 ? allPages[currentIndex - 1] : null,
+      next: currentIndex < allPages.length - 1 ? allPages[currentIndex + 1] : null,
+      current: currentIndex >= 0 ? allPages[currentIndex] : null
+    };
+  };
+
   const pageInfo = getCurrentPageInfo();
+  const navigation = getNavigationInfo();
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-200 flex">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-200">
+      {/* Minimal Docs Toolbar */}
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center space-x-6">
+          {/* Logo */}
+          <Link href="/" className="flex items-center" aria-label="AlignAIR Home">
+            <Image 
+              src={theme === 'dark' ? LogoBW : LogoWB}
+              width={120} 
+              height={30} 
+              alt="AlignAIR Logo" 
+              priority
+              className="transition-opacity"
+            />
+          </Link>
+          
+          {/* Divider */}
+          <div className="h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
+          
+          {/* Docs Label */}
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Documentation</span>
+        </div>
+        
+        <div className="flex items-center space-x-4">
+          {/* Quick nav back to main site */}
+          <Link
+            href="/"
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+          >
+            Home
+          </Link>
+          <Link
+            href="/alignair"
+            className="text-sm bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-md transition-colors"
+          >
+            Try AlignAIR
+          </Link>
+          <ThemeToggle />
+        </div>
+      </div>
 
+      {/* Main docs layout */}
+      <div className="flex">
 
       {/* Enhanced Sidebar */}
       <aside className="w-80 bg-gradient-to-b from-gray-900 via-gray-900 to-black border-r border-gray-800 relative">
@@ -250,7 +332,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-none">
+          <div className="max-w-none pb-8">
             {children}
           </div>
         </div>
@@ -261,44 +343,112 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 
             {/* Previous Page */}
             <div className="flex-1">
-              {/* You could add logic here to determine previous page */}
-              <Link href="/docs" className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors group">
-                <svg className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Docs Home
-              </Link>
+              {navigation.previous ? (
+                <Link href={navigation.previous.href} className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors group">
+                  <svg className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <div>
+                    <div className="text-xs text-gray-500">Previous</div>
+                    <div className="font-medium">{navigation.previous.name}</div>
+                  </div>
+                </Link>
+              ) : (
+                <Link href="/docs" className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors group">
+                  <svg className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <div>
+                    <div className="text-xs text-gray-500">Back to</div>
+                    <div className="font-medium">Docs Home</div>
+                  </div>
+                </Link>
+              )}
             </div>
 
             {/* Center - Page Actions */}
             <div className="flex items-center space-x-4">
-              <button className="inline-flex items-center px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-md text-sm transition-colors">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              <a 
+                href="https://github.com/MuteJester/AlignAIR" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-md text-sm transition-colors"
+              >
+                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                 </svg>
                 Star on GitHub
-              </button>
-              <button className="inline-flex items-center px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-md text-sm transition-colors">
+              </a>
+              <a 
+                href="https://github.com/MuteJester/AlignAIR/issues" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm transition-colors"
+              >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Edit Page
-              </button>
+                Report Issue
+              </a>
             </div>
 
             {/* Next Page */}
             <div className="flex-1 flex justify-end">
-              {/* You could add logic here to determine next page */}
-              <Link href="/docs/installation" className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors group">
-                Get Started
-                <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+              {navigation.next ? (
+                <Link href={navigation.next.href} className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors group">
+                  <div className="text-right">
+                    <div className="text-xs text-gray-500">Next</div>
+                    <div className="font-medium">{navigation.next.name}</div>
+                  </div>
+                  <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              ) : (
+                <Link href="/alignair" className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors group">
+                  <div className="text-right">
+                    <div className="text-xs text-gray-500">Try now</div>
+                    <div className="font-medium">AlignAIR Tool</div>
+                  </div>
+                  <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Legal Footer */}
+        <div className="bg-black border-t border-gray-800 px-8 py-4">
+          <div className="flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
+            <div className="flex items-center space-x-4 mb-2 md:mb-0">
+              <span>© 2025 AlignAIR. All rights reserved.</span>
+              <span className="hidden md:inline">•</span>
+              <span>Advancing computational biology through AI</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/docs/terms" className="hover:text-gray-300 transition-colors">
+                Terms
               </Link>
+              <span>•</span>
+              <Link href="/docs/license" className="hover:text-gray-300 transition-colors">
+                License
+              </Link>
+              <span>•</span>
+              <a 
+                href="https://github.com/MuteJester/AlignAIR" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gray-300 transition-colors"
+              >
+                Open Source
+              </a>
             </div>
           </div>
         </div>
       </main>
+      </div>
     </div>
   );
 }

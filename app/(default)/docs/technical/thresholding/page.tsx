@@ -108,7 +108,7 @@ export default function ThresholdingPage() {
               </div>
 
               {/* Visual Example */}
-              <div>
+            <div>
                 <h3 className="text-xl font-bold text-white mb-6">Example: V Allele Selection</h3>
 
                 <div className="bg-black rounded-lg p-6 border border-gray-700">
@@ -339,7 +339,7 @@ export default function ThresholdingPage() {
               <div className="bg-black/50 rounded-xl p-6 border border-gray-700">
                 <h3 className="text-lg font-bold text-white mb-4">Example Scenario</h3>
                 <div className="space-y-4">
-                  <div>
+            <div>
                     <div className="text-sm text-gray-400 mb-2">Before Short-D Check:</div>
                     <div className="space-y-1">
                       <div className="flex justify-between text-sm">

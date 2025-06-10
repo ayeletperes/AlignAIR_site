@@ -1,117 +1,187 @@
 export default function Features() {
   return (
-    <section>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="py-12 md:py-20">
+    <section className="bg-gray-50 dark:bg-gray-900 py-20 lg:py-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Section header */}
-          <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
-            <h2 className="h2 mb-4">Discover the Unique Features of AlignAIR</h2>
-            <p className="text-xl text-gray-400">Enhance your research with precision, speed, and unparalleled accuracy in immunoglobulin sequence alignment.</p>
+        {/* Section header */}
+        <div className="max-w-4xl mx-auto text-center mb-20">
+          <div className="inline-flex items-center rounded-full px-4 py-2 mb-6 bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 border border-purple-200 dark:border-purple-800/50" data-aos="fade-up">
+            <svg className="w-4 h-4 text-purple-600 dark:text-purple-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+              Advanced Features
+            </span>
+          </div>
+          
+          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6" data-aos="fade-up" data-aos-delay="100">
+            Discover the Unique Features of 
+            <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"> AlignAIR</span>
+          </h2>
+          
+          <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed" data-aos="fade-up" data-aos-delay="200">
+            Enhance your research with precision, speed, and unparalleled accuracy in immunoglobulin sequence alignment.
+          </p>
+        </div>
+
+        {/* Features Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+
+          {/* High Accuracy */}
+          <div className="group relative p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                High Call Accuracy
+              </h3>
+              
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                Exceptional accuracy in allele identification ensures reliable and precise results for your research needs.
+              </p>
+            </div>
           </div>
 
-          {/* Items */}
-          <div className="max-w-sm mx-auto grid gap-8 md:grid-cols-2 lg:grid-cols-2 lg:gap-16 items-start md:max-w-2xl lg:max-w-none" data-aos-id-blocks>
-
-            {/* 1st item */}
-              <div className="relative flex flex-col items-center" data-aos="fade-up" data-aos-anchor="[data-aos-id-blocks]">
-              <svg className="w-16 h-16 mb-4" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-              <rect className="fill-current text-purple-600" width="64" height="64" rx="32" />
-              <g transform="translate(8 8)" stroke="currentColor" strokeWidth="2" fill="none" fillRule="evenodd">
-                <circle className="stroke-current text-purple-100" cx="24" cy="24" r="16" />
-                <circle className="stroke-current text-purple-300" cx="24" cy="24" r="10" />
-                <circle className="stroke-current text-purple-100" cx="24" cy="24" r="5" />
-                <path className="stroke-current text-purple-300" d="M24 0v8M24 40v8M0 24h8M40 24h8" />
-                <path className="stroke-current text-purple-100" d="M17 31c2-2.5 6-2.5 8 0" />
-                <path className="stroke-current text-purple-100" d="M17 17c2 2.5 6 2.5 8 0" />
-                <path className="stroke-current text-purple-100" d="M12 12c3 4 9 4 12 0" />
-                <path className="stroke-current text-purple-100" d="M12 36c3-4 9-4 12 0" />
-              </g>
-            </svg>
-                <h4 className="h4 mb-2">High Call Accuracy</h4>
-                <p className="text-lg text-gray-400 text-center">Exceptional accuracy in allele identification ensures reliable and precise results for your research needs.</p>
-              </div>
-
-              {/* 2nd item */}
-              {/* <div className="relative flex flex-col items-center" data-aos="fade-up" data-aos-delay="100" data-aos-anchor="[data-aos-id-blocks]">
-              <svg className="w-16 h-16 mb-4" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-              <circle className="fill-current text-purple-600" cx="32" cy="32" r="32" />
-              <g transform="translate(16 16)" stroke="currentColor" strokeWidth="2" fill="none" fillRule="evenodd">
-                <circle className="stroke-current text-purple-100" cx="12" cy="12" r="10" />
-                <line className="stroke-current text-purple-300" x1="8" y1="8" x2="16" y2="16" strokeLinecap="round" strokeWidth="2" />
-                <line className="stroke-current text-purple-300" x1="16" y1="8" x2="8" y2="16" strokeLinecap="round" strokeWidth="2" />
-                <line className="stroke-current text-purple-100" x1="18" y1="18" x2="26" y2="26" strokeLinecap="round" strokeWidth="2" />
-                <circle className="stroke-current text-purple-300" cx="12" cy="12" r="10" />
-              </g>
-            </svg>
-
-                <h4 className="h4 mb-2">Mutation Rate Detection</h4>
-                <p className="text-lg text-gray-400 text-center">Accurately estimates mutation rates and noise for deeper insights into sequence variations.</p>
-              </div> */}
-
-              {/* 3rd item */}
-              {/* <div className="relative flex flex-col items-center" data-aos="fade-up" data-aos-delay="200" data-aos-anchor="[data-aos-id-blocks]">
-              <svg className="w-16 h-16 mb-4" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-            <circle className="fill-current text-purple-600" cx="32" cy="32" r="32" />
-            <g transform="translate(12 12)" stroke="currentColor" strokeWidth="2" fill="none" fillRule="evenodd">
-              <circle className="stroke-current text-purple-100" cx="16" cy="16" r="10" />
-              <line className="stroke-current text-purple-300" x1="12" y1="12" x2="20" y2="20" strokeLinecap="round" strokeWidth="2" />
-              <line className="stroke-current text-purple-300" x1="20" y1="12" x2="12" y2="20" strokeLinecap="round" strokeWidth="2" />
-              <line className="stroke-current text-purple-100" x1="22" y1="22" x2="30" y2="30" strokeLinecap="round" strokeWidth="2" />
-              <path className="stroke-current text-purple-100" d="M10 30s6-10 12 0" />
-              <path className="stroke-current text-purple-300" d="M22 30s6-10 12 0" />
-              <line className="stroke-current text-purple-100" x1="24" y1="24" x2="32" y2="32" strokeLinecap="round" strokeWidth="2" />
-            </g>
-          </svg>
-
-                <h4 className="h4 mb-2">Indel Event Identification</h4>
-                <p className="text-lg text-gray-400 text-center">Detects and quantifies indel events for comprehensive sequence modification insights.</p>
-              </div> */}
-
-              {/* 4th item */}
-              <div className="relative flex flex-col items-center" data-aos="fade-up" data-aos-delay="300" data-aos-anchor="[data-aos-id-blocks]">
-              <svg className="w-16 h-16 mb-4" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                  <rect className="fill-current text-purple-600" width="64" height="64" rx="32" />
-                  <g transform="translate(20 16)" strokeLinecap="square" strokeWidth="2" fill="none" fillRule="evenodd">
-                    <path className="stroke-current text-purple-100" d="M16 1L8 14h6l-4 13L22 14h-6z" />
-                  </g>
+          {/* Speed */}
+          <div className="group relative p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-2" data-aos="fade-up" data-aos-delay="200">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-
-                <h4 className="h4 mb-2">Unparalleled Speed</h4>
-                <p className="text-lg text-gray-400 text-center">Processes sequences faster than other aligners, enabling timely and effective research.</p>
               </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                Unparalleled Speed
+              </h3>
+              
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                Processes sequences faster than other aligners, enabling timely and effective research.
+              </p>
+            </div>
+          </div>
 
-              {/* 5th item */}
-              <div className="relative flex flex-col items-center" data-aos="fade-up" data-aos-delay="400" data-aos-anchor="[data-aos-id-blocks]">
-                <svg className="w-16 h-16 mb-4" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                  <rect className="fill-current text-purple-600" width="64" height="64" rx="32" />
-                  <g strokeLinecap="square" strokeWidth="2" fill="none" fillRule="evenodd">
-                    <path className="stroke-current text-purple-100" d="M29 42h10.229a2 2 0 001.912-1.412l2.769-9A2 2 0 0042 29h-7v-4c0-2.373-1.251-3.494-2.764-3.86a1.006 1.006 0 00-1.236.979V26l-5 6" />
-                    <path className="stroke-current text-purple-300" d="M22 30h4v12h-4z" />
-                  </g>
+          {/* Accuracy */}
+          <div className="group relative p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-2" data-aos="fade-up" data-aos-delay="300">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-700 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                <h4 className="h4 mb-2">Accurate Segment Estimate</h4>
-                <p className="text-lg text-gray-400 text-center">Precisely detects gene start and end points, ensuring accurate sequence segmentation.</p>
               </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                Accurate Segment Estimate
+              </h3>
+              
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                Precisely detects gene start and end points, ensuring accurate sequence segmentation.
+              </p>
+            </div>
+          </div>
 
-              {/* 6th item */}
-              <div className="relative flex flex-col items-center" data-aos="fade-up" data-aos-delay="500" data-aos-anchor="[data-aos-id-blocks]">
-                <svg className="w-16 h-16 mb-4" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                  <rect className="fill-current text-purple-600" width="64" height="64" rx="32" />
-                  <g transform="translate(21 22)" strokeLinecap="square" strokeWidth="2" fill="none" fillRule="evenodd">
-                    <path className="stroke-current text-purple-300" d="M17 2V0M19.121 2.879l1.415-1.415M20 5h2M19.121 7.121l1.415 1.415M17 8v2M14.879 7.121l-1.415 1.415M14 5h-2M14.879 2.879l-1.415-1.415" />
-                    <circle className="stroke-current text-purple-300" cx="17" cy="5" r="3" />
-                    <path className="stroke-current text-purple-100" d="M8.86 1.18C3.8 1.988 0 5.6 0 10c0 5 4.9 9 11 9a10.55 10.55 0 003.1-.4L20 21l-.6-5.2a9.125 9.125 0 001.991-2.948" />
-                  </g>
+          {/* Productivity */}
+          <div className="group relative p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-2" data-aos="fade-up" data-aos-delay="400">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
-                <h4 className="h4 mb-2">Productivity Check</h4>
-                <p className="text-lg text-gray-400 text-center">Classifies sequences with high accuracy to determine their productivity, ensuring reliable functional assessments.</p>
               </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                Productivity Check
+              </h3>
+              
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                Classifies sequences with high accuracy to determine their productivity, ensuring reliable functional assessments.
+              </p>
+            </div>
+          </div>
 
+          {/* Multi-platform */}
+          <div className="group relative p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-2 md:col-span-2 lg:col-span-1" data-aos="fade-up" data-aos-delay="500">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-700 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                Multi-Platform Access
+              </h3>
+              
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                Available as web interface, CLI tool, and Python package for seamless integration into any workflow.
+              </p>
+            </div>
+          </div>
 
+          {/* Open Source */}
+          <div className="group relative p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-2 md:col-span-2 lg:col-span-1" data-aos="fade-up" data-aos-delay="600">
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            
+            <div className="relative">
+              <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-pink-700 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                Open Source Community
+              </h3>
+              
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                Fully open source with active community support and continuous development for transparency and collaboration.
+              </p>
+            </div>
           </div>
 
         </div>
+
+        {/* Call to Action */}
+        <div className="text-center mt-16" data-aos="fade-up" data-aos-delay="700">
+          <p className="text-gray-600 dark:text-gray-400 mb-8 text-lg">
+            Ready to experience the future of sequence alignment?
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/alignair"
+              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Try AlignAIR Now
+            </a>
+            <a
+              href="/docs"
+              className="inline-flex items-center px-8 py-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              View Documentation
+            </a>
+          </div>
+        </div>
+
       </div>
     </section>
   )

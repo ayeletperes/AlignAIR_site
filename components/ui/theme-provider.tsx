@@ -19,12 +19,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setMounted(true)
     // Check if there's a saved theme in localStorage
-    // const savedTheme = localStorage.getItem('theme') as Theme
-    // if (savedTheme) {
-    //   setTheme(savedTheme)
-    // }
-    // If no saved theme, keep the default 'dark' theme
-    // This ensures dark mode is the default for new visitors
+    const savedTheme = localStorage.getItem('theme') as Theme
+    
+    if (savedTheme) {
+      setTheme(savedTheme)
+    } else {
+      // Check system preference if no saved theme
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const defaultTheme = systemPrefersDark ? 'dark' : 'light'
+      setTheme(defaultTheme)
+      localStorage.setItem('theme', defaultTheme)
+    }
   }, [])
 
   useEffect(() => {
@@ -69,4 +74,31 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme() {
   const context = useContext(ThemeContext)
   return context
-} 
+}
+
+// Theme script to prevent flash - add this to layout.tsx
+export const ThemeScript = () => (
+  <script
+    dangerouslySetInnerHTML={{
+      __html: `
+        (function() {
+          try {
+            var theme = localStorage.getItem('theme');
+            if (!theme) {
+              theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+              localStorage.setItem('theme', theme);
+            }
+            if (theme === 'dark') {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+          } catch (e) {
+            // Fallback to dark theme
+            document.documentElement.classList.add('dark');
+          }
+        })();
+      `,
+    }}
+  />
+) 
