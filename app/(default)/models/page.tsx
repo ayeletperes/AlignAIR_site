@@ -27,7 +27,7 @@ export default function ModelsPage() {
     },
     {
       id: 'igl',
-      name: 'IGL Light Chain',
+      name: 'IGL/IGK Light Chain',
       checkpoint: '/app/pretrained_models/IGL_S5F_576',
       chainType: 'light',
       species: 'Human',
@@ -265,21 +265,21 @@ export default function ModelsPage() {
                       <code className="bg-gray-800 text-blue-400 px-2 py-1 rounded">heavy</code>
                     </td>
                     <td className="py-3 px-6">V, D, J</td>
-                    <td className="py-3 px-6">IMGT v3.1.25</td>
+                    <td className="py-3 px-6">OGRDB V8 extended</td>
                     <td className="py-3 px-6">B-cell heavy chain analysis</td>
                   </tr>
                   <tr className="border-b border-gray-800 hover:bg-gray-800/50">
                     <td className="py-3 px-6">
                       <div className="flex items-center">
                         <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-                        <span className="text-white font-medium">IGL Light Chain</span>
+                        <span className="text-white font-medium">IGL/IGK Light Chain</span>
                       </div>
                     </td>
                     <td className="py-3 px-6">
                       <code className="bg-gray-800 text-green-400 px-2 py-1 rounded">light</code>
                     </td>
                     <td className="py-3 px-6">V, J</td>
-                    <td className="py-3 px-6">IMGT v3.1.25</td>
+                    <td className="py-3 px-6">OGRDB V2 & V3 extended</td>
                     <td className="py-3 px-6">B-cell lambda/kappa light chain analysis</td>
                   </tr>
                   <tr className="border-b border-gray-800 hover:bg-gray-800/50">
@@ -293,7 +293,7 @@ export default function ModelsPage() {
                       <code className="bg-gray-800 text-purple-400 px-2 py-1 rounded">tcrb</code>
                     </td>
                     <td className="py-3 px-6">V, D, J</td>
-                    <td className="py-3 px-6">IMGT v3.1.25</td>
+                    <td className="py-3 px-6">IMGT 2020</td>
                     <td className="py-3 px-6">T-cell receptor beta chain analysis</td>
                   </tr>
                 </tbody>

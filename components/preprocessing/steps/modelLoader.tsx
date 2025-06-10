@@ -1,5 +1,5 @@
 import { DEFAULT_CHAIN_CONFIG } from '@components/preprocessing/steps/config';
-import { ModelLoader, ChainConfig } from '@components/model/utilities';
+import { ModelLoader, ChainConfig, ModelWarmupOptions } from '@components/model/utilities';
 import * as tf from '@tensorflow/tfjs';
 
 export interface ModelLoadingParams {
@@ -10,6 +10,7 @@ export interface ModelLoadingParams {
   k?: number;
   maxLength?: number;
   allowedMismatches?: number;
+  warmupOptions?: ModelWarmupOptions;
 }
 
 export interface ModelLoadingResult {
@@ -26,6 +27,7 @@ export const loadModel = async ({
   k,
   maxLength,
   allowedMismatches,
+  warmupOptions,
 }: ModelLoadingParams): Promise<ModelLoadingResult> => {
   const chainConfig: ChainConfig = {
     name: chain,
@@ -38,7 +40,9 @@ export const loadModel = async ({
   };
 
   const loader = new ModelLoader(chainConfig);
-  await loader.initialize();
+  
+  // Pass warmup options to initialize
+  await loader.initialize(warmupOptions);
 
   const model = loader.getModel();
   if (!model) {

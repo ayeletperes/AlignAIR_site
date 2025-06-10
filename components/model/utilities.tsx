@@ -18,6 +18,13 @@ export interface ChainConfig {
   orientationModelPath: string; // Path to the orientation model file
 }
 
+export interface ModelWarmupOptions {
+  enabled?: boolean;
+  inputShape?: number[];
+  warmupRuns?: number;
+  logWarmupTimes?: boolean;
+}
+
 export class ModelLoader {
   private chainConfig: ChainConfig;
   private candidateExtractor: FastKmerDensityExtractor | null = null;
@@ -26,17 +33,25 @@ export class ModelLoader {
   private orientationModel: any | null = null;
   private referenceAlleles: Record<string, any> | null = null;
   private dataConfig: Record<string, any> | null = null;
+  private isWarmedUp: boolean = false;
+  private warmupStats: { times: number[]; avgTime: number } | null = null;
 
   constructor(chainConfig: ChainConfig) {
     this.chainConfig = chainConfig;
   }
 
-  public async initialize(): Promise<void> {
+  public async initialize(warmupOptions?: ModelWarmupOptions): Promise<void> {
     logger.log(`Initializing ${this.chainConfig.name} chain model...`);
     await this.loadModel();
     await this.loadMetadata();
     await this.loadOrientationModel();
     await this.loadReferencesAndInitializeExtractor();
+    
+    // Warm up the model if requested
+    if (warmupOptions?.enabled !== false) {
+      await this.warmUpModel(warmupOptions);
+    }
+    
     logger.log(`${this.chainConfig.name} chain model initialized.`);
   }
 
@@ -57,6 +72,192 @@ export class ModelLoader {
       logger.error(errorMessage);
       throw new Error(errorMessage);
     }
+  }
+
+  /**
+   * Warm up the TensorFlow.js model to improve first inference performance
+   */
+  public async warmUpModel(options?: ModelWarmupOptions): Promise<void> {
+    if (!this.model) {
+      logger.warn('Cannot warm up model: model not loaded');
+      return;
+    }
+
+    if (this.isWarmedUp) {
+      logger.log('Model already warmed up');
+      return;
+    }
+
+    const {
+      inputShape = [1, 576], // Default based on maxLength
+      warmupRuns = 3,
+      logWarmupTimes = true
+    } = options || {};
+
+    logger.log(`Warming up ${this.chainConfig.name} model with ${warmupRuns} runs...`);
+    
+    const warmupTimes: number[] = [];
+    const backend = tf.getBackend();
+    
+    // WebGL-specific optimizations
+    if (backend === 'webgl') {
+      await this.prepareWebGLContext();
+    }
+    
+    // Create dummy input tensor with the expected shape
+    const dummyInput = tf.randomUniform(inputShape, 0, 100, 'int32');
+    
+    try {
+      for (let i = 0; i < warmupRuns; i++) {
+        const startTime = performance.now();
+        
+        // Run inference
+        const predictions = this.model.predict(dummyInput) as tf.Tensor | tf.Tensor[];
+        
+        // Ensure computation is complete by accessing data
+        if (Array.isArray(predictions)) {
+          // For WebGL backend, force GPU sync by reading data
+          if (backend === 'webgl') {
+            await Promise.all(predictions.map(p => p.data()));
+          }
+          predictions.forEach(p => p.dispose());
+        } else {
+          if (backend === 'webgl') {
+            await predictions.data();
+          }
+          predictions.dispose();
+        }
+        
+        // Additional WebGL sync for first run to ensure shader compilation
+        if (i === 0 && backend === 'webgl') {
+          await tf.nextFrame();
+        }
+        
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+        warmupTimes.push(duration);
+        
+        if (logWarmupTimes) {
+          logger.log(`Warmup run ${i + 1}/${warmupRuns}: ${duration.toFixed(2)}ms`);
+        }
+      }
+      
+      const avgTime = warmupTimes.reduce((a, b) => a + b, 0) / warmupTimes.length;
+      const improvement = warmupTimes.length > 1 ? 
+        ((warmupTimes[0] - warmupTimes[warmupTimes.length - 1]) / warmupTimes[0] * 100) : 0;
+      
+      this.warmupStats = { times: warmupTimes, avgTime };
+      this.isWarmedUp = true;
+      
+      if (logWarmupTimes) {
+        logger.log(`Model warmup completed. Average time: ${avgTime.toFixed(2)}ms`);
+        logger.log(`First run: ${warmupTimes[0].toFixed(2)}ms, Last run: ${warmupTimes[warmupTimes.length - 1].toFixed(2)}ms`);
+        if (improvement > 0) {
+          logger.log(`Performance improvement: ${improvement.toFixed(1)}%`);
+        }
+        logger.log(`Backend: ${backend}, GPU: ${backend === 'webgl' ? 'Yes' : 'No'}`);
+      }
+      
+    } catch (error) {
+      logger.error('Error during model warmup:', error);
+    } finally {
+      // Clean up dummy input
+      dummyInput.dispose();
+    }
+  }
+
+  /**
+   * Prepare WebGL context and force shader compilation
+   */
+  private async prepareWebGLContext(): Promise<void> {
+    try {
+      // Create a small tensor operation to force WebGL context creation
+      const testTensor = tf.scalar(1);
+      const result = tf.add(testTensor, tf.scalar(1));
+      await result.data(); // Force GPU sync
+      testTensor.dispose();
+      result.dispose();
+      
+      // Force next frame to ensure context is ready
+      await tf.nextFrame();
+    } catch (error) {
+      logger.warn('WebGL context preparation failed:', error);
+    }
+  }
+
+  /**
+   * Get memory usage information for the loaded models
+   */
+  public getMemoryInfo(): {
+    tensorflow: { numTensors: number; numBytes: number };
+    modelSize?: number;
+    backend: string;
+  } {
+    const tfMemory = tf.memory();
+    
+    // Estimate model size if available
+    let modelSize: number | undefined;
+    if (this.model) {
+      try {
+        // Try to estimate model size based on parameters
+        const modelArtifacts = (this.model as any).modelArtifacts;
+        if (modelArtifacts && modelArtifacts.weightData) {
+          modelSize = modelArtifacts.weightData.byteLength;
+        }
+      } catch (error) {
+        // Estimation failed, ignore
+      }
+    }
+
+    return {
+      tensorflow: {
+        numTensors: tfMemory.numTensors,
+        numBytes: tfMemory.numBytes
+      },
+      modelSize,
+      backend: tf.getBackend()
+    };
+  }
+
+  /**
+   * Dispose of the model and free memory
+   */
+  public dispose(): void {
+    logger.log(`Disposing ${this.chainConfig.name} model...`);
+    
+    if (this.model) {
+      this.model.dispose();
+      this.model = null;
+    }
+    
+    if (this.orientationModel) {
+      // ONNX models don't have a standard dispose method, but we can null the reference
+      this.orientationModel = null;
+    }
+    
+    this.isWarmedUp = false;
+    this.warmupStats = null;
+    
+    // Force garbage collection if available
+    if (typeof (globalThis as any).gc === 'function') {
+      (globalThis as any).gc();
+    }
+    
+    logger.log(`${this.chainConfig.name} model disposed`);
+  }
+
+  /**
+   * Get warmup statistics
+   */
+  public getWarmupStats(): { times: number[]; avgTime: number } | null {
+    return this.warmupStats;
+  }
+
+  /**
+   * Check if model is warmed up
+   */
+  public isModelWarmedUp(): boolean {
+    return this.isWarmedUp;
   }
 
   public async loadMetadata(): Promise<void> {
@@ -172,5 +373,38 @@ export class ModelLoader {
     if(back){
       return {inputs, outputs};
     }
+  }
+
+  /**
+   * Get optimal warmup options based on model and system characteristics
+   */
+  public getOptimalWarmupOptions(): ModelWarmupOptions {
+    const backend = tf.getBackend();
+    const isWebGL = backend === 'webgl';
+    
+    // Default warmup configuration
+    let warmupRuns = 2;
+    let inputShape = [1, this.chainConfig.maxLength];
+    
+    // Adjust based on backend capabilities
+    if (isWebGL) {
+      // WebGL benefits from more warmup runs due to shader compilation
+      warmupRuns = 3;
+    } else if (backend === 'cpu') {
+      // CPU backend is more consistent, fewer runs needed
+      warmupRuns = 1;
+    }
+    
+    // Adjust based on model complexity (estimate based on max length)
+    if (this.chainConfig.maxLength > 1000) {
+      warmupRuns = Math.min(warmupRuns + 1, 4); // Cap at 4 runs
+    }
+    
+    return {
+      enabled: true,
+      inputShape,
+      warmupRuns,
+      logWarmupTimes: true
+    };
   }
 }

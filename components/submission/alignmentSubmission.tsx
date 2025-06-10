@@ -7,6 +7,78 @@ import { AlleleAlignmentStep } from '@components/postprocessing/steps/germlineAl
 import { translateVCallToIuisNames } from '@components/postprocessing/steps/translateToIUIS';
 import { logger } from '@components/utils/logger';
 
+// Global model cache - shared across preloading and submission
+interface CachedModelData {
+  loader: any;
+  modelOutputNodes: Record<string, number>;
+  timestamp: number;
+}
+
+const globalModelCache = new Map<string, CachedModelData>();
+
+/**
+ * Get or load a model with global caching
+ */
+export const getOrLoadModel = async (params: {
+  chain: 'heavy' | 'light' | 'trb';
+  modelPath?: string;
+  modelMetadataPath?: string;
+  orientationModelPath?: string;
+  warmupOptions?: any;
+}): Promise<{ loader: any; modelOutputNodes: Record<string, number> }> => {
+  const { chain, modelPath, modelMetadataPath, orientationModelPath, warmupOptions } = params;
+  const cacheKey = `${chain}-${modelPath || 'default'}-${modelMetadataPath || 'default'}-${orientationModelPath || 'default'}`;
+  
+  // Check if model is already cached
+  const cached = globalModelCache.get(cacheKey);
+  if (cached) {
+    logger.log(`Using cached ${chain} model`);
+    return { loader: cached.loader, modelOutputNodes: cached.modelOutputNodes };
+  }
+  
+  // Load model if not cached
+  logger.log(`Loading new ${chain} model`);
+  const { loader, modelOutputNodes } = await loadModel({
+    chain,
+    modelPath,
+    modelMetadataPath,
+    orientationModelPath,
+    warmupOptions,
+  });
+  
+  // Cache the loaded model
+  globalModelCache.set(cacheKey, {
+    loader,
+    modelOutputNodes,
+    timestamp: Date.now(),
+  });
+  
+  return { loader, modelOutputNodes };
+};
+
+/**
+ * Clear global model cache
+ */
+export const clearGlobalModelCache = (): void => {
+  globalModelCache.clear();
+  logger.log('Global model cache cleared');
+};
+
+/**
+ * Get cache status
+ */
+export const getModelCacheStatus = () => {
+  const status: Record<string, { cached: boolean; timestamp?: number }> = {};
+  Array.from(globalModelCache.entries()).forEach(([key, value]) => {
+    const chain = key.split('-')[0];
+    status[chain] = {
+      cached: true,
+      timestamp: value.timestamp,
+    };
+  });
+  return status;
+};
+
 let cachedModel: any = null;
 let cachedChain: string | null = null;
 
@@ -41,11 +113,15 @@ export const submitAlignmentRequest = async (
     // Load the model only if the chain has changed or model is not cached
     if (cachedModel === null || cachedChain !== chain) {
       cachedChain = chain;
-      const { loader, modelOutputNodes } = await loadModel({
+      const { loader, modelOutputNodes } = await getOrLoadModel({
         chain,
         modelPath,
         modelMetadataPath,
         orientationModelPath,
+        warmupOptions: {
+          enabled: false, // Skip warmup since models should already be preloaded and warmed
+          logWarmupTimes: false,
+        },
       });
       cachedModel = { loader, modelOutputNodes };
     }

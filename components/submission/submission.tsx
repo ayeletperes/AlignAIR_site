@@ -12,7 +12,7 @@ const SubmissionButton = ({
   results,
   setResults,
 }: {
-  chain: 'heavy' | 'light';
+  chain: 'heavy' | 'light' | 'trb';
   input: string | null;
   flag: 'file' | 'sequence';
   params: any;
