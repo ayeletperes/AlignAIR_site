@@ -32,7 +32,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
       );  
     }
     
-    const maxCharsPerRow = 72;
+    const maxCharsPerRow = 45;
     const [selectedSequenceV, setSelectedSequenceV] = useState<string>('');
     const [selectedSequenceD, setSelectedSequenceD] = useState<string>('');
     const [selectedSequenceJ, setSelectedSequenceJ] = useState<string>('');
@@ -229,10 +229,9 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
           np2: sequence.slice(dSeqEnd, jSeqStart),
         }
         setGermline(gr);
-        
         const sequenceGermline = gr['v_call'] + gr['np1'] + gr['d_call'] + gr['np2'] + gr['j_call'];
-        
         let germlineAAPad = translateDNAtoAA(sequenceGermline);
+        
         setGermlineAA(germlineAAPad)
   
         if(results.v_germline_start>0){
@@ -300,6 +299,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
                             splitStart={0}
                             splitEnd={vAAIndex}
                             matcher={matcher.V}
+                            indelCounts={results.indel_count}
                         />
                       
                       </div>
@@ -353,6 +353,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
                             splitStart={vAAIndex}
                             splitEnd={jAAIndex}
                             matcher={matcher.D}
+                            indelCounts={results.indel_count}
                         />
                       
                       </div>
@@ -411,6 +412,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
                             splitStart={jAAIndex}
                             splitEnd={jAAIndex+sequenceJ.length}
                             matcher={matcher.J}
+                            indelCounts={results.indel_count}
                         />
                       
                       </div>
@@ -440,26 +442,62 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
   if(selectedSequenceV && selectedSequenceD && selectedSequenceJ && splitedGVAA.length>0 && splitedGDAA.length>0 && splitedGJAA.length>0 && sequenceJ!="" && sequenceD!="" && sequenceV!="" && sequence!="" && sequenceAA!="" && germlineAA!="" && splitDAA.length>0 && splitVAA.length>0 && splitJAA.length>0){  
         
         return (
-        <div>
-            <div className='bg-white relative overflow-x-auto'>
-            {renderVerticalView()}
+        <div className="modern-alignment-container">
+            {/* Enhanced Header with better visual separation */}
+            <div className="alignment-header">
+                <div className="alignment-title">
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">Sequence Alignment Viewer</h3>
+                    <div className="alignment-info">
+                        <span className="info-badge">
+                            Heavy Chain | {results.v_call[0]} • {results.d_call[0]} • {results.j_call[0]}
+                        </span>
+                    </div>
+                </div>
             </div>
-            <div className='alignment-legend'>
-                <div style={{backgroundColor:'#F09EA7', gridRow:1}}>''</div>
-                <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>FR1</div>
-                <div style={{backgroundColor:'#F6CA94', gridRow:1}}>''</div>
-                <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>CDR1</div>
-                <div style={{backgroundColor:'#FAFABE', gridRow:1}}>''</div>
-                <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>FR2</div>
-                <div style={{backgroundColor:'#C1EBC0', gridRow:1}}>''</div>
-                <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>CDR2</div>
-                <div style={{backgroundColor:'#C7CAFF', gridRow:1}}>''</div>
-                <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>FR3</div>
-                <div style={{backgroundColor:'#CDABEB', gridRow:1}}>''</div>
-                <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>CDR3</div>
-                <div style={{backgroundColor:'#F6C2F3', gridRow:1}}>''</div>
-                <div className="text-center text-lg font-semibold text-black" style={{gridRow:1}}>FR4</div>
-              </div>
+
+            {/* Main Alignment Grid with enhanced styling */}
+            <div className='modern-alignment-grid'>
+                <div className="alignment-viewer-container">
+                    {renderVerticalView()}
+                </div>
+            </div>
+            
+            {/* Enhanced Legend with modern design */}
+            <div className='modern-alignment-legend'>
+                <div className="legend-title">
+                    <h4 className="text-lg font-semibold text-gray-700 mb-3">Region Color Coding</h4>
+                </div>
+                <div className="legend-grid">
+                    <div className="legend-item">
+                        <div className="legend-color" style={{backgroundColor:'#FF6B8A'}}></div>
+                        <span className="legend-label">FR1</span>
+                    </div>
+                    <div className="legend-item">
+                        <div className="legend-color" style={{backgroundColor:'#4ECDC4'}}></div>
+                        <span className="legend-label">CDR1</span>
+                    </div>
+                    <div className="legend-item">
+                        <div className="legend-color" style={{backgroundColor:'#45B7D1'}}></div>
+                        <span className="legend-label">FR2</span>
+                    </div>
+                    <div className="legend-item">
+                        <div className="legend-color" style={{backgroundColor:'#96CEB4'}}></div>
+                        <span className="legend-label">CDR2</span>
+                    </div>
+                    <div className="legend-item">
+                        <div className="legend-color" style={{backgroundColor:'#FECA57'}}></div>
+                        <span className="legend-label">FR3</span>
+                    </div>
+                    <div className="legend-item">
+                        <div className="legend-color" style={{backgroundColor:'#FF9FF3'}}></div>
+                        <span className="legend-label">CDR3</span>
+                    </div>
+                    <div className="legend-item">
+                        <div className="legend-color" style={{backgroundColor:'#54A0FF'}}></div>
+                        <span className="legend-label">FR4</span>
+                    </div>
+                </div>
+            </div>
         </div>
         );
     }

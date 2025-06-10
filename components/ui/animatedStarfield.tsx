@@ -1,18 +1,41 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { useTheme } from './theme-provider';
 
 interface Props {
     speedFactor?: number;
-    backgroundColor?: string;
-    starColor?: [number, number, number];
     starCount?: number;
     sectionH?: number;
     sectionW?: number;
+    backgroundColor?: string;
+    starColor?: [number, number, number];
 }
 
 export default function Starfield(props: Props) {
-    const { speedFactor = 0.02, backgroundColor = 'black', starColor = [64, 64, 64], starCount = 5, sectionW = window.innerWidth, sectionH = window.innerHeight} = props;
+    const context = useTheme();
+    const theme = context?.theme || 'dark';
+    // Dynamic star colors based on theme
+    const getStarColor = (): [number, number, number] => {
+        if (props.starColor) return props.starColor;
+        return theme === 'dark' ? [255, 255, 255] : [80, 80, 80]; // White stars in dark mode, dark gray in light mode
+    };
+
+    // Dynamic background color based on theme
+    const getBackgroundColor = (): string => {
+        if (props.backgroundColor) return props.backgroundColor;
+        return theme === 'dark' ? 'black' : 'white'; // Use transparent so the page background shows through
+    };
+
+    const { 
+        speedFactor = 0.02, 
+        starCount = 5, 
+        sectionW = typeof window !== 'undefined' ? window.innerWidth : 800, 
+        sectionH = typeof window !== 'undefined' ? window.innerHeight : 600
+    } = props;
+    
+    const starColor = getStarColor();
+    const backgroundColor = getBackgroundColor();
 
     useEffect(() => {
         const canvas = document.getElementById('starfield') as HTMLCanvasElement;
@@ -56,7 +79,9 @@ export default function Starfield(props: Props) {
                 };
 
                 const drawAntibody = (x: number, y: number, brightness: number) => {
-                    c.strokeStyle = `rgba(${starColor[0]}, ${starColor[1]}, ${starColor[2]}, ${brightness})`;
+                    // Adjust brightness based on theme for better visibility
+                    const adjustedBrightness = theme === 'dark' ? brightness * 0.8 : brightness ;//* 0.6;
+                    c.strokeStyle = `rgba(${starColor[0]}, ${starColor[1]}, ${starColor[2]}, ${adjustedBrightness})`;
                     c.lineWidth = 2;  // Adjust line width to make the lines thicker
                     const size = 5;  // Adjust size to make the antibodies larger
 
@@ -140,7 +165,7 @@ export default function Starfield(props: Props) {
         return () => {
             window.onresize = null;
         };
-    }, [starColor, backgroundColor, speedFactor, starCount]);
+    }, [starColor, backgroundColor, speedFactor, starCount, theme]);
 
     return (
         <canvas
@@ -154,9 +179,9 @@ export default function Starfield(props: Props) {
                 bottom: 0,
                 left: 0,
                 zIndex: 10,
-                opacity: 1,
+                opacity: theme === 'dark' ? 0.9 : 0.7,
                 pointerEvents: 'none',
-                mixBlendMode: 'screen',
+                mixBlendMode: theme === 'dark' ? 'screen' : 'multiply',
             }}
         ></canvas>
     );

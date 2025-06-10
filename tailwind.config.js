@@ -7,6 +7,7 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
     "./node_modules/@nextui-org/theme/dist/components/(dropdown|popover|menu|divider|button|ripple|spinner).js"
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {

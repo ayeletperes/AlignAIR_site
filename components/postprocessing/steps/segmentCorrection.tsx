@@ -3,7 +3,7 @@ import { SequenceRecord } from '@components/preprocessing/utilities/sequenceRead
 
 interface SegmentCorrectionParams {
     sequences: SequenceRecord;
-    chain: 'heavy' | 'light';
+    chain: 'heavy' | 'light' | 'trb';
     v_sequence_start: any;
     v_sequence_end: any;
     d_sequence_start: any | null;
@@ -40,7 +40,7 @@ export const correctSegmentsForPaddings = (params: SegmentCorrectionParams): Cor
     let adjustedDStart: tf.Tensor | null = null;
     let adjustedDEnd: tf.Tensor | null = null;
   
-    if (chain === 'heavy' && d_sequence_start && d_sequence_end) {
+    if (chain !== 'light' && d_sequence_start && d_sequence_end) {
       adjustedDStart = d_sequence_start.squeeze().sub(paddings).round().arraySync();
       adjustedDEnd = d_sequence_end.squeeze().sub(paddings).round().arraySync();
     }

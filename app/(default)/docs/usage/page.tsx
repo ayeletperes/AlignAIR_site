@@ -25,6 +25,7 @@ export default function UsagePage() {
           </div>
         </div>
 
+
         {/* Quick Start Command */}
         <div className="mb-16">
           <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 border border-gray-700">
@@ -362,6 +363,7 @@ python app.py run \
           <h2 className="h2 text-center mb-12 text-white">Tips & Best Practices</h2>
 
           <div className="grid md:grid-cols-3 gap-6">
+
 
             <div className="bg-blue-900/30 rounded-2xl p-6 border border-blue-700">
               <div className="flex items-center mb-4">

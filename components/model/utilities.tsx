@@ -9,7 +9,7 @@ import { logger } from '@components/utils/logger';
 // model class
 
 export interface ChainConfig {
-  name: 'heavy' | 'light';
+  name: 'heavy' | 'light' | 'trb';
   k: number;
   maxLength: number;
   allowedMismatches: number;

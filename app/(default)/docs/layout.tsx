@@ -99,7 +99,8 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   const pageInfo = getCurrentPageInfo();
 
   return (
-    <div className="min-h-screen bg-black text-gray-200 flex">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-200 flex">
+
 
       {/* Enhanced Sidebar */}
       <aside className="w-80 bg-gradient-to-b from-gray-900 via-gray-900 to-black border-r border-gray-800 relative">
@@ -176,6 +177,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                         href={child.href}
                         className={`flex items-center px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
                           pathname === child.href
+
                             ? 'text-purple-400 bg-gray-800 border-l-2 border-purple-400'
                             : 'text-gray-400 hover:text-white hover:bg-gray-800'
                         }`}

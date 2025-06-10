@@ -1,9 +1,14 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import Logo from '@/public/images/logo_alignair13bw.svg'
+import { useTheme } from './theme-provider';
+import LogoBW from '@/public/images/logo_alignair12bw.svg'
+import LogoWB from '@/public/images/logo_alignair12wb.svg'
 
 export default function Footer() {
+  const context = useTheme();
+  const theme = context?.theme || 'dark'; 
+  const Logo = theme === 'dark' ? LogoBW : LogoWB;
   return (
     <footer>
       <div className="py-12 md:py-16">
@@ -17,7 +22,7 @@ export default function Footer() {
               <div className="mb-3">
                 {/* Logo */}
                 <Link href="/" className="inline-block" aria-label="AlignAIR">
-                  <Image className="shadow-md m-0 p-0" src={Logo} width={70} height={70} alt="logo" />
+                  <Image className="m-0 p-0" src={Logo} width={70} height={70} alt="logo" />
                 </Link>
               </div>
               <div className="text-gray-400 mb-3">Improving Adaptive Immune Receptor Alignment</div>

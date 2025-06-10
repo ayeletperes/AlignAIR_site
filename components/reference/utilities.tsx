@@ -34,6 +34,13 @@ type ChainData = {
       J: Segment;
     };
   };
+  trb: {
+    reference: {
+      V: Segment;
+      D: Segment;
+      J: Segment;
+    }
+  };
 };
 
 export async function loadReferenceData(): Promise<ChainData> {
@@ -104,6 +111,21 @@ export async function loadReferenceData(): Promise<ChainData> {
     J: sortSegmentByName(heavyJ),
   };
 
+  const trbV = await loadFasta('reference/trb/trbv.fasta');
+  const trbV_iuisTable = await loadTable('reference/trb/trbv_iuis.tsv');
+  enrichSegment(trbV, trbV_iuisTable, 'iuisName');
+
+  const trbD = await loadFasta('reference/trb/trbd.fasta');
+  const trbJ = await loadFasta('reference/trb/trbj.fasta');
+  const trbJ_anchorTable = await loadTable('reference/trb/trbj_anchor.tsv');
+  enrichSegment(trbJ, trbJ_anchorTable, 'anchor');
+
+  const trbChain = {
+    V: sortSegmentByName(trbV),
+    D: sortSegmentByName(trbD),
+    J: sortSegmentByName(trbJ),
+  };
+
   const lightV_IGK = await loadFasta('reference/light/igkv.fasta');
   const lightJ_IGK = await loadFasta('reference/light/igkj.fasta');
   const lightV_IGK_iuisTable = await loadTable('reference/light/igkv_iuis.tsv');
@@ -130,5 +152,6 @@ export async function loadReferenceData(): Promise<ChainData> {
       kappa: { V: lightV_IGK, J: lightJ_IGK },
       lambda: { V: lightV_IGL, J: lightJ_IGL },
     },
+    trb: { reference: trbChain },
   };
 }

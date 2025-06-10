@@ -231,6 +231,7 @@ export default function ThresholdingPage() {
               </div>
             </div>
 
+
             {/* D Segment */}
             <div className="bg-gradient-to-br from-yellow-500 to-orange-500 p-0.5 rounded-2xl">
               <div className="bg-gray-900 rounded-2xl p-6 h-full">
@@ -382,6 +383,7 @@ export default function ThresholdingPage() {
         {/* Intuition and Optimization */}
         <div className="mb-16">
           <div className="grid md:grid-cols-2 gap-8">
+
 
             {/* Intuition */}
             <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">

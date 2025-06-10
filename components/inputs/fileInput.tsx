@@ -6,9 +6,10 @@ interface FileInputProps {
   setSequence: React.Dispatch<React.SetStateAction<string>>;
   isDisabled?: boolean;
   fileInfoRef: React.RefObject<HTMLDivElement>;
+  setResults: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence, fileInfoRef }) => {
+const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence, fileInfoRef, setResults }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [fileName, setFileName] = useState('');
   const [sequenceCount, setSequenceCount] = useState(0);
@@ -19,6 +20,7 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence,
       processFile(file);
       setFile(file);
       setSequence('');
+      setResults(null);
     }
   };
 
@@ -75,6 +77,7 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence,
     setFileName('');
     setSequenceCount(0);
     setFile(null);
+    setResults(null);
     if (fileInfoRef.current) {
       fileInfoRef.current.style.display = 'none';
     }

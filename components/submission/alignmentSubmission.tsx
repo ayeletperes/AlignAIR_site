@@ -17,7 +17,7 @@ const updateProgress = async (progress: number, setProgress: (progress: number) 
 
 export const submitAlignmentRequest = async (
   formData: {
-    chain: 'heavy' | 'light';
+    chain: 'heavy' | 'light' | 'trb';
     input: string;
     flag: 'file' | 'sequence';
     params: any;

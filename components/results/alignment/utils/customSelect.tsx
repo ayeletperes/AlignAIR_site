@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { translateDNAtoAA } from '@components/results/alignment/utils/translateUtils';
 import { Allele, Segment } from '@components/reference/utilities';
 
@@ -10,6 +10,7 @@ interface GermlineSequenceParams {
   call_id?: number;
   k?: number;
   s?: number;
+  indelCounts: number[];
 }
 
 interface Mappings {
@@ -24,6 +25,7 @@ export const getGermlineSequence = ({
   results,
   segment,
   referenceAlleles,
+  indelCounts,
   call_id = 0,
   k = 15,
   s = 30,
@@ -35,6 +37,7 @@ export const getGermlineSequence = ({
     [results[`${segment}_sequence_start`]],
     [results[`${segment}_sequence_end`]],
     [call],
+    indelCounts,
     k,
     s,
     segment
@@ -69,56 +72,65 @@ export const GetSequenceMismatchIdx = (sequence: string, germline: string, maxCh
   return mismatch;
 };
 
-
 export function getColor(likelihood: number): string {
   if (likelihood > 0.9) {
-    return '#baffc9';
+    return '#10B981'; // Emerald
   } else if (likelihood > 0.8) {
-    return '#bae1ff';
+    return '#3B82F6'; // Blue
   } else if (likelihood > 0.7) {
-    return '#eecbff';
+    return '#8B5CF6'; // Purple
   } else if (likelihood > 0.6) {
-    return '#f7e7b4';
+    return '#F59E0B'; // Amber
   } else if (likelihood > 0.5) {
-    return '#ffdfba';
+    return '#EF4444'; // Red
   } else {
-    return '#ffb3ba';
+    return '#6B7280'; // Gray
   }
 }
 
-
 export function splitSequence(sequence: string, maxCharsPerRow: number){
-  // const numRows = Math.ceil(sequence.length / maxCharsPerRow)
-  // const chunkSize = Math.ceil(sequence.length / numRows);
-  
   const chunks = [];
   for (let i = 0; i < sequence.length; i += maxCharsPerRow) {
     chunks.push(sequence.slice(i, i + maxCharsPerRow));
   }
   return chunks;
 };
-const SmallPillWithText: React.FC<{ text: string; color: string }> = ({ text, color }) => (
-  <svg width="30" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
-    {/* Square Shape */}
-    <rect x="0" y="0" width="60" height="40" fill={color} />
-    {/* Text on Square */}
-    <text x="0" y="20" fontFamily="sans" fontSize="18" fill="black" textAnchor="start" alignmentBaseline="middle">
-      {text}
-    </text>
-  </svg>
-);
 
-const SmallPillWithText2: React.FC<{ text: string; color: string }> = ({ text, color }) => (
-  <svg width="60" height="40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
-    {/* Square Shape */}
-    <rect x="0" y="0" width="60" height="40" fill={color} />
-    {/* Text on Square */}
-    <text x="0" y="20" fontFamily="sans" fontSize="16" fill="white" textAnchor="start" dominantBaseline="middle">
-      {text}
-    </text>
-  </svg>
-);
+// Compact likelihood badge component
+const CompactLikelihoodBadge: React.FC<{ likelihood: number }> = ({ likelihood }) => {
+  const color = getColor(likelihood);
+  const percentage = Math.round(likelihood * 100);
+  
+  return (
+    <span 
+      className="compact-likelihood-badge"
+      style={{ backgroundColor: color }}
+      title={`Likelihood: ${percentage}%`}
+    >
+      {percentage}%
+    </span>
+  );
+};
 
+// Compact chevron icon
+const CompactChevronIcon: React.FC<{ isOpen: boolean }> = ({ isOpen }) => (
+
+    <svg 
+      className={`compact-chevron ${isOpen ? 'open' : ''}`}
+      fill="currentColor" 
+      stroke="none" 
+      viewBox="0 0 20 20"
+    >
+      <path 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+        clipRule="evenodd"
+        fillRule="evenodd"
+      />
+    </svg>
+  
+);
 
 // Define the type for results and reference based on your actual data structure
 interface SelectWidgetVerticalProps {
@@ -140,6 +152,7 @@ interface SelectWidgetVerticalProps {
   splitStart: number;
   splitEnd: number;
   matcher: any;
+  indelCounts: number[];
 }
 
 export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
@@ -161,134 +174,351 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
   splitStart,
   splitEnd,
   matcher,
+  indelCounts
 }) => {
-    const alleles: string[] = results[call];
-    
-    const likelihoods: number[] = results[`${call.charAt(0)}_likelihood`];
-    
-    const [open, setOpen] = useState(false);
+  const alleles: string[] = results[call];
+  const likelihoods: number[] = results[`${call.charAt(0)}_likelihood`];
+  
+  const [isOpen, setIsOpen] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const selectRef = useRef<HTMLDivElement>(null);
 
-  const handleChange = (index: number) => {
-    
-    setOpen(false);
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+        setFocusedIndex(-1);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        if (isOpen && focusedIndex >= 0) {
+          handleOptionSelect(focusedIndex);
+        } else {
+          setIsOpen(!isOpen);
+        }
+        break;
+      case 'Escape':
+        setIsOpen(false);
+        setFocusedIndex(-1);
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+        } else {
+          setFocusedIndex(prev => 
+            prev < alleles.length - 1 ? prev + 1 : 0
+          );
+        }
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        if (isOpen) {
+          setFocusedIndex(prev => 
+            prev > 0 ? prev - 1 : alleles.length - 1
+          );
+        }
+        break;
+    }
+  };
+
+  const updateSequenceData = (index: number) => {
     const allele = alleles[index];
-    
+    console.log(allele);
     setSelectedAllele(allele);
-    // const k = call === 'd_call' ? 5 : 15;
 
     const seq = getGermlineSequence({
       results: results,
       segment: call.charAt(0).toLowerCase(),
       referenceAlleles: reference,
       call_id: index,
-      matcher: matcher
+      matcher: matcher,
+      indelCounts: indelCounts
     });
-    
+    console.log(seq);
     setSelected(seq);
     setGermline({[call]: seq});
-    const mismatch = GetSequenceMismatchIdx(results.sequence.slice(results[call.charAt(0) + "_sequence_start"],results[call.charAt(0) + "_sequence_end"]), seq, maxCharsPerRow);
+    
+    const mismatch = GetSequenceMismatchIdx(
+      results.sequence.slice(
+        results[call.charAt(0) + "_sequence_start"],
+        results[call.charAt(0) + "_sequence_end"]
+      ), 
+      seq, 
+      maxCharsPerRow
+    );
     setMismatch(mismatch);
+    
     const splitedSeq = splitSequence(seq, maxCharsPerRow);
     setSplitedSeq(splitedSeq);
-    splitedSeq.forEach((seq, index) => {
-      const alleleElement = document.querySelector(`.allele.${call}-${index}`) as HTMLElement;
+    
+    // Update DOM elements
+    splitedSeq.forEach((seq, seqIndex) => {
+      const alleleElement = document.querySelector(`.allele.${call}-${seqIndex}`) as HTMLElement;
       if (alleleElement) {
         alleleElement.textContent = seq;
       }
     });
-    let sequenceGermline = '' 
-    if(chain==='heavy'){
+    
+    // Update germline AA sequence
+    let sequenceGermline = '';
+    if (chain === 'heavy') {
       sequenceGermline = germline['v_call'] + germline['np1'] + germline['d_call'] + germline['np2'] + germline['j_call'];
-    }else{
+    } else {
       sequenceGermline = germline['v_call'] + germline['np1'] + germline['j_call'];
     }
     
     let seqAA = translateDNAtoAA(sequenceGermline);
-    setGermlineAA(seqAA)
+    setGermlineAA(seqAA);
 
-    if(results.v_germline_start>0){
-        const padding = 'N'.repeat(results.v_germline_start);
-        const sequencePad = padding + sequenceGermline;
-        seqAA = translateDNAtoAA(sequencePad);
-        // remove all the padding 'X'
-        seqAA = seqAA.replace(/X/g, '');
-        setGermlineAA(seqAA);
+    if (results.v_germline_start > 0) {
+      const padding = 'N'.repeat(results.v_germline_start);
+      const sequencePad = padding + sequenceGermline;
+      seqAA = translateDNAtoAA(sequencePad);
+      seqAA = seqAA.replace(/X/g, '');
+      setGermlineAA(seqAA);
     }
-    setSplittedGAA(splitSequence(seqAA.slice(splitStart, splitEnd), maxCharsPerRow/3));
-  };
-
-  const handleButtonClick = () => {
-    setOpen(!open);
+    
+    setSplittedGAA(splitSequence(seqAA.slice(splitStart, splitEnd), maxCharsPerRow / 3));
   };
 
   const handleOptionSelect = (index: number) => {
-    setSelectedAllele(alleles[index]);
-    setOpen(false);
+    updateSequenceData(index);
+    setIsOpen(false);
+    setFocusedIndex(-1);
   };
 
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const selectedIndex = alleles.indexOf(selectedAllele);
+
   return (
-    <div className="relative">
-      <button
-        onClick={handleButtonClick}
-        type="button"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        className="cursor-default relative  rounded-md border border-gray-300 bg-white pl-3 pr-10 py-2 text-left focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition ease-in-out duration-150 sm:text-sm sm:leading-5"
-        style={{ width: "200px", fontSize: '16px',   maxWidth: "200px", // Controls the maximum width of the text
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",}}
-      >
-        <div className="flex items-center space-x-3">
-          {selected ? (
-            <SmallPillWithText
-              text={Number(likelihoods[alleles.indexOf(selectedAllele)].toFixed(3)).toString()}
-              color={getColor(likelihoods[alleles.indexOf(selectedAllele)])} // Example color
-            />
-          ) : null}
-          <span className="block truncate" style={{fontSize:'14px', color:"black"}}>{selectedAllele}</span>
-        </div>
-        <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-              clipRule="evenodd"
-              fillRule="evenodd"
-            ></path>
-          </svg>
-        </span>
-      </button>
-      <div
-        className="absolute mt-1 rounded-md bg-white shadow-lg"
-        style={{ display: open ? 'block' : 'none', width: "300px" }}
-      >
-        <ul
-          className="max-h-56 rounded-md py-1 text-base leading-6 shadow-xs overflow-auto focus:outline-none sm:text-sm sm:leading-5"
-          role="listbox"
-          aria-labelledby="assigned-to-label"
+    <>
+      <style jsx>{`
+        .compact-select-container {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .compact-select-trigger {
+          width: 100%;
+          height: 150%;
+          background: rgba(255, 255, 255, 0.95);
+          border: 1px solid rgba(102, 126, 234, 0.3);
+          border-radius: 6px;
+          padding: 4px 8px;
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          align-items: center;
+          gap: 6px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .compact-select-trigger:hover {
+          background: rgba(255, 255, 255, 1);
+          border-color: rgba(102, 126, 234, 0.5);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        .compact-select-trigger:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+        }
+
+        .compact-select-content {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            gap: 3px; 
+        }
+
+        .compact-select-text {
+          font-size: 14px;
+          font-weight: 700;
+          color: #111827;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          letter-spacing: -0.025em;
+          grid-column: 2;
+        }
+
+        .compact-likelihood-badge {
+          padding: 1px 8px;
+          border-radius: 8px;
+          font-size: 9px;
+          font-weight: 700;
+          color: white;
+          text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+          min-width: 24px;
+          text-align: center;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+          grid-column: 1;
+        }
+
+        .compact-chevron {
+          width: 5px;
+          height: 5px;
+          color: #6b7280;
+          transition: transform 0.15s ease;
+          grid-column: 3;
+          justify-self: end;
+        }
+
+        .compact-chevron.open {
+          transform: rotate(180deg);
+        }
+
+        .compact-select-dropdown {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          z-index: 1000;
+          margin-top: 2px;
+          background: rgba(255, 255, 255, 0.98);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(102, 126, 234, 0.2);
+          border-radius: 8px;
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+          max-height: 200px;
+          overflow: hidden;
+          opacity: 0;
+          transform: translateY(-5px) scale(0.95);
+          transition: all 0.15s ease;
+          pointer-events: none;
+        }
+
+        .compact-select-dropdown.open {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          pointer-events: all;
+        }
+
+        .compact-options-list {
+          max-height: 200px;
+          overflow-y: auto;
+          padding: 4px;
+        }
+
+        .compact-option-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 8px 10px;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: all 0.1s ease;
+          gap: 8px;
+        }
+
+        .compact-option-item:hover,
+        .compact-option-item.focused {
+          background: rgba(102, 126, 234, 0.08);
+        }
+
+        .compact-option-item.selected {
+          background: linear-gradient(135deg, #667eea, #764ba2);
+          color: white;
+        }
+
+        .compact-option-item.selected .compact-likelihood-badge {
+          background: rgba(255, 255, 255, 0.25) !important;
+          color: white !important;
+        }
+
+        .compact-option-text {
+          font-size: 13px;
+          font-weight: 600;
+          color: #1f2937;
+          flex: 1;
+          min-width: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .compact-option-item.selected .compact-option-text {
+          color: white;
+        }
+
+        .compact-options-list::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        .compact-options-list::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        .compact-options-list::-webkit-scrollbar-thumb {
+          background: rgba(102, 126, 234, 0.3);
+          border-radius: 2px;
+        }
+
+        .compact-options-list::-webkit-scrollbar-thumb:hover {
+          background: rgba(102, 126, 234, 0.5);
+        }
+      `}</style>
+
+      <div className="compact-select-container" ref={selectRef}>
+        <div
+          className="compact-select-trigger"
+          onClick={toggleDropdown}
+          onKeyDown={handleKeyDown}
+          tabIndex={0}
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+          aria-label={`Select ${call.replace('_', ' ')}`}
         >
-          {alleles.map((allele, index) => (
-            <li
-              key={index}
-              onClick={() => handleChange(index)}
-              className={`max-h-56 rounded-md py-1 text-base leading-6 shadow-xs overflow-auto focus:outline-none sm:text-sm sm:leading-5 cursor-pointer ${
-                allele === selectedAllele ? 'text-white bg-indigo-600 cursor-default select-none relative py-2 pl-4 pr-9' : 'text-gray-900 select-none relative py-2 pl-3 pr-9'
-              }`}
-              role="option"
-              aria-selected={allele === selectedAllele}
-            >
-              <div className="flex items-center justify-between">
-                <span className="block truncate">{allele}</span>
-                <SmallPillWithText2
-                  text={Number(likelihoods[index].toFixed(3)).toString()}
-                  color={getColor(likelihoods[index])} // Example color
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+          <CompactLikelihoodBadge likelihood={likelihoods[selectedIndex]} />
+          <span className="compact-select-text">{selectedAllele}</span>
+          <CompactChevronIcon isOpen={isOpen} />
+        </div>
+
+        <div className={`compact-select-dropdown ${isOpen ? 'open' : ''}`}>
+          <ul 
+            className="compact-options-list"
+            role="listbox"
+            aria-label={`${call.replace('_', ' ')} options`}
+          >
+            {alleles.map((allele, index) => (
+              <li
+                key={`${allele}-${index}`}
+                className={`compact-option-item ${
+                  allele === selectedAllele ? 'selected' : ''
+                } ${focusedIndex === index ? 'focused' : ''}`}
+                onClick={() => handleOptionSelect(index)}
+                role="option"
+                aria-selected={allele === selectedAllele}
+                aria-label={`${allele}, likelihood ${Math.round(likelihoods[index] * 100)}%`}
+              >
+                <span className="compact-option-text">{allele}</span>
+                <CompactLikelihoodBadge likelihood={likelihoods[index]} />
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

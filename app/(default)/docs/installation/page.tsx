@@ -73,6 +73,7 @@ export default function InstallationPage() {
               </div>
             </div>
 
+
             {/* Local Installation */}
             <div className="bg-gradient-to-br from-yellow-500 to-orange-500 p-0.5 rounded-2xl">
               <div className="bg-gray-900 rounded-2xl p-8 h-full">
@@ -116,6 +117,7 @@ export default function InstallationPage() {
             </div>
           </div>
         </div>
+
 
         {/* Docker Installation Steps */}
         <div className="mb-16">

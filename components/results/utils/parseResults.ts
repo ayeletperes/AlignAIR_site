@@ -20,7 +20,7 @@ export const parseResults = (results: any, sequences: any) => {
             d_call: results.d_call? results.d_call[i] : '',
             j_call: results.j_call? results.j_call[i] : '',
             productive: results.productive? results.productive[i]===1 ? 'true' : 'false' : null,
-            chain: results.type_ === null ? 'heavy' : results.type_ === 1 ? 'kappa' : 'lambda',
+            chain: results.type_ ,//=== null ? 'heavy' : results.type_ === 1 ? 'kappa' : 'lambda',
             v_sequence_start: results.v_sequence_start ? results.v_sequence_start[i] : null,
             v_sequence_end: results.v_sequence_end ? results.v_sequence_end[i] : null,
             d_sequence_start: results.d_sequence_start ? results.d_sequence_start[i] : null,
@@ -37,7 +37,7 @@ export const parseResults = (results: any, sequences: any) => {
             d_likelihood: results.d_likelihood? results.d_likelihood[i] : [],
             j_likelihood: results.j_likelihood? results.j_likelihood[i] : [],
             mutation_rate: results.mutation_rate ? results.mutation_rate[i] : null,
-            indel_count: results.indel_count ? results.indel_count[i] : null
+            indel_count: results.indel_count ? Math.abs(results.indel_count[i]) : null
         };
         return row;
     });

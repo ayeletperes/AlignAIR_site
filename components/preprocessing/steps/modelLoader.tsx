@@ -3,7 +3,7 @@ import { ModelLoader, ChainConfig } from '@components/model/utilities';
 import * as tf from '@tensorflow/tfjs';
 
 export interface ModelLoadingParams {
-  chain: 'heavy' | 'light';
+  chain: 'heavy' | 'light' | 'trb';
   modelPath?: string;
   modelMetadataPath?: string;
   orientationModelPath?: string;

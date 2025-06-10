@@ -8,3 +8,4 @@ archive_components/
 archive_public/
 app/\(auth\)
 app/api
+scripts/
