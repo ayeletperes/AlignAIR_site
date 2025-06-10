@@ -8,7 +8,7 @@ import LogoBW from '@/public/images/logo_alignair11bw.svg'
 import LogoWB from '@/public/images/logo_alignair11wb.svg'
 import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button} from "@nextui-org/react";
 
-// The header component. TODO: add the logo and the navigation links.
+// The header component with updated navigation including Models page
 
 export default function Header() {
   const context = useTheme();
@@ -51,10 +51,16 @@ export default function Header() {
                   Docs
                 </Link>
               </li>
+              {/* NEW: Models page link */}
               <li>
-                {/* <Link href="/alignair" className="btn-sm text-white bg-purple-600 hover:bg-purple-700 ml-3">
-                  AlignAIR
-                </Link> */}
+                <Link
+                  href="/models"
+                  className="btn-sm text-purple-600  hover:text-gray-200 px-4 py-3 flex items-center transition duration-150 ease-in-out"
+                >
+                  Models
+                </Link>
+              </li>
+              <li>
                 <Dropdown>
                   <DropdownTrigger>
                     <Button className="btn-sm text-white bg-purple-600 hover:bg-purple-700 ml-3 transition-all duration-300">
@@ -70,6 +76,12 @@ export default function Header() {
                     <DropdownItem key="docs" className="custom-dropdown-text">
                       <Link href="/docs">
                         AlignAIR Docs
+                      </Link>
+                    </DropdownItem>
+                    {/* NEW: Models option in dropdown too */}
+                    <DropdownItem key="models" className="custom-dropdown-text">
+                      <Link href="/models">
+                        Supported Models
                       </Link>
                     </DropdownItem>
                     <DropdownItem key="cli" className="custom-dropdown-text">
