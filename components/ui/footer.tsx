@@ -52,7 +52,7 @@ export default function Footer({ isHomePage = false }: FooterProps) {
                   License
                 </Link>
                 <Link 
-                  href="mailto:alignair@gmail.com" 
+                  href="mailto:alignair@alignair.ai" 
                   className="text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 text-sm transition-colors duration-200"
                 >
                   Contact
@@ -241,7 +241,7 @@ export default function Footer({ isHomePage = false }: FooterProps) {
                 <ul className="space-y-4">
                   <li>
                     <Link 
-                      href="mailto:alignair@gmail.com" 
+                      href="mailto:support@alignair.ai" 
                       className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
                     >
                       Contact Support
@@ -342,7 +342,7 @@ export default function Footer({ isHomePage = false }: FooterProps) {
                   License
                 </Link>
                 <Link 
-                  href="mailto:thomas.konstat@gmail.com" 
+                  href="mailto:alignair@alignair.ai" 
                   className="text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 text-sm transition-colors duration-200"
                 >
                   Contact

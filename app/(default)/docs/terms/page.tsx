@@ -259,10 +259,10 @@ export default function TermsPage() {
                   <h4 className="font-semibold text-white mb-3">📧 Direct Contact</h4>
                   <p className="text-gray-400 text-sm mb-2">For legal and licensing matters:</p>
                   <a 
-                    href="mailto:thomas.konstat@gmail.com?subject=AlignAIR Legal Inquiry" 
+                    href="mailto:alignair@alignair.ai?subject=AlignAIR Legal Inquiry" 
                     className="text-blue-400 hover:text-blue-300"
                   >
-                    thomas.konstat@gmail.com
+                    alignair@alignair.ai
                   </a>
                 </div>
                 
