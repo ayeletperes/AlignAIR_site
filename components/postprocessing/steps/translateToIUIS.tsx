@@ -10,7 +10,7 @@ export function translateVCallToIuisNames(
     return vCall.map(alleleGroup =>
         alleleGroup.map(allele => {
           const referenceEntry = referenceMap[allele];
-          return referenceEntry?.iuisName || allele; // Ensure it always returns a string
+          return referenceEntry?.iuis || allele; // Ensure it always returns a string
         })
     );
   }

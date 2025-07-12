@@ -1,0 +1,51 @@
+{
+  "IGHJ1*01": {
+    "sequence": "GCTGAATACTTCCAGCACTGGGGCCAGGGCACCCTGGTCACCGTCTCCTCAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "18"
+  },
+  "IGHJ2*01": {
+    "sequence": "CTACTGGTACTTCGATCTCTGGGGCCGTGGCACCCTGGTCACTGTCTCCTCAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "19"
+  },
+  "IGHJ3*02": {
+    "sequence": "TGATGCTTTTGATATCTGGGGCCAAGGGACAATGGTCACCGTCTCTTCAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "16"
+  },
+  "IGHJ4*02": {
+    "sequence": "ACTACTTTGACTACTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "14"
+  },
+  "IGHJ5*02": {
+    "sequence": "ACAACTGGTTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "17"
+  },
+  "IGHJ6*02": {
+    "sequence": "ATTACTACTACTACTACGGTATGGACGTCTGGGGCCAAGGGACCACGGTCACCGTCTCCTCAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "29"
+  },
+  "IGHJ6*03": {
+    "sequence": "ATTACTACTACTACTACTACATGGACGTCTGGGGCAAAGGGACCACGGTCACCGTCTCCTCAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "29"
+  }
+}

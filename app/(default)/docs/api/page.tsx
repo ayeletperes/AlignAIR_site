@@ -369,10 +369,10 @@ python app.py [COMMAND] [OPTIONS]
 
                   <div className="bg-gray-800 rounded-lg p-3">
                     <div className="text-xs text-gray-400 mb-1">Example:</div>
-                    <pre className="text-green-400 text-xs">
-sequence_id,sequence
+                    <pre className="bg-gray-800 text-green-400 p-4 rounded-lg overflow-x-auto text-sm">
+{`sequence_id,sequence
 seq_001,CAGGTGCAGCTG...
-seq_002,GAGGTGCAGCTG...
+seq_002,GAGGTGCAGCTG...`}
                     </pre>
                   </div>
                 </div>
@@ -397,10 +397,10 @@ seq_002,GAGGTGCAGCTG...
 
                   <div className="bg-gray-800 rounded-lg p-3">
                     <div className="text-xs text-gray-400 mb-1">Example:</div>
-                    <pre className="text-blue-400 text-xs">
-sequence_id	sequence
+                    <pre className="bg-gray-800 text-green-400 p-4 rounded-lg overflow-x-auto text-sm">
+{`sequence_id	sequence
 seq_001	CAGGTGCAGCTG...
-seq_002	GAGGTGCAGCTG...
+seq_002	GAGGTGCAGCTG...`}
                     </pre>
                   </div>
                 </div>
@@ -425,11 +425,11 @@ seq_002	GAGGTGCAGCTG...
 
                   <div className="bg-gray-800 rounded-lg p-3">
                     <div className="text-xs text-gray-400 mb-1">Example:</div>
-                    <pre className="text-yellow-400 text-xs">
-&gt;seq_001
+                    <pre className="bg-gray-800 text-green-400 p-4 rounded-lg overflow-x-auto text-sm">
+{`>seq_001
 CAGGTGCAGCTGGTGGAG...
-&gt;seq_002
-GAGGTGCAGCTGGTGGAG...
+>seq_002
+GAGGTGCAGCTGGTGGAG...`}
                     </pre>
                   </div>
                 </div>

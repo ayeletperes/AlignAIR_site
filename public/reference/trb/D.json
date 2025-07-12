@@ -1,0 +1,23 @@
+{
+  "TRBD1*01": {
+    "sequence": "GGGACAGGGGGC",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "TRBD1*01"
+  },
+  "TRBD2*01": {
+    "sequence": "GGGACTAGCGGGGGGG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "TRBD2*01"
+  },
+  "TRBD2*02": {
+    "sequence": "GGGACTAGCGGGAGGG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "TRBD2*02"
+  }
+}

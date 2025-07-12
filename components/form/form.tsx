@@ -11,6 +11,8 @@ interface AlignmentFormProps {
   sequence: string;
   setSelectedChain: React.Dispatch<React.SetStateAction<string>>;
   selectedChain: string;
+  selectedModelId?: string;
+  setSelectedModelId?: React.Dispatch<React.SetStateAction<string>>;
   params: {
     vCap: number;
     dCap: number;
@@ -30,6 +32,8 @@ const AlignmentForm: React.FC<AlignmentFormProps> = ({
   sequence,
   setSelectedChain,
   selectedChain,
+  selectedModelId,
+  setSelectedModelId,
   params,
   setParams,
   setResults,
@@ -67,8 +71,16 @@ const AlignmentForm: React.FC<AlignmentFormProps> = ({
         <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-8">
           <h4 className="text-4xl font-extrabold dark:text-white">Alignment Parameters</h4>
           <div>
-            <ParamInput params={params} setParams={setParams} isDisabled={selectedChain === 'light'} setSelectedChain={setSelectedChain} 
-            selectedChain={selectedChain}/>
+            <ParamInput 
+              params={params} 
+              setParams={setParams} 
+              isDisabled={selectedChain === 'light'} 
+              setSelectedChain={setSelectedChain} 
+              selectedChain={selectedChain}
+              selectedModelId={selectedModelId}
+              setSelectedModelId={setSelectedModelId}
+              onModelChange={() => setResults(null)}
+            />
           </div>
         </div>
       </div>

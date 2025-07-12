@@ -1,0 +1,114 @@
+{
+  "TRBJ1-1*01": {
+    "sequence": "TGAACACTGAAGCTTTCTTTGGACAAGGCACCAGACTCACAGTTGTAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "17"
+  },
+  "TRBJ1-2*01": {
+    "sequence": "CTAACTATGGCTACACCTTCGGTTCGGGGACCAGGTTAACCGTTGTAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "17"
+  },
+  "TRBJ1-3*01": {
+    "sequence": "CTCTGGAAACACCATATATTTTGGAGAGGGAAGTTGGCTCACTGTTGTAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "19"
+  },
+  "TRBJ1-4*01": {
+    "sequence": "CAACTAATGAAAAACTGTTTTTTGGCAGTGGAACCCAGCTCTCTGTCTTGG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "20"
+  },
+  "TRBJ1-5*01": {
+    "sequence": "TAGCAATCAGCCCCAGCATTTTGGTGATGGGACTCGACTCTCCATCCTAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "19"
+  },
+  "TRBJ1-6*01": {
+    "sequence": "CTCCTATAATTCACCCCTCCACTTTGGGAATGGGACCAGGCTCACTGTGACAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "22"
+  },
+  "TRBJ1-6*02": {
+    "sequence": "CTCCTATAATTCACCCCTCCACTTTGGGAACGGGACCAGGCTCACTGTGACAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "22"
+  },
+  "TRBJ2-1*01": {
+    "sequence": "CTCCTACAATGAGCAGTTCTTCGGGCCAGGGACACGGCTCACCGTGCTAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "19"
+  },
+  "TRBJ2-2*01": {
+    "sequence": "CGAACACCGGGGAGCTGTTTTTTGGAGAAGGCTCTAGGCTGACCGTACTGG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "20"
+  },
+  "TRBJ2-2P*01": {
+    "sequence": "CTGAGAGGCGCTGCTGGGCGTCTGGGCGGAGGACTCCTGGTTCTGG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "15"
+  },
+  "TRBJ2-3*01": {
+    "sequence": "AGCACAGATACGCAGTATTTTGGCCCAGGCACCCGGCTGACAGTGCTCG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "18"
+  },
+  "TRBJ2-4*01": {
+    "sequence": "AGCCAAAAACATTCAGTACTTCGGCGCCGGGACCCGGCTCTCAGTGCTGG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "19"
+  },
+  "TRBJ2-5*01": {
+    "sequence": "ACCAAGAGACCCAGTACTTCGGGCCAGGCACGCGGCTCCTGGTGCTCG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "17"
+  },
+  "TRBJ2-6*01": {
+    "sequence": "CTCTGGGGCCAACGTCCTGACTTTCGGGGCCGGCAGCAGGCTGACCGTGCTGG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "22"
+  },
+  "TRBJ2-7*01": {
+    "sequence": "CTCCTACGAGCAGTACTTCGGGCCGGGCACCAGGCTCACGGTCACAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "16"
+  },
+  "TRBJ2-7*02": {
+    "sequence": "CTCCTACGAGCAGTACGTCGGGCCGGGCACCAGGCTCACGGTCACAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "16"
+  }
+}

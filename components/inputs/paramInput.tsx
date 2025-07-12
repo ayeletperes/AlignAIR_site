@@ -1,5 +1,6 @@
 import React from 'react';
 import InputCounter from '@components/inputs/inputCounter';
+import ModelSelector from '@components/inputs/ModelSelector';
 
 interface Params {
   vCap: number;
@@ -16,11 +17,23 @@ interface ParamInputProps {
   isDisabled?: boolean;
   setSelectedChain: React.Dispatch<React.SetStateAction<string>>;
   selectedChain: string;
+  selectedModelId?: string;
+  setSelectedModelId?: React.Dispatch<React.SetStateAction<string>>;
+  onModelChange?: () => void;
 }
 
 type InputChangeHandler = (id: string, value: number) => void;
 
-const ParamInput: React.FC<ParamInputProps> = ({ setParams, params, isDisabled, setSelectedChain, selectedChain}) => {
+const ParamInput: React.FC<ParamInputProps> = ({ 
+  setParams, 
+  params, 
+  isDisabled, 
+  setSelectedChain, 
+  selectedChain,
+  selectedModelId,
+  setSelectedModelId,
+  onModelChange
+}) => {
 
   const handleInputChange: InputChangeHandler = (id, value) => {
     setParams((prevInputs) => ({
@@ -29,36 +42,16 @@ const ParamInput: React.FC<ParamInputProps> = ({ setParams, params, isDisabled, 
     }));
   };
 
-  const handleClickChange = (buttonId: string) => {
-    setSelectedChain(buttonId);
-  };
-
   return (
     <>
-      <p>Select the model</p>
-      <div id="modelButtons" className="inline-flex rounded-md shadow-sm" role="group">
-        <button 
-          id="heavy"
-          value="heavy"
-          name="model-chain"
-          onClick={() => handleClickChange('heavy')}
-          type="button" 
-          className={`px-4 py-2 text-sm font-medium text-gray-900 border border-gray-300 rounded-s-lg hover:bg-purple-700 hover:text-white focus:z-10 focus:ring-2 focus:ring-gray-500 focus:blue-400 focus:text-white dark:border-gray-800 dark:text-white dark:hover:text-white dark:hover:bg-purple-600 dark:focus:bg-purple-600 ${selectedChain === 'heavy' ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800'}`}>Heavy</button>
-        <button 
-          id="light"
-          value="light"
-          name="model-chain"
-          onClick={() => handleClickChange('light')}
-          type="button" 
-          className={`px-4 py-2 text-sm font-medium text-gray-900 border border-gray-300 hover:bg-purple-700 hover:text-white focus:z-10 focus:ring-2 focus:ring-gray-500 focus:blue-400 focus:text-white dark:border-gray-800 dark:text-white dark:hover:text-white dark:hover:bg-purple-600 dark:focus:bg-purple-600 ${selectedChain === 'light' ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800'}`}>Light</button>
-        <button 
-          id="trb"
-          value="trb"
-          name="model-chain"
-          onClick={() => handleClickChange('trb')}
-          type="button" 
-          className={`px-4 py-2 text-sm font-medium text-gray-900 border rounded-e-lg border-gray-300 hover:bg-purple-700 hover:text-white focus:z-10 focus:ring-2 focus:ring-gray-500 focus:blue-400 focus:text-white dark:border-gray-800 dark:text-white dark:hover:text-white dark:hover:bg-purple-600 dark:focus:bg-purple-600 ${selectedChain === 'trb' ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800'}`}>TRB</button>
-      </div>
+      <ModelSelector
+        selectedChain={selectedChain}
+        setSelectedChain={setSelectedChain}
+        selectedModelId={selectedModelId}
+        setSelectedModelId={setSelectedModelId}
+        onModelChange={onModelChange}
+      />
+      
       <label className="block mb-2 text-base font-large text-white-900 dark:text-white">Select the max number of assignments for each call</label>
       <div id="capButtons" className="grid md:grid-cols-3 md:gap-6">
         <div className="relative z-0 w-full mb-5 group">

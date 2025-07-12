@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import emailjs from 'emailjs-com';
+import { logger } from '@components/utils/logger';
 
 export default function Newsletter() {
   const [email, setEmail] = useState('');
@@ -19,10 +20,10 @@ export default function Newsletter() {
       templateParams,
       'D02_Q9aV0tx-apL_F', // Replace with your EmailJS user ID,
     ).then((response) => {
-      console.log('SUCCESS!', response.status, response.text);
+      logger.log('SUCCESS!', response.status, response.text);
       setMessage('Thanks for subscribing!');
     }).catch((err) => {
-      console.error('FAILED...', err);
+      logger.error('FAILED...', err);
       setMessage('Failed to subscribe. Please try again.');
     });
 

@@ -1,0 +1,121 @@
+{
+  "IGKJ1*01": {
+    "sequence": "GTGGACGTTCGGCCAAGGGACCAAGGTGGAAATCAAAC",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGKJ2*01": {
+    "sequence": "TGTACACTTTTGGCCAGGGGACCAAGCTGGAGATCAAAC",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "8"
+  },
+  "IGKJ2*03": {
+    "sequence": "TGTACAGTTTTGGCCAGGGGACCAAGCTGGAGATCAAAC",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "8"
+  },
+  "IGKJ2*04": {
+    "sequence": "TGTGCAGTTTTGGCCAGGGGACCAAGCTGGAGATCAAAC",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "8"
+  },
+  "IGKJ3*01": {
+    "sequence": "ATTCACTTTCGGCCCTGGGACCAAAGTGGATATCAAAC",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGKJ4*01": {
+    "sequence": "GCTCACTTTCGGCGGAGGGACCAAGGTGGAGATCAAAC",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGKJ5*01": {
+    "sequence": "GATCACCTTCGGCCAAGGGACACGACTGGAGATTAAAC",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGLJ1*01": {
+    "sequence": "TTATGTCTTCGGAACTGGGACCAAGGTCACCGTCCTAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGLJ2*01": {
+    "sequence": "TGTGGTATTCGGCGGAGGGACCAAGCTGACCGTCCTAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGLJ3*01": {
+    "sequence": "TGTGGTATTCGGCGGAGGGACCAAGCTGACCGTCCTAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGLJ3*02": {
+    "sequence": "TTGGGTGTTCGGCGGAGGGACCAAGCTGACCGTCCTAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGLJ4*01": {
+    "sequence": "TTTTGTATTTGGTGGAGGAACCCAGCTGATCATTTTAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGLJ5*01": {
+    "sequence": "CTGGGTGTTTGGTGAGGGGACCGAGCTGACCGTCCTAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGLJ5*02": {
+    "sequence": "CTGGGTGTTTGGTGAGGGGACGGAGCTGACCGTCCTAG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGLJ6*01": {
+    "sequence": "TAATGTGTTCGGCAGTGGCACCAAGGTGACCGTCCTCG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGLJ7*01": {
+    "sequence": "TGCTGTGTTCGGAGGAGGCACCCAGCTGACCGTCCTCG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  },
+  "IGLJ7*02": {
+    "sequence": "TGCTGTGTTCGGAGGAGGCACCCAGCTGACCGCCCTCG",
+    "iuis": "",
+    "asc": "",
+    "iglabel": "",
+    "anchor": "7"
+  }
+}

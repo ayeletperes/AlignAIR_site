@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { translateDNAtoAA } from '@components/results/alignment/utils/translateUtils';
 import { Allele, Segment } from '@components/reference/utilities';
+import { logger } from '@components/utils/logger';
 
 interface GermlineSequenceParams {
   matcher: any;
@@ -153,6 +154,8 @@ interface SelectWidgetVerticalProps {
   splitEnd: number;
   matcher: any;
   indelCounts: number[];
+  splitedNP2?: number[];
+  setSplitedNP2?: (splitedNP2: number[]) => void;
 }
 
 export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
@@ -174,7 +177,9 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
   splitStart,
   splitEnd,
   matcher,
-  indelCounts
+  indelCounts,
+  splitedNP2,
+  setSplitedNP2
 }) => {
   const alleles: string[] = results[call];
   const likelihoods: number[] = results[`${call.charAt(0)}_likelihood`];
@@ -235,7 +240,7 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
 
   const updateSequenceData = (index: number) => {
     const allele = alleles[index];
-    console.log(allele);
+    logger.log(allele);
     setSelectedAllele(allele);
 
     const seq = getGermlineSequence({
@@ -246,7 +251,7 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
       matcher: matcher,
       indelCounts: indelCounts
     });
-    console.log(seq);
+    logger.log(seq);
     setSelected(seq);
     setGermline({[call]: seq});
     
@@ -291,6 +296,34 @@ export const SelectWidgetVertical2: React.FC<SelectWidgetVerticalProps> = ({
     }
     
     setSplittedGAA(splitSequence(seqAA.slice(splitStart, splitEnd), maxCharsPerRow / 3));
+    
+    // Update np2 counts for D region
+    if (call === 'd_call' && setSplitedNP2) {
+      // Calculate np2 counts for each D chunk
+      const vSeqEnd = results.v_sequence_end;
+      const dSeqEnd = results.d_sequence_end;
+      const jSeqStart = results.j_sequence_start;
+      
+      // Use the actual sequence region, not the germline sequence
+      const dRegionSequence = results.sequence.slice(vSeqEnd, jSeqStart);
+      const splitDLocal = splitSequence(dRegionSequence, maxCharsPerRow);
+      
+      let dRegionStart = vSeqEnd;
+      let np2Start = dSeqEnd;
+      let np2End = jSeqStart;
+      let chunkStart = dRegionStart;
+      
+      const np2CountsInDChunks = splitDLocal.map(chunk => {
+        const chunkEnd = chunkStart + chunk.length;
+        const overlapStart = Math.max(chunkStart, np2Start);
+        const overlapEnd = Math.min(chunkEnd, np2End);
+        const overlap = Math.max(0, overlapEnd - overlapStart);
+        chunkStart += chunk.length;
+        return overlap;
+      });
+      
+      setSplitedNP2(np2CountsInDChunks);
+    }
   };
 
   const handleOptionSelect = (index: number) => {

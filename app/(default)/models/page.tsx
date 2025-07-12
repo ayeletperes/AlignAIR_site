@@ -1,9 +1,12 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useModelMetadata } from '@/hooks/useModelMetadata'
+import { ModelMetadata } from '@components/model/modelMetadataLoader'
 
 export default function ModelsPage() {
-  const [copiedId, setCopiedId] = useState(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+  const { allModels: models, loading, error } = useModelMetadata({ preload: true })
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text)
@@ -11,47 +14,33 @@ export default function ModelsPage() {
     setTimeout(() => setCopiedId(null), 2000)
   }
 
-  const models = [
-    {
-      id: 'igh',
-      name: 'IGH Heavy Chain',
-      checkpoint: '/app/pretrained_models/IGH_S5F_576',
-      chainType: 'heavy',
-      species: 'Human',
-      referenceSet: 'OGRDB V8 extended',
-      lastUpdated: 'February 2025',
-      description: 'Immunoglobulin Heavy Chain model trained on S5F mutation patterns',
-      features: ['V/D/J segmentation', 'Allele calling', 'Mutation prediction', 'Productivity assessment'],
-      gradient: 'from-blue-500 to-cyan-500',
-      iconColor: 'bg-blue-600'
-    },
-    {
-      id: 'igl',
-      name: 'IGL/IGK Light Chain',
-      checkpoint: '/app/pretrained_models/IGL_S5F_576',
-      chainType: 'light',
-      species: 'Human',
-      referenceSet: 'OGRDB V2 & V3 extended',
-      lastUpdated: 'March 2025',
-      description: 'Immunoglobulin Lambda Light Chain model with enhanced V/J prediction',
-      features: ['V/J segmentation', 'Allele calling', 'Mutation prediction', 'Productivity assessment'],
-      gradient: 'from-green-500 to-teal-500',
-      iconColor: 'bg-green-600'
-    },
-    {
-      id: 'tcrb',
-      name: 'TCRB Beta Chain',
-      checkpoint: '/app/pretrained_models/TCRB_UNIFORM_576',
-      chainType: 'tcrb',
-      species: 'Human',
-      referenceSet: 'IMGT 2022',
-      lastUpdated: 'July 2025',
-      description: 'T Cell Receptor Beta Chain model optimized for TCR repertoire analysis',
-      features: ['V/D/J segmentation', 'Allele calling', 'Productivity assessment'],
-      gradient: 'from-purple-500 to-pink-500',
-      iconColor: 'bg-purple-600'
-    }
-  ]
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            <p className="mt-4 text-gray-400">Loading models...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="text-center">
+            <div className="bg-red-900/20 border border-red-700 rounded-lg p-6">
+              <h2 className="text-xl font-bold text-red-400 mb-2">Error Loading Models</h2>
+              <p className="text-red-300">{error}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section>
@@ -254,48 +243,77 @@ export default function ModelsPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-gray-900">
-                  <tr className="border-b border-gray-800 hover:bg-gray-800/50">
-                    <td className="py-3 px-6">
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
-                        <span className="text-white font-medium">IGH Heavy Chain</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-6">
-                      <code className="bg-gray-800 text-blue-400 px-2 py-1 rounded">heavy</code>
-                    </td>
-                    <td className="py-3 px-6">V, D, J</td>
-                    <td className="py-3 px-6">OGRDB V8 extended</td>
-                    <td className="py-3 px-6">B-cell heavy chain analysis</td>
-                  </tr>
-                  <tr className="border-b border-gray-800 hover:bg-gray-800/50">
-                    <td className="py-3 px-6">
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
-                        <span className="text-white font-medium">IGL/IGK Light Chain</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-6">
-                      <code className="bg-gray-800 text-green-400 px-2 py-1 rounded">light</code>
-                    </td>
-                    <td className="py-3 px-6">V, J</td>
-                    <td className="py-3 px-6">OGRDB V2 & V3 extended</td>
-                    <td className="py-3 px-6">B-cell lambda/kappa light chain analysis</td>
-                  </tr>
-                  <tr className="border-b border-gray-800 hover:bg-gray-800/50">
-                    <td className="py-3 px-6">
-                      <div className="flex items-center">
-                        <div className="w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
-                        <span className="text-white font-medium">TCRB Beta Chain</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-6">
-                      <code className="bg-gray-800 text-purple-400 px-2 py-1 rounded">tcrb</code>
-                    </td>
-                    <td className="py-3 px-6">V, D, J</td>
-                    <td className="py-3 px-6">IMGT 2020</td>
-                    <td className="py-3 px-6">T-cell receptor beta chain analysis</td>
-                  </tr>
+                  {models.map((model) => {
+                    const getSegments = (chainType: string) => {
+                      switch (chainType) {
+                        case 'heavy':
+                        case 'trb':
+                          return 'V, D, J';
+                        case 'light':
+                          return 'V, J';
+                        default:
+                          return 'V, J';
+                      }
+                    };
+
+                    const getUseCase = (chainType: string) => {
+                      switch (chainType) {
+                        case 'heavy':
+                          return 'B-cell heavy chain analysis';
+                        case 'light':
+                          return 'B-cell lambda/kappa light chain analysis';
+                        case 'trb':
+                          return 'T-cell receptor beta chain analysis';
+                        default:
+                          return 'Immunoglobulin analysis';
+                      }
+                    };
+
+                    const getColor = (chainType: string) => {
+                      switch (chainType) {
+                        case 'heavy':
+                          return 'bg-blue-500';
+                        case 'light':
+                          return 'bg-green-500';
+                        case 'trb':
+                          return 'bg-purple-500';
+                        default:
+                          return 'bg-gray-500';
+                      }
+                    };
+
+                    const getCodeColor = (chainType: string) => {
+                      switch (chainType) {
+                        case 'heavy':
+                          return 'text-blue-400';
+                        case 'light':
+                          return 'text-green-400';
+                        case 'trb':
+                          return 'text-purple-400';
+                        default:
+                          return 'text-gray-400';
+                      }
+                    };
+
+                    return (
+                      <tr key={model.id} className="border-b border-gray-800 hover:bg-gray-800/50">
+                        <td className="py-3 px-6">
+                          <div className="flex items-center">
+                            <div className={`w-3 h-3 ${getColor(model.chainType)} rounded-full mr-3`}></div>
+                            <span className="text-white font-medium">{model.name}</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-6">
+                          <code className={`bg-gray-800 ${getCodeColor(model.chainType)} px-2 py-1 rounded`}>
+                            {model.chainType}
+                          </code>
+                        </td>
+                        <td className="py-3 px-6">{getSegments(model.chainType)}</td>
+                        <td className="py-3 px-6">{model.referenceSet}</td>
+                        <td className="py-3 px-6">{getUseCase(model.chainType)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

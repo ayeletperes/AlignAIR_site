@@ -5,7 +5,6 @@ import * as tf from '@tensorflow/tfjs';
 export interface ModelLoadingParams {
   chain: 'heavy' | 'light' | 'trb';
   modelPath?: string;
-  modelMetadataPath?: string;
   orientationModelPath?: string;
   k?: number;
   maxLength?: number;
@@ -22,7 +21,6 @@ export interface ModelLoadingResult {
 export const loadModel = async ({
   chain,
   modelPath,
-  modelMetadataPath,
   orientationModelPath,
   k,
   maxLength,
@@ -35,7 +33,6 @@ export const loadModel = async ({
     maxLength: maxLength || DEFAULT_CHAIN_CONFIG.maxLength!,
     allowedMismatches: allowedMismatches || DEFAULT_CHAIN_CONFIG.allowedMismatches!,
     modelPath: modelPath || DEFAULT_CHAIN_CONFIG.modelPath(chain),
-    modelMetadataPath: modelMetadataPath || DEFAULT_CHAIN_CONFIG.modelMetadataPath(chain),
     orientationModelPath: orientationModelPath || DEFAULT_CHAIN_CONFIG.orientationModelPath(chain),
   };
 
@@ -49,19 +46,20 @@ export const loadModel = async ({
     throw new Error('Failed to load model.');
   }
   
-  // Metadata processing guard
-  let metadata: any | null = null;
+  // Get metadata and process output nodes
+  const metadata = await loader.getModelMetadata();
+  
   let modelOutputNodes: Record<string, number> = {};
-  if (chainConfig.modelMetadataPath) {
-    metadata = await loader.getModelMetadata();
+  
+  if (metadata && metadata.outputNodes) {
+    // Process the new metadata format with outputNodes mapping
     modelOutputNodes = model.outputs.map((output) => output.name).reduce((acc, node, index) => {
-      const key = `${node}:0`;
-      if (metadata && metadata[key]) {
-        acc[metadata[key]] = index;
+      // The new format maps node names to human-readable names
+      if (metadata.outputNodes[node]) {
+        acc[metadata.outputNodes[node]] = index;
       }
       return acc;
     }, {} as Record<string, number>);
-    
   }
   
   return { loader, modelOutputNodes, metadata };

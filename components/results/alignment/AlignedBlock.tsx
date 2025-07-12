@@ -60,7 +60,7 @@ export const AlignedBlock: React.FC<AlignedBlockProps> = ({ sequence, regions, a
     const modifiedAasequence: (string | JSX.Element)[] = [];
     const modifiedRegions: (string | JSX.Element)[] = [];
     let aaStart = 0;
-    
+
     if(regions){
         const regionsIDX = regions.regions;
         
@@ -158,7 +158,7 @@ export const AlignedBlock: React.FC<AlignedBlockProps> = ({ sequence, regions, a
     
     if (np1) {
         for (let i = 0; i < np1; i++) {
-            modifiedSequence.push(<span key={i} className="alignment-np np-region" style={{ gridRow:3}} title={`N-terminal addition: ${sequence[i]}`}>{sequence[i]}</span>);
+            modifiedSequence.push(<span key={i} className="alignment-np np-region" style={{ gridRow:3}} title={`NP1 addition: ${sequence[i]}`}>{sequence[i]}</span>);
             modifiedGermline.push(<span key={i} className="alignment-hidden" style={{ gridRow:4 }}>{sequence[i]}</span>);
         }
     }
@@ -189,8 +189,9 @@ export const AlignedBlock: React.FC<AlignedBlockProps> = ({ sequence, regions, a
     }
 
     if (np2) {
+        
         for (let i = sequenceLength; i < sequence.length; i++) {
-            modifiedSequence.push(<span key={i} className="alignment-np np-region" style={{gridRow:3}} title={`C-terminal addition: ${sequence[i]}`}>{sequence[i]}</span>);
+            modifiedSequence.push(<span key={i} className="alignment-np np-region" style={{gridRow:3}} title={`NP2 addition: ${sequence[i]}`}>{sequence[i]}</span>);
             modifiedGermline.push(<span key={i} className="alignment-hidden" style={{gridRow:4}}>{sequence[i]}</span>);
         }
     }

@@ -15,23 +15,11 @@ import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button} from "@ne
 export default function Header() {
   const context = useTheme();
   const theme = context?.theme || 'dark'; 
-  const [isScrolled, setIsScrolled] = useState(false);
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
-    <header className={`fixed w-full z-50 transition-all duration-300 ${
-      isScrolled 
-        ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200/20 dark:border-gray-800/20 shadow-lg' 
-        : 'bg-transparent'
-    }`}>
+    <header className={`w-full z-50 transition-all duration-300 `}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           
@@ -40,8 +28,9 @@ export default function Header() {
             <Link href="/" className="flex items-center space-x-2" aria-label="AlignAIR">
               <Image 
                 src={theme === 'dark' ? LogoBW : LogoWB}
-                width={180} 
-                height={45} 
+                // width={180} 
+                // height={45}
+                style={{ width: 180, height: 45 }} 
                 alt="AlignAIR Logo" 
                 priority
                 className="transition-all duration-300"
@@ -132,13 +121,29 @@ export default function Header() {
                       </div>
                     </Link>
                   </DropdownItem>
+                  
+                  {isDevelopment && (
+                    <DropdownItem key="allele-query" className="text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-3">
+                      <Link href="/tools/allele-query" className="flex items-center w-full">
+                      <div className="p-2 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg mr-3">
+                        <svg className="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="font-medium">Allele Query</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">Search allele database</div>
+                      </div>
+                    </Link>
+                  </DropdownItem>
+                  )}
                 </DropdownMenu>
               </Dropdown>
             </div>
 
             {/* Action Buttons */}
             <div className="flex items-center space-x-3 ml-6">
-            <Link
+            {/* <Link
                 href="/alignair"
                 className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
               >
@@ -146,7 +151,7 @@ export default function Header() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
                 Try AlignAIR
-              </Link>
+              </Link> */}
               
               <ThemeToggle />
               

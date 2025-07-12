@@ -1,4 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
+import { logger } from '@components/utils/logger';
 
 const sortIndicesByDescendingValues = (indices: tf.Tensor, prediction: tf.Tensor): tf.Tensor => {
   const gatheredValues = tf.gather(prediction, indices);
@@ -46,7 +47,7 @@ const maxLikelihoodPercentageThreshold = async (
         .map((val, idx) => (val >= thresholdValue ? idx : -1)) 
         .filter(idx => idx !== -1);
     if (indicesArray.length === 0) {
-        console.log("No indices found above threshold");
+        logger.log("No indices found above threshold");
         return [[], []];
     }
     const sortedIndices = indicesArray.sort((a, b) => predictionArray[b] - predictionArray[a]).slice(0, cap);

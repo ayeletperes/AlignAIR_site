@@ -50,8 +50,9 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
     const [splitedGJAA, setSplitedGJAA] = useState<string[]>([]);
     const [germline, setGermline] = useState<{ [key: string]: string }>({});
     const [germlineAA, setGermlineAA] = useState<string>('');
+    const [splitedNP2, setSplitedNP2] = useState<number[]>([]);
 
-    referenceAlleles.D["Short-D"] = {sequence:""};
+    referenceAlleles.D["Short-D"] = {sequence:"", anchor:0, iuis:"", iglabel:"", asc:""};
     
     let sequence = results.sequence.slice(results.v_sequence_start, results.j_sequence_end);
 
@@ -133,16 +134,35 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
     
     
     const splitV = splitSequence(sequence.slice(vSeqStart,vSeqEnd), maxCharsPerRow)
-    
     const splitVAA = splitSequence(sequenceV, maxCharsPerRow/3)
     const splitD = splitSequence(sequence.slice(vSeqEnd,jSeqStart), maxCharsPerRow)
     const splitDAA = splitSequence(sequenceD, maxCharsPerRow/3)
-    const splitJ = splitSequence(sequence.slice(jSeqStart), maxCharsPerRow)
-    
+    const splitJ = splitSequence(sequence.slice(jSeqStart), maxCharsPerRow)   
     const splitJAA = splitSequence(sequenceJ, maxCharsPerRow/3)
     const np1 = dSeqStart - (vSeqEnd);
     const np2 = jSeqStart - (dSeqEnd);
 
+    // Compute how many np2 nucleotides are in each splitD chunk
+    // np2 region: sequence.slice(dSeqEnd, jSeqStart)
+    // D region in sequence: sequence.slice(vSeqEnd, jSeqStart)
+    // For each chunk in splitD, determine its start/end in the D region, then map to full sequence
+    let dRegionStart = vSeqEnd; // in full sequence
+    let dRegionEnd = jSeqStart; // in full sequence
+    let np2Start = dSeqEnd;     // in full sequence
+    let np2End = jSeqStart;     // in full sequence
+    let chunkStart = dRegionStart;
+    const np2CountsInDChunks: number[] = splitD.map(chunk => {
+        const chunkEnd = chunkStart + chunk.length;
+        // Overlap with np2 region
+        const overlapStart = Math.max(chunkStart, np2Start);
+        const overlapEnd = Math.min(chunkEnd, np2End);
+        const overlap = Math.max(0, overlapEnd - overlapStart);
+        chunkStart += chunk.length;
+        return overlap;
+    });
+
+    
+    
     const [gappedAA, gappNotes] = numberIghv(sequenceV);
     
     let Vregions = null;
@@ -193,7 +213,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
 
     useEffect(() => {
       setSelectedSequenceV(
-        referenceAlleles.V[results.v_call[0]].sequence.slice(0, results.v_germline_end)
+        referenceAlleles.invertedV[results.v_call[0]].sequence.slice(0, results.v_germline_end)
       );
       
       setSelectedSequenceD(
@@ -211,6 +231,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
       setSplitedSequenceV(splitSequence(selectedSequenceV, maxCharsPerRow));
       setSplitedSequenceD(splitSequence(selectedSequenceD, maxCharsPerRow));
       setSplitedSequenceJ(splitSequence(selectedSequenceJ, maxCharsPerRow));
+      setSplitedNP2(np2CountsInDChunks)
     }, [selectedSequenceV, selectedSequenceD, selectedSequenceJ]);
     
     useEffect(() => {
@@ -257,8 +278,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
           matcher[segment] = new HeuristicReferenceMatcher(referenceAlleles[segment]);
       });
     }
-  
- 
+
     const rows = {
       header: 1,
       seq: 2,
@@ -266,6 +286,8 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
       d: 4,
       j: 5,
     };
+    
+    
     const vrow = ((splitedSequenceV.length*3)-rows.v*2-1)
     const drow = (index: number) => (index * 2) + vrow
     const drowG = (index: number) => drow(index) + 1
@@ -284,7 +306,7 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
                             call='v_call'
                             chain="heavy"
                             results={results}
-                            reference={referenceAlleles.V}
+                            reference={referenceAlleles.invertedV}
                             setSelected={setSelectedSequenceV}
                             selected={selectedSequenceV}
                             selectedAllele={selectedAlleleV}
@@ -354,6 +376,8 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
                             splitEnd={jAAIndex}
                             matcher={matcher.D}
                             indelCounts={results.indel_count}
+                            splitedNP2={splitedNP2}
+                            setSplitedNP2={setSplitedNP2}
                         />
                       
                       </div>
@@ -377,9 +401,9 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
                 {splitD.length === 1 ? (
                         <AlignedBlock sequence={chunk} regions={Dregions ? Dregions[index] : Dregions} aasequence={splitDAA[index]} germline={splitedSequenceD[index]} aagermline={splitedGDAA[index]} mismatch={mismatchD[index]} np1={np1} np2={np2} remainingNucPrev={remainingV} remainingNucCur={remainingD}/>
                     ) : splitD.length > 1 && index === 0 ? (
-                        <AlignedBlock sequence={chunk} regions={Dregions ? Dregions[index] : Dregions} aasequence={splitDAA[index]} germline={splitedSequenceD[index]} aagermline={splitedGDAA[index]} mismatch={mismatchD[index]} np1={np1} remainingNucPrev={remainingV} />
+                        <AlignedBlock sequence={chunk} regions={Dregions ? Dregions[index] : Dregions} aasequence={splitDAA[index]} germline={splitedSequenceD[index]} aagermline={splitedGDAA[index]} mismatch={mismatchD[index]} np1={np1} np2={splitedNP2[index]} remainingNucPrev={remainingV} />
                     ) : splitD.length > 1 && (splitD.length - 1) === index ? (
-                        <AlignedBlock sequence={chunk} regions={Dregions ? Dregions[index] : Dregions} aasequence={splitDAA[index]} germline={splitedSequenceD[index]} aagermline={splitedGDAA[index]} mismatch={mismatchD[index]} np2={np2} remainingNucCur={remainingD}/>
+                        <AlignedBlock sequence={chunk} regions={Dregions ? Dregions[index] : Dregions} aasequence={splitDAA[index]} germline={splitedSequenceD[index]} aagermline={splitedGDAA[index]} mismatch={mismatchD[index]} np2={splitedNP2[index]} remainingNucCur={remainingD}/>
                     ) : splitD.length > 1 && splitD.length < index && index > 0 ? (
                         <AlignedBlock sequence={chunk} regions={Dregions ? Dregions[index] : Dregions} aasequence={splitDAA[index]} germline={splitedSequenceD[index]} aagermline={splitedGDAA[index]} mismatch={mismatchD[index]} />
                     ) : null}

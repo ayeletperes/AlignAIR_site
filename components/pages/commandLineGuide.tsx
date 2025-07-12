@@ -1,12 +1,13 @@
 "use client";
 import { useState } from 'react';
+import { logger } from '@components/utils/logger';
 
 export default function Guide() {
 
     const [expandedSections, setExpandedSections] = useState(Array(17).fill(false));
 
     const toggleSection = (index: number) => {
-        console.log('index', index);
+        logger.log('index', index);
         const updatedSections = [...expandedSections];
         updatedSections[index] = !updatedSections[index];
         setExpandedSections(updatedSections);
@@ -486,7 +487,7 @@ export default function Guide() {
                         <li><b className="text-white">ModelLoadingStep</b>: Loads the pre-trained AlignAIR model.</li>
                         <li><b className="text-white">BatchProcessingStep</b>: Processes sequences in batches according to the specified batch size.</li>
                         <li><b className="text-white">CleanAndArrangeStep</b>: Cleans and arranges the raw predictions into a structured format.</li>
-                        <li><b className="text-white">SegmentCorrectionStep</b>: Corrects segmentations based on the model’s output.</li>
+                        <li><b className="text-white">SegmentCorrectionStep</b>: Corrects segmentations based on the model's output.</li>
                         <li><b className="text-white">MaxLikelihoodPercentageThresholdApplicationStep</b>: Applies likelihood thresholds to select the best V, D, and J allele assignments.</li>
                         <li><b className="text-white">FinalizationStep</b>: Finalizes the alignment process and saves the results to the output file.</li>
                     </ul>  

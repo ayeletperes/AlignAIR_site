@@ -3,15 +3,179 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { useState, useEffect, useRef } from 'react';
 import ThemeToggle from '@/components/ui/theme-toggle';
 import { useTheme } from '@/components/ui/theme-provider';
 import LogoBW from '@/public/images/logo_alignair11bw.svg';
 import LogoWB from '@/public/images/logo_alignair11wb.svg';
 
+// Search data structure
+interface SearchItem {
+  title: string;
+  description: string;
+  href: string;
+  category: string;
+  keywords: string[];
+}
+
+// Search data - this would ideally come from a CMS or be generated from markdown files
+const searchData: SearchItem[] = [
+  {
+    title: 'Installation Guide',
+    description: 'Step-by-step guide to install AlignAIR using Docker or build from source',
+    href: '/docs/installation',
+    category: 'Installation',
+    keywords: ['install', 'setup', 'docker', 'build', 'source', 'requirements']
+  },
+  {
+    title: 'Usage Guide',
+    description: 'Learn how to run AlignAIR with different parameters and configure thresholds',
+    href: '/docs/usage',
+    category: 'Usage',
+    keywords: ['usage', 'parameters', 'thresholds', 'configuration', 'run', 'execute']
+  },
+  {
+    title: 'Examples',
+    description: 'Real-world examples with sample data, commands, and expected outputs',
+    href: '/docs/examples',
+    category: 'Examples',
+    keywords: ['examples', 'sample', 'tutorial', 'demo', 'workflow']
+  },
+  {
+    title: 'API Reference',
+    description: 'Complete parameter reference and API documentation',
+    href: '/docs/api',
+    category: 'API',
+    keywords: ['api', 'reference', 'parameters', 'endpoints', 'documentation']
+  },
+  {
+    title: 'Technical Details',
+    description: 'Deep dive into algorithms, neural network architecture, and training pipeline',
+    href: '/docs/technical',
+    category: 'Technical',
+    keywords: ['technical', 'algorithms', 'neural network', 'architecture', 'training']
+  },
+  {
+    title: 'Architecture',
+    description: 'Detailed overview of AlignAIR\'s neural network architecture',
+    href: '/docs/technical/architecture',
+    category: 'Technical',
+    keywords: ['architecture', 'neural network', 'model', 'design', 'structure']
+  },
+  {
+    title: 'Thresholding Logic',
+    description: 'Understanding how AlignAIR applies thresholds for allele selection',
+    href: '/docs/technical/thresholding',
+    category: 'Technical',
+    keywords: ['thresholding', 'thresholds', 'allele', 'selection', 'logic']
+  },
+  {
+    title: 'Mutation Handling',
+    description: 'How AlignAIR handles mutations and sequence variations',
+    href: '/docs/technical/mutations',
+    category: 'Technical',
+    keywords: ['mutations', 'variations', 'sequence', 'handling', 'processing']
+  },
+  {
+    title: 'FAQ & Help',
+    description: 'Common questions, troubleshooting guides, and community support',
+    href: '/docs/faq',
+    category: 'Help',
+    keywords: ['faq', 'help', 'troubleshooting', 'support', 'questions']
+  },
+  {
+    title: 'Terms & License',
+    description: 'Legal information, terms of use, and licensing details',
+    href: '/docs/terms',
+    category: 'Legal',
+    keywords: ['terms', 'license', 'legal', 'privacy', 'policy']
+  }
+];
+
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const context = useTheme();
   const theme = context?.theme || 'dark';
+  
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchItem[]>([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Search functionality
+  const performSearch = (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const lowerQuery = query.toLowerCase();
+    const results = searchData.filter(item => {
+      const searchableText = [
+        item.title.toLowerCase(),
+        item.description.toLowerCase(),
+        item.category.toLowerCase(),
+        ...item.keywords.map(k => k.toLowerCase())
+      ].join(' ');
+      
+      return searchableText.includes(lowerQuery);
+    });
+
+    setSearchResults(results);
+  };
+
+  // Handle search input changes
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    performSearch(query);
+    setIsSearchOpen(true);
+  };
+
+  // Handle search input focus
+  const handleSearchFocus = () => {
+    if (searchQuery.trim()) {
+      setIsSearchOpen(true);
+    }
+  };
+
+  // Handle click outside search
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setIsSearchOpen(false);
+      setSearchQuery('');
+      setSearchResults([]);
+    }
+  };
+
+  // Keyboard shortcut to focus search (Ctrl+K or Cmd+K)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.querySelector('input[placeholder="Search docs..."]') as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => document.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   const links = [
     {
@@ -148,11 +312,12 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           <Link href="/" className="flex items-center" aria-label="AlignAIR Home">
             <Image 
               src={theme === 'dark' ? LogoBW : LogoWB}
-              width={120} 
-              height={30} 
+              // width={120} 
+              // height={30} 
               alt="AlignAIR Logo" 
               priority
               className="transition-opacity"
+              style={{ width: 120, height: 30 }}
             />
           </Link>
           
@@ -202,7 +367,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           </div>
 
           {/* Search Bar */}
-          <div className="relative">
+          <div className="relative" ref={searchRef}>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -211,8 +376,77 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             <input
               type="text"
               placeholder="Search docs..."
-              className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full pl-10 pr-20 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onFocus={handleSearchFocus}
+              onKeyDown={handleKeyDown}
             />
+            
+            {/* Keyboard Shortcut Indicator */}
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+              <kbd className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-400 bg-gray-700 border border-gray-600 rounded">
+                {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}K
+              </kbd>
+            </div>
+            
+            {/* Search Results Dropdown */}
+            {isSearchOpen && searchResults.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+                <div className="p-2">
+                  <div className="text-xs text-gray-400 mb-2 px-2">
+                    {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} found
+                  </div>
+                  {searchResults.map((result, index) => (
+                    <Link
+                      key={result.href}
+                      href={result.href}
+                      className="block p-3 rounded-lg hover:bg-gray-700 transition-colors group"
+                      onClick={() => {
+                        setIsSearchOpen(false);
+                        setSearchQuery('');
+                        setSearchResults([]);
+                      }}
+                    >
+                      <div className="flex items-start space-x-3">
+                        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-white group-hover:text-purple-300 transition-colors">
+                            {result.title}
+                          </div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            {result.description}
+                          </div>
+                          <div className="flex items-center mt-2">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-700 text-gray-300">
+                              {result.category}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* No Results Message */}
+            {isSearchOpen && searchQuery.trim() && searchResults.length === 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50">
+                <div className="p-4 text-center">
+                  <div className="text-gray-400 text-sm">
+                    No results found for "{searchQuery}"
+                  </div>
+                  <div className="text-gray-500 text-xs mt-1">
+                    Try different keywords or check the navigation menu
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

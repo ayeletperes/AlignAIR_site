@@ -1,4 +1,5 @@
 import * as onnx from 'onnxruntime-web';
+import { logger } from '@components/utils/logger';
 //const onnx = require('onnxruntime-node');
 
 
@@ -6,18 +7,18 @@ import * as onnx from 'onnxruntime-web';
 export async function inspectModel(path: string): Promise<void> {
   try {
     const session = await onnx.InferenceSession.create(path);
-    console.log('Model Inputs:');
+    logger.log('Model Inputs:');
     session.inputNames.forEach((name: string) => {
-      console.log(`- Name: ${name}`);
+      logger.log(`- Name: ${name}`);
     });
 
-    console.log('Model Outputs:');
+    logger.log('Model Outputs:');
     session.outputNames.forEach((name: string) => {
-      console.log(`- Name: ${name}`);
+      logger.log(`- Name: ${name}`);
     });
 
   } catch (error) {
-    console.error('Failed to inspect the model:', error);
+    logger.error('Failed to inspect the model:', error);
   }
 }
 
@@ -37,12 +38,12 @@ export const runModel = async (
       results = await pipeline.run(feeds, ['label']);
       return results.label.data as string[];
     } catch (labelError) {
-      console.log('Trying output_label instead of label...');
+      logger.log('Trying output_label instead of label...');
       results = await pipeline.run(feeds, ['output_label']);
       return results.output_label.data as string[];
     }
   } catch (error) {
-    console.error('Error during model inference. Reinitializing session...');
+    logger.error('Error during model inference. Reinitializing session...');
     throw error;
   }
 };
@@ -61,7 +62,7 @@ export const fixOrientation = async (
     );
     return fixedSequences;
   } catch (error) {
-    console.error('Error during orientation fixing:', error);
+    logger.error('Error during orientation fixing:', error);
     throw error;
   } 
 };

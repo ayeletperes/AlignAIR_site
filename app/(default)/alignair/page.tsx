@@ -7,15 +7,16 @@ import { useMount, usePrevious, useSetState } from 'react-use';
 import AlignmentForm from '@/components/form/form';
 import Submission from '@components/submission/submission';
 import Results from '@/components/results/Results';
-import { getOrLoadModel } from '@components/submission/alignmentSubmission';
+import { getOrLoadModel, getOrLoadModelById } from '@components/submission/alignmentSubmission';
 import { logger } from '@components/utils/logger';
+import { getDefaultModelForChain, getModelById } from '@components/model/modelMetadataLoader';
 //import Results from '@/components/functional/results';
 import { metadata } from './metadata';
 
 function logGroup(type: string, data: any) {
-  console.groupCollapsed(type);
-  console.log(data);
-  console.groupEnd();
+  if (process.env.NODE_ENV === 'development') {
+    logger.log(`[${type}]`, data);
+  }
 }
 
 interface State {
@@ -45,8 +46,10 @@ export default function App() {
   const [file, setFile] = useState<File | null>(null);
   const [sequence, setSequence] = useState<string>('');
   const [selectedChain, setSelectedChain] = useState<'heavy' | 'light' | 'trb'>('heavy');
+  const [selectedModelId, setSelectedModelId] = useState<string>('igh-v1.0'); // Default to IGH model
   const [results, setResults] = useState<any>(null);
   const [resultsReady, setResultsReady] = useState(false); // New state to track if results are ready
+  const [isProcessing, setIsProcessing] = useState(false); // New state to track processing status
   const [modelPreloadStatus, setModelPreloadStatus] = useState<ModelPreloadStatus>({
     heavy: 'idle',
     light: 'idle',
@@ -65,26 +68,43 @@ export default function App() {
   const [input, setInput] = useState<string | File | null>(null);
   const [flag, setFlag] = useState<'sequence' | 'file'>('sequence');
 
-  // Model preloading function
-  const preloadModel = async (chain: 'heavy' | 'light' | 'trb') => {
+  // Model preloading function by ID
+  const preloadModelById = async (modelId: string) => {
     try {
-      setModelPreloadStatus(prev => ({ ...prev, [chain]: 'loading' }));
-      logger.log(`Preloading ${chain} chain model...`);
+      const modelMetadata = await getModelById(modelId);
+      if (!modelMetadata) {
+        logger.error(`Model not found: ${modelId}`);
+        return;
+      }
+
+      const chain = modelMetadata.chainType;
       
-      await getOrLoadModel({
-        chain,
+      // Check if model is already ready to avoid unnecessary re-warmup
+      if (modelPreloadStatus[chain] === 'ready') {
+        logger.log(`Model ${modelId} is already ready, skipping preload`);
+        return;
+      }
+      
+      setModelPreloadStatus(prev => ({ ...prev, [chain]: 'loading' }));
+      logger.log(`Preloading model: ${modelId} (${chain} chain)...`);
+      
+      await getOrLoadModelById({
+        modelId,
         warmupOptions: {
           enabled: true,
-          warmupRuns: 2, // Reduced from 3 to 2 for faster preloading
+          warmupRuns: 2,
           logWarmupTimes: true,
         },
       });
       
       setModelPreloadStatus(prev => ({ ...prev, [chain]: 'ready' }));
-      logger.log(`${chain} chain model preloaded and ready!`);
+      logger.log(`Model ${modelId} preloaded and ready!`);
     } catch (error) {
-      logger.error(`Failed to preload ${chain} chain model:`, error);
-      setModelPreloadStatus(prev => ({ ...prev, [chain]: 'error' }));
+      logger.error(`Failed to preload model ${modelId}:`, error);
+      const modelMetadata = await getModelById(modelId);
+      if (modelMetadata) {
+        setModelPreloadStatus(prev => ({ ...prev, [modelMetadata.chainType]: 'error' }));
+      }
     }
   };
 
@@ -101,10 +121,11 @@ export default function App() {
 
   useEffect(() => {
     setSelectedChain('heavy');
+    setSelectedModelId('igh-v1.0'); // Set default model
     setIsClient(true);
 
-    // Preload the heavy chain model immediately when page loads
-    preloadModel('heavy');
+    // Note: Model preloading is now handled by the selectedModelId useEffect
+    // No need to call preloadModelById here as it will be triggered automatically
 
     if (window.gtag) {
       window.gtag('config', 'G-W94F4SGX8B', {
@@ -114,29 +135,43 @@ export default function App() {
     }
   }, []);
 
-  // Preload light chain model when user selects it
+  // Update selectedModelId when selectedChain changes (only if no specific model is selected)
   useEffect(() => {
-    if (selectedChain === 'light' && modelPreloadStatus.light === 'idle') {
-      preloadModel('light');
-    }
-  }, [selectedChain, modelPreloadStatus.light]);
+    const updateDefaultModel = async () => {
+      const defaultModel = await getDefaultModelForChain(selectedChain);
+      if (defaultModel && !selectedModelId) {
+        setSelectedModelId(defaultModel.id);
+        // Reset results when chain changes and model is automatically updated
+        setResults(null);
+      }
+    };
+    
+    updateDefaultModel();
+  }, [selectedChain, selectedModelId]);
 
-  // Preload TCRB model when user selects it
+  // Preload model when selected model changes - this is the single source of truth for model preloading
   useEffect(() => {
-    if (selectedChain === 'trb' && modelPreloadStatus.trb === 'idle') {
-      preloadModel('trb');
+    if (selectedModelId) {
+      preloadModelById(selectedModelId);
     }
-  }, [selectedChain, modelPreloadStatus.trb]);
+  }, [selectedModelId]);
 
   // Watch for results being set and update resultsReady
   useEffect(() => {
     if (results) {
-      
+      setIsProcessing(false);
       setResultsReady(true); // Results are now fully ready
     } else {
       setResultsReady(false);
     }
   }, [results]);
+
+  // Watch for submission changes to set processing state
+  useEffect(() => {
+    if (submission && (input || sequence)) {
+      setIsProcessing(true);
+    }
+  }, [submission, input, sequence]);
   
   const [{ modalIsOpen, run, steps }, setState] = useSetState<State>({
     modalIsOpen: true,
@@ -241,13 +276,15 @@ export default function App() {
         sequence={sequence}
         setSelectedChain={setSelectedChain as Dispatch<SetStateAction<string>>}
         selectedChain={selectedChain}
+        selectedModelId={selectedModelId}
+        setSelectedModelId={setSelectedModelId}
         params={params}
         setParams={setParams as Dispatch<SetStateAction<Params>>}
         setResults={setResults}
       />
 
       <Submission
-        chain={selectedChain}
+        modelId={selectedModelId}
         input={input as string | null} // Dynamically set input
         flag={flag} // Dynamically set flag
         params={params}
@@ -255,7 +292,13 @@ export default function App() {
         setResults={setResults}
       />
       
-      {resultsReady && <Results results={results} selectedChain={selectedChain} />}
+      {(resultsReady || isProcessing) && (
+        <Results 
+          results={results} 
+          selectedChain={selectedChain} 
+          isLoading={isProcessing && !resultsReady}
+        />
+      )}
     </>
   );
 }

@@ -142,7 +142,7 @@ export const AlignmentBrowserLight: React.FC<AlignmentBrowserProps> = ({ results
 
     useEffect(() => {
       setSelectedSequenceV(
-        referenceAlleles.V[results.v_call[0]].sequence.slice(0, results.v_germline_end)
+        referenceAlleles.invertedV[results.v_call[0]].sequence.slice(0, results.v_germline_end)
       );
       
       setSelectedSequenceJ(
@@ -219,7 +219,7 @@ export const AlignmentBrowserLight: React.FC<AlignmentBrowserProps> = ({ results
                             call='v_call'
                             chain='light'
                             results={results}
-                            reference={referenceAlleles.V}
+                            reference={referenceAlleles.invertedV}
                             setSelected={setSelectedSequenceV}
                             selected={selectedSequenceV}
                             selectedAllele={selectedAlleleV}

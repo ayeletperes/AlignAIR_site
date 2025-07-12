@@ -1,6 +1,6 @@
 import { FastKmerDensityExtractor } from '@components/preprocessing/longsequences/fastKmerDensityExtractor';
-import { loadReferenceData } from '@components/reference/utilities';
-import { readMetadata } from '@components/preprocessing/utilities/readMetadata';
+import { loadReferenceDataForModel } from '@components/reference/utilities';
+import { getModelById } from '@components/model/modelMetadataLoader';
 import * as onnx from 'onnxruntime-web';
 import { env } from 'onnxruntime-web';
 import * as tf from '@tensorflow/tfjs';
@@ -14,7 +14,7 @@ export interface ChainConfig {
   maxLength: number;
   allowedMismatches: number;
   modelPath: string; // Path to the main model file
-  modelMetadataPath: string; // Path to the model metadata file
+  modelMetadataPath?: string; // Path to the model metadata file (optional, now handled by new system)
   orientationModelPath: string; // Path to the orientation model file
 }
 
@@ -31,11 +31,11 @@ export class ModelLoader {
   private model: tf.GraphModel | null = null;
   private modelMetadata: any | null = null;
   private orientationModel: any | null = null;
-  private referenceAlleles: Record<string, any> | null = null;
+  private referenceAlleles: any | null = null;
   private dataConfig: Record<string, any> | null = null;
   private isWarmedUp: boolean = false;
   private warmupStats: { times: number[]; avgTime: number } | null = null;
-
+  private modelId: string | null = null;
   constructor(chainConfig: ChainConfig) {
     this.chainConfig = chainConfig;
   }
@@ -261,20 +261,31 @@ export class ModelLoader {
   }
 
   public async loadMetadata(): Promise<void> {
-    logger.log(`Loading model Metadata for ${this.chainConfig.name} chain from ${this.chainConfig.modelMetadataPath}...`);
+    logger.log(`Loading model Metadata for ${this.chainConfig.name} chain...`);
     try {
-      if(this.chainConfig.modelMetadataPath){
-        this.modelMetadata = readMetadata(this.chainConfig.modelMetadataPath);
-        logger.log(`Model Metadata for ${this.chainConfig.name} chain loaded successfully.`);
-      }else{
-        logger.log('Model Metadata path is not provided.');
+      // Determine model ID from chain type
+      const modelIdMap: Record<string, string> = {
+        'heavy': 'igh-v1.0',
+        'light': 'igl-v1.0',
+        'trb': 'tcrb-v1.0'
+      };
+      
+      this.modelId = modelIdMap[this.chainConfig.name];
+      if (!this.modelId) {
+        throw new Error(`Unknown chain type: ${this.chainConfig.name}`);
       }
+      
+      this.modelMetadata = await getModelById(this.modelId);
+      if (!this.modelMetadata) {
+        throw new Error(`Failed to load metadata for model ${this.modelId}`);
+      }
+      
+      logger.log(`Model Metadata for ${this.chainConfig.name} chain loaded successfully.`);
     } catch (error) {
       // Ensure error is an instance of Error and extract the message
       let errorMessage = 'An unknown error occurred while loading the model metadata.';
       if (error instanceof Error) {
-        errorMessage = `Failed to load main model metadata for ${this.chainConfig.name} chain from path: ${this.chainConfig.modelMetadataPath}. 
-        Ensure the file exists and the path is correct. 
+        errorMessage = `Failed to load main model metadata for ${this.chainConfig.name} chain. 
         Original error: ${error.message}`;
       }
       logger.error(errorMessage);
@@ -295,14 +306,14 @@ export class ModelLoader {
   private async loadReferencesAndInitializeExtractor(): Promise<void> {
     logger.log(`Loading references for ${this.chainConfig.name} chain...`);
     try {
-      const references = await loadReferenceData();
-      this.referenceAlleles = references[this.chainConfig.name].reference;
-      this.dataConfig = references[this.chainConfig.name];
+      const references = await loadReferenceDataForModel(this.modelId);
+      this.referenceAlleles = Object.freeze(references.reference);
+      this.dataConfig = references;
       if (this.referenceAlleles) {
         const refSequences = [
-          ...Object.values(this.referenceAlleles.V).map((allele: any) => allele.sequence),
-          ...(this.referenceAlleles.D ? Object.values(this.referenceAlleles.D).map((allele: any) => allele.sequence) : []),
-          ...Object.values(this.referenceAlleles.J).map((allele: any) => allele.sequence),
+          ...Object.values(references.reference.V).map((allele: any) => allele.sequence),
+          ...(references.reference.D ? Object.values(references.reference.D).map((allele: any) => allele.sequence) : []),
+          ...Object.values(references.reference.J).map((allele: any) => allele.sequence),
         ];
   
         this.initializeCandidateExtractor(refSequences);
@@ -333,6 +344,10 @@ export class ModelLoader {
     return this.model;
   }
 
+  public getModelId(): string | null {
+    return this.modelId;
+  }
+
   public getModelMetadata(): any | null {
     return this.modelMetadata;
   }
@@ -341,7 +356,7 @@ export class ModelLoader {
     return this.orientationModel;
   }
 
-  public getReferenceAlleles(): Record<string, any> | null {
+  public getReferenceAlleles(): any | null {
     return this.referenceAlleles;
   }
 

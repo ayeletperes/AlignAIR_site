@@ -1,18 +1,18 @@
 import Modal from 'react-modal';
 import React, { useState, useEffect } from 'react';
-import { submitAlignmentRequest } from '@components/submission/alignmentSubmission';
+import { submitAlignmentRequestById } from '@components/submission/alignmentSubmission';
 import { initializeBackend } from '@components/submission/initializeBackend';
 import { logger } from '@components/utils/logger';
 
 const SubmissionButton = ({
-  chain,
+  modelId,
   input,
   flag,
   params,
   results,
   setResults,
 }: {
-  chain: 'heavy' | 'light' | 'trb';
+  modelId: string;
   input: string | null;
   flag: 'file' | 'sequence';
   params: any;
@@ -43,13 +43,13 @@ const SubmissionButton = ({
 
     try {
       const submissionData = {
-        chain,
+        modelId,
         input,
         flag,
         params,
       };
 
-      const response = await submitAlignmentRequest(submissionData, setProgress);
+      const response = await submitAlignmentRequestById(submissionData, setProgress);
       setResults(response);
       setProgress(0);
     } catch (err) {

@@ -1,3 +1,5 @@
+import { logger } from '@components/utils/logger';
+
 export const readMetadata = async (filePath: string): Promise<any> => {
     try {
       // Fetch the file from the public directory
@@ -12,7 +14,7 @@ export const readMetadata = async (filePath: string): Promise<any> => {
       
       return jsonData;
     } catch (error) {
-      console.error("Error reading metadata:", error);
+      logger.error("Error reading metadata:", error);
       return null;
     }
   };
