@@ -16,7 +16,7 @@ interface AlignmentBrowserProps {
 export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results, referenceAlleles }) => {
     
     
-    if (results.ar_indels > 0) {
+    if (results.indel_count > 0) {
       return (
         <>
         <div className="flex items-center space-x-3 bg-purple-100 p-4 rounded-md">
