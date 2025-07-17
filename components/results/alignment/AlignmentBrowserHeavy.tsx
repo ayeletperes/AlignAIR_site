@@ -209,8 +209,6 @@ export const AlignmentBrowserHeavy: React.FC<AlignmentBrowserProps> = ({ results
     
 
     
-    
-
     useEffect(() => {
       setSelectedSequenceV(
         referenceAlleles.invertedV[results.v_call[0]].sequence.slice(0, results.v_germline_end)
