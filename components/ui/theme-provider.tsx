@@ -5,14 +5,15 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 type Theme = 'light' | 'dark'
 
 interface ThemeContextType {
-  theme: Theme
+  theme: Theme | undefined
   toggleTheme: () => void
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('dark')
+  // Initialize with undefined to prevent hydration mismatch
+  const [theme, setTheme] = useState<Theme | undefined>(undefined)
   const [mounted, setMounted] = useState(false)
 
   // Set mounted to true after hydration to prevent SSR mismatch
@@ -33,7 +34,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (!mounted) return
+    if (!mounted || !theme) return
 
     // Add transition class to prevent jarring changes
     document.documentElement.classList.add('theme-transition')
@@ -56,7 +57,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [theme, mounted])
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
+    setTheme(prev => {
+      if (!prev) return 'dark' // Default to dark if undefined
+      return prev === 'light' ? 'dark' : 'light'
+    })
   }
 
   // Prevent hydration mismatch by not rendering until mounted
@@ -90,8 +94,6 @@ export const ThemeScript = () => (
             }
             if (theme === 'dark') {
               document.documentElement.classList.add('dark');
-            } else {
-              document.documentElement.classList.remove('dark');
             }
           } catch (e) {
             // Fallback to dark theme
@@ -101,4 +103,4 @@ export const ThemeScript = () => (
       `,
     }}
   />
-) 
+)

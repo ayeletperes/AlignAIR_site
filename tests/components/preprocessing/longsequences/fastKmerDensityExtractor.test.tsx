@@ -1,8 +1,8 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
-import { ModelLoader, ChainConfig } from '@components/model/utilities';
-import { FastKmerDensityExtractor } from '@components/preprocessing/longsequences/fastKmerDensityExtractor';
+import { ModelLoader, ChainConfig } from '@/components/model/utilities';
+import { FastKmerDensityExtractor } from '@/components/preprocessing/longsequences/fastKmerDensityExtractor';
 import { model } from '@tensorflow/tfjs';
 
 jest.setTimeout(20000);

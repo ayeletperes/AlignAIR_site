@@ -1,19 +1,28 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} **/
-// module.exports = {
-//   testEnvironment: "node",
-//   transform: {
-//     "^.+.tsx?$": ["ts-jest",{}],
-//   },
-// };
-
 module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/tests/setup/jest.setup.js'],
   roots: ['<rootDir>/tests'],
-  testMatch: ['**/*.test.tsx'], // Matches all `.test.tsx` files
+  testMatch: ['**/*.test.tsx'],
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
+    '^.+\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          jsx: 'react-jsx',
+        },
+      },
+    ],
   },
   moduleNameMapper: {
-    '^@utilities/(.*)$': '<rootDir>/components/Utilities/$1', // Map @utilities/ to components/Utilities/
-    '^@components/(.*)$': '<rootDir>/components/$1', // If you have other aliases like @components/
+    '^@/components/(.*)$': '<rootDir>/components/$1',
+    '^@/utils/(.*)$': '<rootDir>/utils/$1',
+    '^@/config/(.*)$': '<rootDir>/config/$1',
+    '^@/types/(.*)$': '<rootDir>/types/$1',
+    '^@/contexts/(.*)$': '<rootDir>/contexts/$1',
+    '^@/hooks/(.*)$': '<rootDir>/hooks/$1',
+    '^@/tests/(.*)$': '<rootDir>/tests/$1',
+    '^@/(.*)$': '<rootDir>/$1',
   },
 };

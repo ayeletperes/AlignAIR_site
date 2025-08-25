@@ -1,45 +1,16 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { useModelMetadata } from '@/hooks/useModelMetadata'
-import { ModelMetadata } from '@components/model/modelMetadataLoader'
+import { AVAILABLE_MODELS } from '@/lib/model/modelMetadataLoader';
 
 export default function ModelsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null)
-  const { allModels: models, loading, error } = useModelMetadata({ preload: true })
+  const models = AVAILABLE_MODELS;
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text)
     setCopiedId(id)
     setTimeout(() => setCopiedId(null), 2000)
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-4 text-gray-400">Loading models...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="text-center">
-            <div className="bg-red-900/20 border border-red-700 rounded-lg p-6">
-              <h2 className="text-xl font-bold text-red-400 mb-2">Error Loading Models</h2>
-              <p className="text-red-300">{error}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -82,7 +53,7 @@ export default function ModelsPage() {
               {models.map((model) => (
                 <div key={model.id} className="bg-black/50 rounded-xl p-4 border border-gray-700">
                   <div className="flex items-center mb-3">
-                    <div className={`p-2 ${model.iconColor} rounded-lg mr-3`}>
+                    <div className="p-2 bg-purple-500 rounded-lg mr-3">
                       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.5 3l4.5 6H8.5l3 7-6-7h3L5.5 3z" />
                       </svg>
@@ -101,20 +72,22 @@ export default function ModelsPage() {
           </div>
         </div>
 
-        {/* Detailed Model Cards */}
+
+
+        {/* Model Details Table */}
         <div className="mb-16">
           <h2 className="h2 text-center mb-12 text-white">Model Details</h2>
 
           <div className="space-y-8">
             {models.map((model) => (
-              <div key={model.id} className={`bg-gradient-to-br ${model.gradient} p-0.5 rounded-2xl`}>
+              <div key={model.id} className="bg-gradient-to-br from-purple-500 to-pink-500 p-0.5 rounded-2xl">
                 <div className="bg-gray-900 rounded-2xl p-8 h-full">
                   <div className="grid lg:grid-cols-3 gap-8">
 
                     {/* Model Info */}
                     <div className="lg:col-span-2">
                       <div className="flex items-center mb-6">
-                        <div className={`p-3 ${model.iconColor} rounded-xl mr-4`}>
+                        <div className={`p-3 rounded-xl mr-4`}>
                           <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.5 3l4.5 6H8.5l3 7-6-7h3L5.5 3z" />
                           </svg>

@@ -1,147 +1,192 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useModelMetadata } from '@/hooks/useModelMetadata';
-import { loadReferenceDataForModel } from '@components/reference/utilities';
-import { Allele, Segment } from '@components/reference/utilities';
-import { logger } from '@components/utils/logger';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ReferenceLoader, type SegmentKey } from '@/lib/data/ReferenceLoader';
+import { logger } from '@/utils/logger';
+import { AVAILABLE_MODELS } from '@/lib/model/modelMetadataLoader';
+
+type SearchKind = 'iuis' | 'iglabel' | 'asc' | 'sequence';
+
+interface AlleleLite {
+  name: string;
+  sequence: string;
+  iuis?: string;
+  iglabel?: string;
+  asc?: string;
+  anchor?: number;
+}
 
 interface AlleleResult {
-  id: string;
-  segment: 'V' | 'D' | 'J';
+  id: string;                       // allele name
+  segment: SegmentKey;              // 'V' | 'D' | 'J'
   chainType: string;
   modelId: string;
-  allele: Allele;
+  allele: AlleleLite;
+}
+
+const SEGMENTS: SegmentKey[] = ['V', 'D', 'J'];
+
+function normalizeSeq(s = ''): string {
+  return s.toUpperCase().replace(/[\s\-.]/g, '');
 }
 
 export default function AlleleQueryPage() {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
-  const [selectedModelId, setSelectedModelId] = useState<string>('igh-v1.0');
+  const [selectedModelId, setSelectedModelId] = useState<string>(
+    AVAILABLE_MODELS[0]?.id || 'igh-v1.0'
+  );
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [searchType, setSearchType] = useState<'iuis' | 'iglabel' | 'asc' | 'sequence'>('iuis');
+  const [searchType, setSearchType] = useState<SearchKind>('iuis');
   const [results, setResults] = useState<AlleleResult[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [referenceData, setReferenceData] = useState<any>(null);
+  const [refLoader, setRefLoader] = useState<ReferenceLoader | null>(null);
 
-  const { allModels: availableModels, loading: modelsLoading } = useModelMetadata();
-
-  // Load reference data when model changes
+  // Load reference data when the model changes
   useEffect(() => {
     const loadReferenceData = async () => {
-      if (!selectedModelId) return;
+      const model = AVAILABLE_MODELS.find(m => m.id === selectedModelId);
       
+      if (!model) return;
+
       setIsLoading(true);
       try {
-        const data = await loadReferenceDataForModel(selectedModelId);
-        setReferenceData(data);
-        logger.log(`Loaded reference data for model: ${selectedModelId}`);
+        const toPaths = (rp: unknown): string[] => {
+          if (Array.isArray(rp)) return rp as string[];
+          if (typeof rp === 'string') {
+            return rp.split(',').map(s => s.trim()).filter(Boolean);
+          }
+          throw new Error('referencePath must be a string or string[]');
+        };
+
+        const paths = toPaths(model.referencePath);
+        const payloads: any[] = [];
+        for (const path of paths) {
+          const res = await fetch(path);
+          if (!res?.ok) throw new Error(`Failed to fetch reference: ${path}`);
+          payloads.push(await res.json());
+        }
+
+        const loader = new ReferenceLoader(payloads);
+        await loader.load();
+        setRefLoader(loader);
+        logger.info(`Loaded reference data for model: ${selectedModelId}`);
       } catch (error) {
         logger.error(`Failed to load reference data for model ${selectedModelId}:`, error);
+        setRefLoader(null);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadReferenceData();
-  }, [selectedModelId]);
+  }, [selectedModelId, AVAILABLE_MODELS]);
 
-  // Search function
-  const performSearch = () => {
-    if (!searchQuery.trim() || !referenceData) {
+  // Flatten all alleles once per loader change for faster searches
+  const allAlleles = useMemo<AlleleResult[]>(() => {
+    if (!refLoader) return [];
+    const modelMeta = AVAILABLE_MODELS.find(m => m.id === selectedModelId);
+    const chainType = modelMeta?.chainType || 'heavy';
+
+    const out: AlleleResult[] = [];
+    for (const seg of SEGMENTS) {
+      const seqs = refLoader.getSeqs(seg) || {};
+      const labels = refLoader.getLabels(seg) || {};
+      for (const name of Object.keys(seqs)) {
+        const p = labels[name] || {};
+        out.push({
+          id: name,
+          segment: seg,
+          chainType,
+          modelId: selectedModelId,
+          allele: {
+            name,
+            sequence: seqs[name],
+            iuis: p.iuis,
+            iglabel: p.iglabel,
+            asc: p.asc,
+            anchor: p.anchor,
+          },
+        });
+      }
+    }
+    return out;
+  }, [refLoader, AVAILABLE_MODELS, selectedModelId]);
+
+  // Search
+  useEffect(() => {
+    if (!refLoader) {
+      setResults([]);
+      return;
+    }
+    const q = searchQuery.trim();
+    if (!q) {
       setResults([]);
       return;
     }
 
-    const query = searchQuery.toLowerCase().trim();
-    const modelMetadata = availableModels.find(m => m.id === selectedModelId);
-    const chainType = modelMetadata?.chainType || 'heavy';
-    
-    const segments = referenceData.reference;
-    if (!segments) return;
-    // Build a flat list of all alleles with their info
-    const allAlleles: AlleleResult[] = [];
-    const segmentTypes: ('V' | 'D' | 'J')[] = ['V', 'D', 'J'];
-    segmentTypes.forEach(segmentType => {
-      const segment = segments[segmentType] as Segment;
-      if (!segment) return;
-      Object.entries(segment).forEach(([alleleId, allele]) => {
-        if (!allele) return;
-        allAlleles.push({
-          id: alleleId,
-          segment: segmentType,
-          chainType,
-          modelId: selectedModelId,
-          allele
-        });
-      });
-    });
+    const queryLower = q.toLowerCase();
 
-    // For sequence search, just match by sequence
+    // Sequence search: substring on normalized sequence
     if (searchType === 'sequence') {
-      const finalResults: AlleleResult[] = [];
+      const normQ = normalizeSeq(q);
       const seen = new Set<string>();
-      allAlleles.forEach(result => {
-        const value = result.allele.sequence?.toLowerCase() || '';
-        if (value.includes(query) && !seen.has(result.id)) {
-          finalResults.push(result);
-          seen.add(result.id);
+      const finalRes: AlleleResult[] = [];
+      for (const r of allAlleles) {
+        const s = normalizeSeq(r.allele.sequence);
+        if (s.includes(normQ) && !seen.has(r.id)) {
+          finalRes.push(r);
+          seen.add(r.id);
         }
-      });
-      setResults(finalResults);
+      }
+      setResults(finalRes);
       return;
     }
 
-    // 1. Find all alleles matching the query in the selected field
-    const initialMatches: AlleleResult[] = [];
-    allAlleles.forEach(result => {
-      let value = '';
-      switch (searchType) {
-        case 'iuis': value = result.allele.iuis?.toLowerCase() || ''; break;
-        case 'iglabel': value = result.allele.iglabel?.toLowerCase() || ''; break;
-        case 'asc': value = result.allele.asc?.toLowerCase() || ''; break;
+    // Label search: find initial matches by substring on the chosen label
+    const initial: AlleleResult[] = [];
+    for (const r of allAlleles) {
+      const val =
+        searchType === 'iuis' ? (r.allele.iuis || '') :
+        searchType === 'iglabel' ? (r.allele.iglabel || '') :
+        (r.allele.asc || '');
+      if (val && val.toLowerCase().includes(queryLower)) {
+        initial.push(r);
       }
-      if (value && value.includes(query)) {
-        initialMatches.push(result);
-      }
-    });
+    }
 
-    // 2. Collect all IUIS, IG Label, and ASC values from those matches
+    if (initial.length === 0) {
+      setResults([]);
+      return;
+    }
+
+    // Collect all exact label values from the initial set
     const iuisSet = new Set<string>();
     const iglabelSet = new Set<string>();
     const ascSet = new Set<string>();
-    initialMatches.forEach(result => {
-      if (result.allele.iuis) iuisSet.add(result.allele.iuis);
-      if (result.allele.iglabel) iglabelSet.add(result.allele.iglabel);
-      if (result.allele.asc) ascSet.add(result.allele.asc);
-    });
+    for (const r of initial) {
+      if (r.allele.iuis) iuisSet.add(r.allele.iuis);
+      if (r.allele.iglabel) iglabelSet.add(r.allele.iglabel);
+      if (r.allele.asc) ascSet.add(r.allele.asc);
+    }
 
-    // 3. Find all alleles that have any of those values in any of the three fields
-    const finalResults: AlleleResult[] = [];
+    // Final set: any allele sharing any of those exact values
     const seen = new Set<string>();
-    allAlleles.forEach(result => {
-      const iuis = result.allele.iuis || '';
-      const iglabel = result.allele.iglabel || '';
-      const asc = result.allele.asc || '';
-      if (
+    const finalRes: AlleleResult[] = [];
+    for (const r of allAlleles) {
+      const { iuis, iglabel, asc } = r.allele;
+      const linked =
         (iuis && iuisSet.has(iuis)) ||
         (iglabel && iglabelSet.has(iglabel)) ||
-        (asc && ascSet.has(asc))
-      ) {
-        if (!seen.has(result.id)) {
-          finalResults.push(result);
-          seen.add(result.id);
-        }
+        (asc && ascSet.has(asc));
+      if (linked && !seen.has(r.id)) {
+        finalRes.push(r);
+        seen.add(r.id);
       }
-    });
+    }
 
-    setResults(finalResults);
-  };
-
-  // Perform search when query or search type changes
-  useEffect(() => {
-    performSearch();
-  }, [searchQuery, searchType, referenceData]);
+    setResults(finalRes);
+  }, [searchQuery, searchType, refLoader, allAlleles]);
 
   const getChainDisplayName = (chainType: string) => {
     switch (chainType) {
@@ -161,11 +206,10 @@ export default function AlleleQueryPage() {
     }
   };
 
-  if (isDevelopment) {
   return (
     <section>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
-        {/* Hero content */}
+        {/* Hero */}
         <div className="relative pt-32 pb-10 md:pt-40 md:pb-16">
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
             <div className="flex items-center justify-center mb-6">
@@ -175,10 +219,10 @@ export default function AlleleQueryPage() {
                 </svg>
               </div>
             </div>
-            <h1 className="h1 mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent" data-aos="fade-up">
+            <h1 className="h1 mb-4 bg-gradient-to-r from-white to gray-300 bg-clip-text text-transparent">
               Allele Query Tool
             </h1>
-            <p className="text-xl text-gray-400 mb-8" data-aos="fade-up" data-aos-delay="200">
+            <p className="text-xl text-gray-400 mb-8">
               Search and explore allele information across different naming conventions and reference sets.
             </p>
           </div>
@@ -188,7 +232,7 @@ export default function AlleleQueryPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-800 mb-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Search Alleles</h2>
-            
+
             {/* Model Selection */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -198,9 +242,8 @@ export default function AlleleQueryPage() {
                 value={selectedModelId}
                 onChange={(e) => setSelectedModelId(e.target.value)}
                 className="w-full px-4 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                disabled={modelsLoading}
               >
-                {availableModels.map((model) => (
+                {AVAILABLE_MODELS.map((model) => (
                   <option key={model.id} value={model.id}>
                     {model.name} ({model.referenceSet})
                   </option>
@@ -208,7 +251,7 @@ export default function AlleleQueryPage() {
               </select>
             </div>
 
-            {/* Search Type Selection */}
+            {/* Search Type */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Search By
@@ -222,7 +265,7 @@ export default function AlleleQueryPage() {
                 ].map((type) => (
                   <button
                     key={type.value}
-                    onClick={() => setSearchType(type.value as any)}
+                    onClick={() => setSearchType(type.value as SearchKind)}
                     className={`p-4 rounded-lg border transition-all ${
                       searchType === type.value
                         ? 'bg-blue-600 border-blue-500 text-white'
@@ -257,7 +300,6 @@ export default function AlleleQueryPage() {
               </div>
             </div>
 
-            {/* Loading State */}
             {isLoading && (
               <div className="flex items-center justify-center py-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -279,7 +321,7 @@ export default function AlleleQueryPage() {
               <div className="text-center py-12">
                 <div className="text-gray-500 dark:text-gray-400 text-lg mb-2">No results found</div>
                 <div className="text-gray-400 dark:text-gray-500 text-sm">
-                  Try adjusting your search query or reference set
+                  Try adjusting your search query or reference set.
                 </div>
               </div>
             ) : results.length > 0 ? (
@@ -295,12 +337,6 @@ export default function AlleleQueryPage() {
                           {getChainDisplayName(result.chainType)}
                         </span>
                       </div>
-                      {/* Only show the internal ID if it is not the same as ASC or IG label */}
-                      {/* {result.id && result.id !== result.allele.asc && result.id !== result.allele.iglabel && (
-                        <div className="text-sm text-gray-500 font-mono">
-                          {result.id}
-                        </div>
-                      )} */}
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-4">
@@ -331,15 +367,19 @@ export default function AlleleQueryPage() {
                       <div>
                         <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sequence</h4>
                         <div className="bg-gray-50 dark:bg-gray-900 rounded p-3">
-                          <div className="text-xs text-gray-500 mb-1">Length: {result.allele.sequence?.length || 0} bp</div>
+                          <div className="text-xs text-gray-500 mb-1">
+                            Length: {result.allele.sequence?.length || 0} bp
+                          </div>
                           <div className="text-sm text-green-600 dark:text-green-400 font-mono break-all">
                             {result.allele.sequence || 'No sequence available'}
                           </div>
                         </div>
-                        {result.allele.anchor && (
+                        {result.allele.anchor !== undefined && (
                           <div className="mt-2">
                             <span className="text-xs text-gray-500">Anchor:</span>
-                            <span className="text-sm text-gray-900 dark:text-white ml-1">{result.allele.anchor}</span>
+                            <span className="text-sm text-gray-900 dark:text-white ml-1">
+                              {result.allele.anchor}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -351,7 +391,7 @@ export default function AlleleQueryPage() {
               <div className="text-center py-12">
                 <div className="text-gray-500 dark:text-gray-400 text-lg mb-2">Ready to search</div>
                 <div className="text-gray-400 dark:text-gray-500 text-sm">
-                  Enter a search query above to find alleles
+                  Enter a search query above to find alleles.
                 </div>
               </div>
             )}
@@ -361,4 +401,3 @@ export default function AlleleQueryPage() {
     </section>
   );
 }
-} 

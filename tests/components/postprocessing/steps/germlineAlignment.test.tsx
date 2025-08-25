@@ -1,9 +1,9 @@
-import { loadModel } from '@components/preprocessing/steps/modelLoader';
-import { BatchProcessor, ProcessingParams } from '@components/preprocessing/steps/batchProcessor';
-import { cleanAndArrangePredictions, CleanedPredictions } from '@components/postprocessing/steps/cleanAndArrange';
-import { correctSegmentsForPaddings } from '@components/postprocessing/steps/segmentCorrection';
-import { applyMaxLikelihoodThresholds } from '@components/postprocessing/steps/maxLikelihoodThreshold';
-import { AlleleAlignmentStep } from '@components/postprocessing/steps/germlineAlignment';
+import { loadModel } from '@/components/preprocessing/steps/modelLoader';
+import { BatchProcessor, ProcessingParams } from '@/components/preprocessing/steps/batchProcessor';
+import { cleanAndArrangePredictions, CleanedPredictions } from '@/components/postprocessing/steps/cleanAndArrange';
+import { correctSegmentsForPaddings } from '@/components/postprocessing/steps/segmentCorrection';
+import { applyMaxLikelihoodThresholds } from '@/components/postprocessing/steps/maxLikelihoodThreshold';
+import { AlleleAlignmentStep } from '@/components/postprocessing/steps/germlineAlignment';
 
 import express from 'express';
 import * as path from 'path';

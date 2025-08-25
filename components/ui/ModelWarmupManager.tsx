@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { ChainConfig, ModelWarmupOptions, ModelLoader } from '@components/model/utilities';
-import { logger } from '@components/utils/logger';
+import { ChainConfig, ModelWarmupOptions, ModelLoader } from '@/lib/model/utilities';
+import { logger } from '@/utils/logger';
 
 interface ModelWarmupManagerProps {
   chainConfigs: ChainConfig[];
@@ -37,7 +37,7 @@ export const ModelWarmupManager: React.FC<ModelWarmupManagerProps> = ({
     const totalModels = chainConfigs.length;
 
     try {
-      logger.log(`Starting warmup for ${totalModels} models...`);
+      logger.info(`Starting warmup for ${totalModels} models...`);
 
       for (let i = 0; i < chainConfigs.length; i++) {
         const config = chainConfigs[i];
@@ -62,7 +62,7 @@ export const ModelWarmupManager: React.FC<ModelWarmupManagerProps> = ({
             warmupTime
           });
           
-          logger.log(`${config.name} model warmed up in ${warmupTime.toFixed(2)}ms`);
+          logger.info(`${config.name} model warmed up in ${warmupTime.toFixed(2)}ms`);
           
           // Dispose the model to free memory (we're just warming up)
           modelLoader.dispose();
@@ -85,7 +85,7 @@ export const ModelWarmupManager: React.FC<ModelWarmupManagerProps> = ({
       onWarmupComplete?.(results);
       
       const successful = results.filter(r => r.success).length;
-      logger.log(`Warmup complete: ${successful}/${totalModels} models warmed up successfully`);
+      logger.info(`Warmup complete: ${successful}/${totalModels} models warmed up successfully`);
       
     } catch (error) {
       setWarmupStatus('error');

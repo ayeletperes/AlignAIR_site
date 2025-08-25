@@ -1,4 +1,4 @@
-import { fastaFileReader } from '@components/utilities/sequenceReaders';
+import { fastaFileReader } from '@/utils/preprocessing/sequenceReaders';
 
 test('reads and parses FASTA input correctly', () => {
   const input = `

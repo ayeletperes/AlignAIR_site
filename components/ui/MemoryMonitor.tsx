@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as tf from '@tensorflow/tfjs';
+import { MemoryOptimizer } from '@/utils/memoryOptimizer';
 
 interface MemoryMonitorProps {
   showDetailed?: boolean;
@@ -84,7 +85,20 @@ export const MemoryMonitor: React.FC<MemoryMonitorProps> = ({
         {/* Warning for high memory usage */}
         {isHighMemory && (
           <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-            <span className="text-yellow-800">⚠️ High memory usage detected</span>
+            <div className="flex items-center justify-between">
+              <span className="text-yellow-800">⚠️ High memory usage detected</span>
+              <button
+                onClick={() => MemoryOptimizer.performCleanup()}
+                className="text-xs px-2 py-1 bg-yellow-200 hover:bg-yellow-300 text-yellow-800 rounded transition-colors"
+              >
+                Cleanup
+              </button>
+            </div>
+            <div className="mt-1 text-xs text-yellow-700">
+              {MemoryOptimizer.getRecommendations().map((rec, index) => (
+                <div key={index}>• {rec}</div>
+              ))}
+            </div>
           </div>
         )}
       </div>

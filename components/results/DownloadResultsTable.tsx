@@ -1,7 +1,7 @@
 // components/results/DownloadResultsTable.tsx
 
 import React from 'react';
-import { formatLikelihoodArray } from '@components/results/utils/formatResults';
+import { formatLikelihoodArray } from '@/utils/results/formatResults';
 
 interface DownloadResultsTableProps {
   results: any;
@@ -39,12 +39,12 @@ const DownloadResultsTable: React.FC<DownloadResultsTableProps> = ({ results }) 
     
     const rows = Object.entries(results).map(([seqID, result]: [string, any]) => [
       result.sequence_id,
-      result.sequence,
-      result.productive,
+      result.sequence?.sequence,
+      result.productive==="true"?"True":"False",
       result.chain,
-      result.v_call?.join(', '),
-      result.d_call?.join(', '),
-      result.j_call?.join(', '),
+      typeof result.v_call === 'string' ? result.v_call : result.v_call?.join(','),
+      typeof result.d_call === 'string' ? result.d_call : result.d_call?.join(','),
+      typeof result.j_call === 'string' ? result.j_call : result.j_call?.join(','),
       result.v_sequence_start,
       result.v_sequence_end,
       result.d_sequence_start,

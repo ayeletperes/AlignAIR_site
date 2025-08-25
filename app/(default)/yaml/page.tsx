@@ -3,7 +3,7 @@ export const metadata = {
     description: 'AlignAIR yaml generator',
   }
   import Link from 'next/link'
-  import Yaml from '@components/helpers/generateYAML'
+  import Yaml from '@/lib/helpers/generateYAML'
 
   export default function YamlPage() {
     return (

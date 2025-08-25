@@ -1,11 +1,12 @@
 import { metadata } from './metadata';
-import './css/style.css'
+import './css/style.css';
 import { Inter, Architects_Daughter } from 'next/font/google'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { ThemeScript } from '@/components/ui/theme-provider'
 import ClientLayout from '@/components/layouts/ClientLayout'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 import DevNav from '@/components/ui/DevNav'
+import { env } from '@/config/env'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -26,33 +27,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${architects_daughter.variable}`}>
+    <html 
+      lang="en" 
+      className={`${inter.variable} ${architects_daughter.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <ThemeScript />
         <link rel="icon" href="/icon.ico" />
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
         <meta name="keywords" content={metadata.keywords.join(', ')} />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              // Prevent flash of wrong theme
-              (function() {
-                var theme = localStorage.getItem('theme') || 'dark';
-                document.documentElement.classList.add('preload');
-                if (theme === 'dark') {
-                  document.documentElement.classList.add('dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                }
-                // Remove preload class after a brief moment
-                setTimeout(function() {
-                  document.documentElement.classList.remove('preload');
-                }, 100);
-              })();
-            `,
-          }}
-        />
+        <script src="/onnx/ort.min.js"></script>
       </head>
       <body className="font-inter antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 tracking-tight transition-colors duration-300">
         <DevNav />
@@ -61,9 +47,10 @@ export default function RootLayout({
             {children}
           </ClientLayout>
         </ErrorBoundary>
-        <GoogleAnalytics gaId="G-W94F4SGX8B" />
+        {env.services.googleAnalytics.enabled && (
+          <GoogleAnalytics gaId={env.services.googleAnalytics.id} />
+        )}
       </body>
     </html>
   )
 }
- 

@@ -1,4 +1,4 @@
-import { validateSequence } from '@components/utilities/validateSequence';
+import { validateSequence } from '@/utils/preprocessing/validateSequence';
 
 test('validates a correct DNA sequence', () => {
   const input = 'ACTGACTGNNN';

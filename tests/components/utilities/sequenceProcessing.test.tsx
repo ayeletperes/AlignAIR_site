@@ -1,4 +1,4 @@
-import { tokenizeSingleSequence } from '@components/utilities/sequenceProcessor';
+import { tokenizeSingleSequence } from '@/utils/preprocessing/sequenceProcessor';
 import * as tf from '@tensorflow/tfjs';
 
 describe('tokenizeSingleSequence', () => {

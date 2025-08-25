@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatLikelihoodArray } from '@components/results/utils/formatResults';
+import { formatLikelihoodArray } from '@/utils/results/formatResults';
 
 interface ResultsHTMLTableProps {
   results: any;

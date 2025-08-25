@@ -1,4 +1,4 @@
-import { loadReferenceData } from '@components/reference/utilities';
+import { loadReferenceData } from '@/components/reference/utilities';
 
 describe('loadReferenceData', () => {
   test('should load reference data correctly for heavy and light chains', async () => {

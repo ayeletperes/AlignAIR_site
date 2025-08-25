@@ -1,6 +1,6 @@
-import { BatchProcessor, ProcessingParams } from '@components/preprocessing/steps/batchProcessor';
-import {inspectModel} from '@components/preprocessing/orientation/utilities'; 
-import { loadModel } from '@components/preprocessing/steps/modelLoader';
+import { BatchProcessor, ProcessingParams } from '@/components/preprocessing/steps/batchProcessor';
+import {inspectModel} from '@/components/preprocessing/orientation/utilities'; 
+import { loadModel } from '@/components/preprocessing/steps/modelLoader';
 import express from 'express';
 import * as path from 'path';
 import * as tf from '@tensorflow/tfjs-node'; 

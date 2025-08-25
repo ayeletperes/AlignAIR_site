@@ -1,7 +1,7 @@
-import { loadModel } from '@components/preprocessing/steps/modelLoader';
-import { BatchProcessor, ProcessingParams } from '@components/preprocessing/steps/batchProcessor';
-import { cleanAndArrangePredictions } from '@components/postprocessing/steps/cleanAndArrange';
-import { correctSegmentsForPaddings } from '@components/postprocessing/steps/segmentCorrection';
+import { loadModel } from '@/components/preprocessing/steps/modelLoader';
+import { BatchProcessor, ProcessingParams } from '@/components/preprocessing/steps/batchProcessor';
+import { cleanAndArrangePredictions } from '@/components/postprocessing/steps/cleanAndArrange';
+import { correctSegmentsForPaddings } from '@/components/postprocessing/steps/segmentCorrection';
 
 import express from 'express';
 import * as path from 'path';

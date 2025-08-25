@@ -4,9 +4,9 @@ tensorflow_convert.sh
 .src
 /.next/
 /.src/
-archive_components/
-archive_public/
+archive/
 app/\(auth\)
 app/api
 scripts/
-AlignAIR_site.code-workspace
+tsconfig.tsbuildinfo
+out/

@@ -1,5 +1,5 @@
-import { ModelLoader, ChainConfig } from '@components/model/utilities';
-import { getFilePath } from '@components/utilities/getFilePath';
+import { ModelLoader, ChainConfig } from '@/components/model/utilities';
+import { getFilePath } from '@/utils/preprocessing/getFilePath';
 import { spawn } from 'child_process';
 import * as tf from '@tensorflow/tfjs';
 

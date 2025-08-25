@@ -17,10 +17,11 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence,
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      processFile(file);
-      setFile(file);
+      // Clear any free-text sequence first, then set the file input in state
       setSequence('');
       setResults(null);
+      processFile(file);
+      setFile(file);
     }
   };
 
@@ -87,7 +88,7 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence,
     <>
       <div className="grid md:grid-cols-2 md:gap-6">
           <div className="relative z-0 w-full mb-5 group">
-            <label htmlFor="dropzone-file" className="block mb-2 text-base font-large text-white-900 dark:text-white">
+            <label htmlFor="file_input" className="block mb-2 text-base font-large text-white-900 dark:text-white">
               Or Enter a FASTA file
             </label>
             <p className="text-gray-500 text-xs dark:text-gray-400">
@@ -120,7 +121,12 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence,
           aria-describedby="file_input_help"
           id="file_input"
           type="file"
+          accept=".fasta,.fa,.txt"
+          aria-label="Upload FASTA file"
         />
+        <div id="file_input_help" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          Supported formats: FASTA (.fasta, .fa), Text (.txt). Maximum 1000 sequences.
+        </div>
       </div>
       <div ref={fileInfoRef} style={{ display: 'none' }}>
         File Name: {fileName}

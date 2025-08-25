@@ -3,13 +3,16 @@ import {
   ModelMetadata, 
   loadModelMetadata, 
   loadAllModelMetadata, 
+  loadDefaultModelMetadata,
   getModelsByChainType, 
   getActiveModels,
   getDefaultModelForChain,
   getModelById,
-  preloadModelMetadata
-} from '@components/model/modelMetadataLoader';
-import { logger } from '@components/utils/logger';
+  preloadModelMetadata,
+  preloadDefaultModelMetadata
+} from '@/lib/model/modelMetadataLoader';
+import { loadDefaultModel } from '@/lib/submission/alignmentSubmission';
+import { logger } from '@/utils/logger';
 
 interface UseModelMetadataOptions {
   preload?: boolean;
@@ -27,7 +30,10 @@ export function useModelMetadata(options: UseModelMetadataOptions = {}) {
       setError(null);
       const models = await loadAllModelMetadata();
       setAllModels(models);
-      logger.log(`Loaded ${models.length} model metadata files`);
+      // Only log in development mode
+      if (process.env.NODE_ENV === 'development') {
+        logger.info(`[ModelMetadata] Loaded ${models.length} model metadata files`);
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load model metadata';
       setError(errorMessage);
@@ -37,15 +43,50 @@ export function useModelMetadata(options: UseModelMetadataOptions = {}) {
     }
   }, []);
 
-  useEffect(() => {
-    loadModels();
-  }, [loadModels]);
+  const loadDefaultModels = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const models = await loadDefaultModelMetadata();
+      setAllModels(models);
+      // Only log in development mode
+      if (process.env.NODE_ENV === 'development') {
+        logger.info(`[ModelMetadata] Loaded ${models.length} default model metadata files`);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load default model metadata';
+      setError(errorMessage);
+      logger.error('Error loading default model metadata:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const loadDefaultIghModel = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      // Load only the default IGH model
+      await loadDefaultModel();
+      // Load metadata for display purposes
+      const ighModel = await loadModelMetadata('igh-v1.0');
+      setAllModels(ighModel ? [ighModel] : []);
+      if (process.env.NODE_ENV === 'development') {
+        logger.info('[ModelMetadata] Loaded default IGH model');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load default IGH model';
+      setError(errorMessage);
+      logger.error('Error loading default IGH model:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (options.preload) {
-      preloadModelMetadata();
-    }
-  }, [options.preload]);
+    // Load only the default IGH model by default for better performance
+    loadDefaultIghModel();
+  }, [loadDefaultIghModel]);
 
   const getModelsByChain = useCallback(async (chainType: string): Promise<ModelMetadata[]> => {
     return await getModelsByChainType(chainType);
@@ -60,8 +101,8 @@ export function useModelMetadata(options: UseModelMetadataOptions = {}) {
   }, []);
 
   const refresh = useCallback(() => {
-    loadModels();
-  }, [loadModels]);
+    loadDefaultIghModel();
+  }, [loadDefaultIghModel]);
 
   return {
     allModels,
@@ -70,7 +111,10 @@ export function useModelMetadata(options: UseModelMetadataOptions = {}) {
     getModelsByChain,
     getDefaultModel,
     getModel,
-    refresh
+    refresh,
+    loadDefaultModels,
+    loadDefaultIghModel,
+    loadAllModels: loadModels,
   };
 }
 

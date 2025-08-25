@@ -6,6 +6,7 @@ import MobileMenu from './mobile-menu'
 import ThemeToggle from './theme-toggle'
 import Image from 'next/image'
 import { useTheme } from './theme-provider';
+import { env } from '@/config/env';
 import LogoBW from '@/public/images/logo_alignair11bw.svg'
 import LogoWB from '@/public/images/logo_alignair11wb.svg'
 import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button} from "@nextui-org/react";
@@ -15,7 +16,7 @@ import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button} from "@ne
 export default function Header() {
   const context = useTheme();
   const theme = context?.theme || 'dark'; 
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  const isDevelopment = env.isDevelopment;
 
 
   return (
@@ -80,7 +81,7 @@ export default function Header() {
                   aria-label="Tools"
                   className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl min-w-[200px]"
                 >
-                  <DropdownItem key="web" className="text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-3">
+                  <DropdownItem key="web" textValue="AlignAIR Web" className="text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-3">
                     <Link href="/alignair" className="flex items-center w-full">
                       <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg mr-3">
                         <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +95,7 @@ export default function Header() {
                     </Link>
                   </DropdownItem>
                   
-                  <DropdownItem key="cli" className="text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-3">
+                  <DropdownItem key="cli" textValue="AlignAIR CLI" className="text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-3">
                     <Link href="/cli" className="flex items-center w-full">
                       <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg mr-3">
                         <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,7 +109,7 @@ export default function Header() {
                     </Link>
                   </DropdownItem>
                   
-                  <DropdownItem key="yaml" className="text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-3">
+                  <DropdownItem key="yaml" textValue="YAML Generator" className="text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-3">
                     <Link href="/yaml" className="flex items-center w-full">
                       <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg mr-3">
                         <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,8 +123,7 @@ export default function Header() {
                     </Link>
                   </DropdownItem>
                   
-                  {isDevelopment && (
-                    <DropdownItem key="allele-query" className="text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-3">
+                  <DropdownItem key="allele-query" textValue="Allele Query" className="text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-3">
                       <Link href="/tools/allele-query" className="flex items-center w-full">
                       <div className="p-2 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg mr-3">
                         <svg className="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +136,6 @@ export default function Header() {
                       </div>
                     </Link>
                   </DropdownItem>
-                  )}
                 </DropdownMenu>
               </Dropdown>
             </div>
@@ -156,7 +155,7 @@ export default function Header() {
               <ThemeToggle />
               
               <Link
-                href="https://github.com/MuteJester/AlignAIR"
+                href={env.services.github.repo}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"

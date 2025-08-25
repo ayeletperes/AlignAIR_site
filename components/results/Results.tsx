@@ -1,11 +1,10 @@
 // components/results/Results.tsx
 
 import React, { memo } from 'react';
-import TabSetResults from '@components/results/TabSetResults';
-import DownloadResultsTable from '@components/results/DownloadResultsTable';
-import { parseResults } from '@components/results/utils/parseResults';
-import { LoadingSpinner } from '@components/ui/LoadingSpinner';
-import { logger } from '@components/utils/logger';
+import TabSetResults from '@/components/results/TabSetResults';
+import DownloadResultsTable from '@/components/results/DownloadResultsTable';
+import { parseResults } from '@/utils/results/parseResults';
+import { logger } from '@/utils/logger';
 
 interface ResultsProps {
   results: any;
@@ -42,24 +41,12 @@ const arePropsEqual = (prevProps: ResultsProps, nextProps: ResultsProps) => {
     return prevResultsString === nextResultsString;
   } catch (error) {
     // If JSON.stringify fails, assume they're different
-    logger.warn('Failed to compare results props:', error);
+    logger.error('Failed to compare results props:', error);
     return false;
   }
 };
 
 const Results: React.FC<ResultsProps> = memo(({ results, selectedChain, isLoading = false }) => {
-  // Early return for loading state
-  // if (isLoading) {
-  //   return (
-  //     <section className="min-h-[400px] flex items-center justify-center">
-  //       <LoadingSpinner 
-  //         size="lg" 
-  //         text="Processing results..." 
-  //         className="flex-col"
-  //       />
-  //     </section>
-  //   );
-  // }
 
   // Early return for no results
   if (!results) {
@@ -97,8 +84,8 @@ const Results: React.FC<ResultsProps> = memo(({ results, selectedChain, isLoadin
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
               <TabSetResults 
                 results={parsedResults} 
-                referenceAlleles={results.referenceMap} 
-                chain={selectedChain}
+                referenceLoader={results['referenceLoader']} 
+                chain={selectedChain as 'heavy' | 'light' | 'trb'}
               />
             </div>
           </div>

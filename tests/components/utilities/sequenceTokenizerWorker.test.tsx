@@ -1,5 +1,5 @@
-import { ModelLoader, ChainConfig } from '@components/preprocessing/steps/modelLoader';
-import { sequenceTokenizerWorker } from '@components/utilities/sequenceTokenizerWorker';
+import { ModelLoader, ChainConfig } from '@/components/preprocessing/steps/modelLoader';
+import { sequenceTokenizerWorker } from '@/utils/preprocessing/sequenceTokenizerWorker';
 import express from 'express';
 import path from 'path';
 import * as tf from '@tensorflow/tfjs';

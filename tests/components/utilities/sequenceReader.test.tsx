@@ -1,4 +1,4 @@
-import { sequenceReader } from '@components/utilities/sequenceReaders';
+import { sequenceReader } from '@/utils/preprocessing/sequenceReaders';
 
 test('reads a plain sequence input and assigns default ID', () => {
   const input = 'ACTGACTGNNN';
@@ -13,7 +13,7 @@ ACTG
 GGTT
 `.trim();
   const result = sequenceReader(input);
-  expect(result).toEqual([{ id: 'seq1', sequence: 'ACTGGGTT' }]);
+  expect(result).toEqual([{ id: 'SEQ1', sequence: 'ACTGGGTT' }]);
 });
 
 test('reads a FASTA-like sequence input without ID and assigns default ID', () => {

@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "target": "ES2020",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "typeRoots": ["./node_modules/@types", "./types"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -16,30 +12,38 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",          // ← change from "node"
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "jsxImportSource": "react",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "baseUrl": ".", // Base directory to resolve non-absolute module names
+    "plugins": [{ "name": "next" }],
+    "baseUrl": ".",
     "paths": {
-      "@components/*": ["components/*"], // Alias for components
-      "@utilities/*": ["components/utilities/*"], // Alias for utilities
-      "@/*": ["./*"] // Existing catch-all alias
+      "@components/*": ["components/*"],
+      "@utilities/*": ["components/utilities/*"],
+      "@/config/*": ["config/*"],
+      "@/types/*": ["types/*"],
+      "@/utils/*": ["utils/*"],
+      "@/contexts/*": ["contexts/*"],
+      "@/hooks/*": ["hooks/*"],
+      "@/tests/*": ["tests/*"],
+      "@/*": ["./*"]
     }
   },
   "include": [
     "next-env.d.ts",
+    "globals.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-, "tests/components/utilities/sequenceTokenizerWorker.test.tsx", "app/(default)/alignair/.archive_page"  ],
+  ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "archive/**/*",
+    "tests/**/*",
+    "app/(default)/alignair/.archive_page",
+    "tests/components/utilities/sequenceTokenizerWorker.test.tsx"
   ]
 }

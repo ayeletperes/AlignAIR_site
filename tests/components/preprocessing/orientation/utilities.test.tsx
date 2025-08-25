@@ -1,5 +1,5 @@
-import { runModel, inspectModel, fixOrientation } from '@components/preprocessing/orientation/utilities';
-import { getFilePath } from '@components/utilities/getFilePath';
+import { runModel, inspectModel, fixOrientation } from '@/components/preprocessing/orientation/utilities';
+import { getFilePath } from '@/utils/preprocessing/getFilePath';
 import * as onnx from 'onnxruntime-web';
 
 

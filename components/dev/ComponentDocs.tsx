@@ -119,7 +119,7 @@ export const componentDocs: ComponentDoc[] = [
   // Form Components
   {
     name: 'AlignmentForm',
-    path: 'components/form/form.tsx',
+    path: 'components/alignair/AlignmentForm.tsx',
     description: 'Main form component for sequence input and parameter configuration',
     category: 'form',
     complexity: 'complex',

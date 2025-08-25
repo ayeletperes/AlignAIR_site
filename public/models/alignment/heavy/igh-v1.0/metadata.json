@@ -1,0 +1,33 @@
+{
+    "id": "igh-v1.0",
+    "name": "IGH Heavy Chain",
+    "version": "v1.0",
+    "chainType": "heavy",
+    "species": "Human",
+    "hasD": true,
+    "multiChain": false,
+    "referenceSet": "OGRDB V8",
+    "lastUpdated": "February 2025",
+    "description": "Immunoglobulin Heavy Chain model trained on S5F mutation patterns",
+    "features": ["V/D/J segmentation", "Allele calling", "Mutation prediction", "Productivity assessment"],
+    "documentationUrl": "/models",
+    "modelPath": "/models/alignment/heavy/igh-v1.0/model.json",
+    "checkpoint": "/app/pretrained_models/IGH_S5F_576", 
+    "orientationModelPath": "/models/orientation/heavychain_ornt_pipeline.onnx",
+    "referencePath": "/dataconfig/HUMAN_IGH_OGRDB.json",
+    "isActive": true,
+    "outputNodes": {
+        "Identity": "productive",
+        "Identity_1": "v_allele",
+        "Identity_2": "indel_count",
+        "Identity_3": "d_sequence_start",
+        "Identity_4": "j_sequence_start",
+        "Identity_5": "d_sequence_end",
+        "Identity_6": "d_allele",
+        "Identity_7": "v_sequence_start",
+        "Identity_8": "v_sequence_end",
+        "Identity_9": "j_allele",
+        "Identity_10": "mutation_rate",
+        "Identity_11": "j_sequence_end"
+    }
+}

@@ -1,18 +1,17 @@
 "use client";
 
-import React, { useRef } from 'react';
+import React from 'react';
 
 interface SequenceInputProps {
   selectedChain: string;
-  setSequence: React.Dispatch<React.SetStateAction<string>>;
+  setSequence: (sequence: string) => void;
   sequence: string;
   isDisabled?: boolean;
-  setFile: React.Dispatch<React.SetStateAction<File | null>>;
-  setResults: React.Dispatch<React.SetStateAction<any>>;
+  setFile: (file: File | null) => void;
+  setResults: (results: any) => void;
 }
 
 const SequenceInput: React.FC<SequenceInputProps> = ({ selectedChain, setSequence, sequence, isDisabled, setFile, setResults }) => {
-  const sequenceInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const exampleSequences: Record<string, string> = {
     heavy: "CAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCTCCGGGGACCCTGTCCCTCACCTGCGCTGTCTCTGGTGGCTCCATCAGCAGTAGTAACTGGTGGAGTTGGGTCCGCCAGCCCCCAGGGAAGGGGCTGGAGTGGATTGGGGAAATCTATCATAGTCGGAGCACCAACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACAAGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGCACACCTCCGGGTGTATTACTATGGTTCGGGGAGTTATTAGGCCCGATTTGGGTGGTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCAG",
@@ -21,9 +20,8 @@ const SequenceInput: React.FC<SequenceInputProps> = ({ selectedChain, setSequenc
   };
 
   const handleExample = () => {
-    if (selectedChain && sequenceInputRef.current) {
+    if (selectedChain) {
       const example = exampleSequences[selectedChain.toLowerCase()];
-      sequenceInputRef.current.value = example || '';
       setSequence(example || '');
       setFile(null);
       setResults(null);
@@ -31,9 +29,6 @@ const SequenceInput: React.FC<SequenceInputProps> = ({ selectedChain, setSequenc
   };
 
   const clearSequence = () => {
-    if (sequenceInputRef.current) {
-      sequenceInputRef.current.value = '';
-    }
     setSequence('');
     setResults(null);
   };
@@ -46,6 +41,13 @@ const SequenceInput: React.FC<SequenceInputProps> = ({ selectedChain, setSequenc
       window.alert('Invalid characters in sequence. Please use only A, C, G, T, or N.');
     } else {
       setSequence(sanitizedInput);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Prevent form submission on Enter key
+    if (e.key === 'Enter') {
+      e.preventDefault();
     }
   };
 
@@ -90,12 +92,16 @@ const SequenceInput: React.FC<SequenceInputProps> = ({ selectedChain, setSequenc
           className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-purple-600 focus:border-purple-600 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-600 dark:focus:border-purple-600"
           rows={4}
           id="sequenceInput"
-          ref={sequenceInputRef}
           value={sequence}
           onChange={(e) => validateSequence(e.target.value)}
+          onKeyDown={handleKeyDown}
           disabled={isDisabled}
           placeholder="Enter your sequence here..."
+          aria-describedby="sequence-help"
         />
+        <div id="sequence-help" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          Enter DNA sequence using only A, C, G, T, or N characters
+        </div>
       </div>
     </>
   );

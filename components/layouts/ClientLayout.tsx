@@ -5,6 +5,7 @@ import Header from '@/components/ui/header'
 import Banner from '@/components/ui/banner'
 import { ThemeProvider } from '@/components/ui/theme-provider'
 import DevNav from '@/components/ui/DevNav'
+import { env } from '@/config/env'
 
 interface ClientLayoutProps {
   children: React.ReactNode;
@@ -26,7 +27,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
       ) : (
         // Regular pages: include header, dev nav, and banner
         <div className="flex flex-col min-h-screen overflow-hidden">
-          {/* <DevNav /> */}
+          {/* {env.features.devNav && <DevNav />} */}
           <Header />
           {children}
           {/* <Banner /> */}

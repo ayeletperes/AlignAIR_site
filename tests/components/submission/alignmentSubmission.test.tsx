@@ -1,4 +1,4 @@
-import {submitAlignmentRequest} from '@components/submission/alignmentSubmission';
+import {submitAlignmentRequest} from '@/components/submission/alignmentSubmission';
 
 import express from 'express';
 import * as path from 'path';

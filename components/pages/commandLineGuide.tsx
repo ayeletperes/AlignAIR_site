@@ -1,13 +1,13 @@
 "use client";
 import { useState } from 'react';
-import { logger } from '@components/utils/logger';
+import { logger } from '@/utils/logger';
 
 export default function Guide() {
 
     const [expandedSections, setExpandedSections] = useState(Array(17).fill(false));
 
     const toggleSection = (index: number) => {
-        logger.log('index', index);
+        logger.info('index', index);
         const updatedSections = [...expandedSections];
         updatedSections[index] = !updatedSections[index];
         setExpandedSections(updatedSections);

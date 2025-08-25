@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { logger } from '@components/utils/logger';
+import { logger } from '@/utils/logger';
 import { componentDocs, getComponentsByCategory, getComplexityStats, getStatusStats } from '@/components/dev/ComponentDocs';
 import { MODEL_DEVELOPMENT_GUIDE, MODEL_DEVELOPMENT_CHECKLIST, COMMON_PITFALLS } from '@/components/dev/ModelDevelopmentGuide';
 
@@ -276,10 +276,10 @@ const DevDocs = () => {
                 Use the logger utility for performance monitoring:
               </p>
               <pre className="text-xs bg-gray-900 p-3 rounded overflow-x-auto text-green-400">
-{`import { logger } from '@components/utils/logger';
+{`import { logger } from '@/utils/logger';
 
 // Performance logging
-logger.log('Model loading started');
+logger.info('Model loading started');
 logger.warn('Memory usage high');
 logger.error('Model inference failed');`}
               </pre>
@@ -369,7 +369,7 @@ npm start`}
                 <p className="text-sm text-gray-300 mb-2">Check model file paths and metadata format</p>
                 <pre className="text-xs bg-gray-900 p-2 rounded text-red-400">
 {`// Verify model paths in modelConfig.ts
-modelPath: '/models/alignment/alignair_heavy/model.json'`}
+modelPath: '/models/alignment/heavy/igh-v1.0/model.json'`}
                 </pre>
               </div>
               

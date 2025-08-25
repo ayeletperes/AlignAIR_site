@@ -107,7 +107,9 @@
     height: 116px;
     background: #f1f5f9;
     border-radius: 8px;
-    padding: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
     transition: all 0.2s ease;
 }
 
@@ -206,7 +208,7 @@
     font-family: 'JetBrains Mono', 'SF Mono', monospace;
     border: 1px solid transparent;
     position: relative;
-    cursor: help;
+    cursor: default;
 }
 
 .alignment-char:hover {
@@ -233,7 +235,7 @@
     font-family: 'JetBrains Mono', 'SF Mono', monospace;
     box-shadow: 0 2px 4px rgba(238, 90, 82, 0.3);
     position: relative;
-    cursor: help;
+    cursor: default;
 }
 
 .alignment-mismatch:hover {
@@ -276,7 +278,7 @@
     font-family: 'JetBrains Mono', 'SF Mono', monospace;
     border: 1px solid #e2e8f0;
     position: relative;
-    cursor: help;
+    cursor: default;
 }
 
 .alignment-np:hover {
@@ -309,7 +311,7 @@
     color: white;
     border-radius: 2px;
     transition: all 0.15s ease;
-    cursor: help;
+    cursor: default;
     position: relative;
 }
 
@@ -318,7 +320,8 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Tooltip Styles */
+/* Tooltip Styles - Disabled */
+/*
 .alignment-char:hover::after,
 .alignment-mismatch:hover::after,
 .alignment-np:hover::after,
@@ -357,6 +360,7 @@
     opacity: 0;
     animation: tooltipFadeIn 0.2s ease-out 0.5s forwards;
 }
+*/
 
 @keyframes tooltipFadeIn {
     from {
