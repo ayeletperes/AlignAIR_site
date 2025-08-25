@@ -19,8 +19,8 @@
   ],
   "license": "SEE LICENSE IN LICENSE.txt",
   "scripts": {
-    "predev": "node scripts/copy-onnx-assets.js",
-    "prebuild": "node scripts/copy-onnx-assets.js",
+    "predev": "node scripts/copy-onnx-assets.js && node scripts/generate-model-metadata.js",
+    "prebuild": "node scripts/copy-onnx-assets.js && node scripts/generate-model-metadata.js",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
