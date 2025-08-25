@@ -37,9 +37,10 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
-, "tests/components/utilities/sequenceTokenizerWorker.test.tsx", "app/(default)/alignair/.archive_page"  ],
+    ".next/types/**/*.ts" ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "app/(default)/alignair/.archive_page",
+    "tests/components/utilities/sequenceTokenizerWorker.test.tsx" 
   ]
 }
