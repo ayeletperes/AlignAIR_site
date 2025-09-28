@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(rmdir:*)",
+      "Bash(mkdir:*)",
+      "Bash(find:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm install:*)",
+      "Bash(npm test)",
+      "Bash(rm:*)",
+      "Bash(grep:*)",
+      "Bash(npm run lint)",
+      "Bash(node:*)"
+    ],
+    "deny": [],
+    "defaultMode": "acceptEdits"
+  }
+}

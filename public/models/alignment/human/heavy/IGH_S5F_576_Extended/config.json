@@ -1,0 +1,21 @@
+{
+  "alignairr_version": "unknown",
+  "chain_types": null,
+  "created_utc": "2025-09-22T05:59:07.259944Z",
+  "d_allele_count": 38,
+  "d_allele_latent_size": null,
+  "extra": null,
+  "format_version": 1,
+  "git_commit": null,
+  "has_d_gene": true,
+  "j_allele_count": 10,
+  "j_allele_latent_size": null,
+  "max_seq_length": 576,
+  "model_type": "single_chain",
+  "notes": null,
+  "number_of_chains": null,
+  "python_version": "3.11.13",
+  "tf_version": "2.17.1",
+  "v_allele_count": 342,
+  "v_allele_latent_size": null
+}

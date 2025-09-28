@@ -1,0 +1,32 @@
+{
+    "id": "IGL_S5F_576_OGRDB",
+    "name": "IGL/IGK Light Chain OGRDB",
+    "version": "v1.0",
+    "chainType": "light",
+    "species": "Human",
+    "hasD": false,
+    "multiChain": false,
+    "referenceSet": "OGRDB V2 & V3 extended",
+    "lastUpdated": "March 2025",
+    "description": "Immunoglobulin Lambda Light Chain model with enhanced V/J prediction",
+    "features": ["V/J segmentation", "Allele calling", "Mutation prediction", "Productivity assessment"],
+    "documentationUrl": "/models",
+    "modelPath": "/models/alignment/human/light/IGL_S5F_576_OGRDB/model.json",
+    "checkpoint": "legacy",
+    "dataconfigPython": "legacy",
+    "orientationModelPath": "/models/orientation/human/lightchain_ornt_pipeline.onnx",
+    "referencePath": "/dataconfig/HUMAN_IGK_OGRDB.json,/dataconfig/HUMAN_IGL_OGRDB.json",
+    "isActive": true,
+    "outputNodes": {
+        "Identity": "j_sequence_end",
+        "Identity_1": "chain_type",
+        "Identity_2": "v_allele",
+        "Identity_3": "v_sequence_end",
+        "Identity_4": "productive",
+        "Identity_5": "j_allele",
+        "Identity_6": "j_sequence_start",
+        "Identity_7": "mutation_rate",
+        "Identity_8": "v_sequence_start",
+        "Identity_9": "indel_count"
+    }
+}
