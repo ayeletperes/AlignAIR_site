@@ -2,6 +2,18 @@ import React from 'react';
 import { getModelById } from '@/lib/model/modelMetadataLoader';
 import { notFound } from 'next/navigation';
 
+export async function generateStaticParams() {
+  // Return an array of all model IDs you want to statically generate
+  return [
+    { modelId: 'IGH_S5F_576' },
+    { modelId: 'IGH_S5F_576_Extended' },
+    { modelId: 'IGL_S5F_576' },
+    { modelId: 'IGL_S5F_576_OGRDB' },
+    { modelId: 'TCRB_UNIFORM_576' },
+    { modelId: 'IGH_AlignAIR_RHESUS_MACAQUE' },
+  ];
+}
+
 interface ModelDocPageProps {
   params: {
     modelId: string;
