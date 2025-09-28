@@ -1,8 +1,10 @@
+const isPages = process.env.GITHUB_PAGES === 'true';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // output: "export",  // <=== enables static exports
+    output: isPages ? 'export' : undefined,
     reactStrictMode: false,
-    
+    images: { unoptimized: isPages },
     // Add headers for cross-origin isolation to enable SharedArrayBuffer
     async headers() {
       return [
