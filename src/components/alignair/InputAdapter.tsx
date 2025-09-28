@@ -6,6 +6,9 @@
 import React from 'react';
 import { useFormState } from '@/hooks/useFormState';
 import { useResultsState } from '@/hooks/useResultsState';
+import { useAlignment } from '@/contexts/AlignmentContext';
+import { Species } from '@/config/species/config';
+import { ParsedRecord } from '@/utils/preprocessing/sequenceParse';
 
 // Import old input components
 import FileInput from '@/components/inputs/fileInput';
@@ -18,16 +21,18 @@ interface InputAdapterProps {
   setSelectedModelId?: (modelId: string) => void;
 }
 
-export function InputAdapter({ 
-  selectedChain, 
-  selectedModelId, 
-  setSelectedModelId 
+export function InputAdapter({
+  selectedChain,
+  selectedModelId,
+  setSelectedModelId
 }: InputAdapterProps) {
   const {
     input,
     params,
+    selectedSpecies,
     setInput,
     setChain,
+    setSpecies,
     setParams,
     getFile,
     getSequence,
@@ -36,10 +41,12 @@ export function InputAdapter({
   } = useFormState();
 
   const { clearResults } = useResultsState();
+  const { actions } = useAlignment();
 
   // Convert new state format to old component props
   const file = getFile();
-  const sequence = getSequence();
+  const sequenceString = getSequence();
+  const sequence: ParsedRecord[] = sequenceString ? sequenceString as ParsedRecord[] : [];
 
   // Handlers that bridge new state management with old component interface
   const readFileAsText = (file: File): Promise<string> => {
@@ -73,16 +80,24 @@ export function InputAdapter({
     clearResults();
   };
 
-  const handleSetSequence = (newSequence: string) => {
-    if (newSequence) {
+  const handleSetSequence = (newSequence: ParsedRecord[]) => {
+    if (newSequence.length > 0) {
+      const content = newSequence;
       setInput({
         type: 'sequence',
-        content: newSequence,
+        content,
         name: 'User Input'
       });
     } else {
       setInput(null);
+      // Clear processing errors when clearing sequence
+      actions.resetProcessing();
     }
+    clearResults();
+  };
+
+  const handleSetSelectedSpecies = (species: Species) => {
+    setSpecies(species);
     clearResults();
   };
 
@@ -105,17 +120,18 @@ export function InputAdapter({
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6">
-      <SequenceInput 
-        selectedChain={selectedChain} 
-        setSequence={handleSetSequence} 
+      <SequenceInput
+        selectedChain={selectedChain}
+        selectedSpecies={selectedSpecies}
+        setSequence={handleSetSequence}
         sequence={sequence}
         isDisabled={file != null}
-        setFile={handleSetFile} 
+        setFile={handleSetFile}
         setResults={handleSetResults}
       />
       <FileInput 
         setFile={handleSetFile} 
-        isDisabled={sequence !== ''} 
+        isDisabled={sequence.length > 0} 
         setSequence={handleSetSequence} 
         fileInfoRef={fileInfoRef} 
         setResults={handleSetResults}
@@ -124,11 +140,13 @@ export function InputAdapter({
       <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-8">
         <h4 className="text-4xl font-extrabold dark:text-white">Alignment Parameters</h4>
         <div>
-          <ParamInput 
-            params={params} 
-            setParams={handleSetParams} 
-            isDisabled={selectedChain === 'light'} 
-            setSelectedChain={handleSetSelectedChain} 
+          <ParamInput
+            params={params}
+            setParams={handleSetParams}
+            isDisabled={selectedChain === 'light'}
+            selectedSpecies={selectedSpecies}
+            setSelectedSpecies={handleSetSelectedSpecies}
+            setSelectedChain={handleSetSelectedChain}
             selectedChain={selectedChain}
             selectedModelId={selectedModelId}
             setSelectedModelId={setSelectedModelId}

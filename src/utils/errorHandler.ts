@@ -331,6 +331,13 @@ export class ErrorHandler {
   static getTechnicalDetails(error: AlignmentError): string | undefined {
     return error.technicalDetails;
   }
+
+  // Clear processing errors
+  static clearProcessingError(): void {
+    // This is a placeholder for clearing processing errors
+    // The actual clearing is handled by the context's resetProcessing action
+    logger.info('[ErrorHandler] Processing errors cleared');
+  }
 }
 
 /**

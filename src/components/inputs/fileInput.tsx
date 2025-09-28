@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react';
 import Link from 'next/link'
+import { ParsedRecord } from '@/utils/preprocessing/sequenceParse';
 
 interface FileInputProps {
   setFile: React.Dispatch<React.SetStateAction<File | null>>;
-  setSequence: React.Dispatch<React.SetStateAction<string>>;
+  setSequence: React.Dispatch<React.SetStateAction<ParsedRecord[]>>;
   isDisabled?: boolean;
   fileInfoRef: React.RefObject<HTMLDivElement>;
   setResults: React.Dispatch<React.SetStateAction<any>>;
@@ -18,7 +19,7 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence,
     const file = event.target.files?.[0];
     if (file) {
       // Clear any free-text sequence first, then set the file input in state
-      setSequence('');
+      setSequence([]);
       setResults(null);
       processFile(file);
       setFile(file);

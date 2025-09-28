@@ -1,39 +1,58 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback, useImperativeHandle, forwardRef } from "react";
 import {
+  ParsedRecord,
   parseInput,
   toFasta,
   type ParseReport,
 } from "@/utils/preprocessing/sequenceParse";
-
+import { Species } from '@/config/species/config';
+import { ErrorHandler } from '@/utils/errorHandler';
+import { useAlignment } from '@/contexts/AlignmentContext';
 
 interface SequenceInputProps {
   selectedChain: string;
-  setSequence: (sequence: string | string[]) => void; // accepts string or string[]
-  sequence: string | string[];                         // can be string or string[]
+  selectedSpecies?: Species;
+  setSequence: (sequence: ParsedRecord[]) => void; // accepts string or string[]
+  sequence: ParsedRecord[];                         // can be string or string[]
   isDisabled?: boolean;
   setFile: (file: File | null) => void;
   setResults: (results: any) => void;
 }
 
-const exampleSequences: Record<string, string> = {
-  heavy:
-    ">seq1\nCAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCTCCGGGGACCCTGTCCCTCACCTGCGCTGTCTCTGGTGGCTCCATCAGCAGTAGTAACTGGTGGAGTTGGGTCCGCCAGCCCCCAGGGAAGGGGCTGGAGTGGATTGGGGAAATCTATCATAGTCGGAGCACCAACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACAAGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGCACACCTCCGGGTGTATTACTATGGTTCGGGGAGTTATTAGGCCCGATTTGGGTGGTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCAG\n>seq2\nCAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCTCCGGGGACCCTGTCCCTCACCTGCGCTGTCTCTGGTGGCTCCATCAGCAGTAGTAACTGGTGGAGTTGGGTCCGCCAGCCCCCAGGGAAGGGGCTGGAGTGGATTGGGGAAATCTATCATAGTCGGAGCACCAACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACAAGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGCACACCTCCGGGTGTATTACTATGGTTCGGGGAGTTATTAGGCCCGATTTGGGTGGTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCAG",
-  light:
-    ">IGL_Example\nCAGCCTGTGCTGACTCAATCATCCTCTGCCTCTGCTTCCCTGGGATCCTCGGTCAAGCTCACCTGCACTCTGAGCAGTGGGCACAGTAGCTACATCATCGCATGGCATCAACAGCAGCCAGGGAAGGCCCCTCGGTACTTGATGAAGCTTGAAGGTAGTGGAAGCTACAACAAGGGGAGCGGAGTTCCTGATCGCTTCTCAGGCTCCAGCT ",
-  trb:
-    ">TRB_Example\nGAAGCTGGAGTGGTTCAGTCTCCCAGATATAAGATTATAGAGAAAAAGCAGCCTGTGGCTTTTTGGTGCAATCCTATTTCTGGACACAATACCCTTTACTGGTACCGGCAGAACTTGGGACAGGGCCCGGAGCTTCTGATTCGATATGAGAATGAGGAAGCAGTAGACGATTCACAGTTGCCTAAGGATCGATTTTCTGCAGAGAGGCTCAAAGGAGTAGGCTCCACTCTCAAGATCCAGCCTGCAGAGCTTGGGGACTCGGCCGNGTATCTCTGTGCCAGCNACCCTGACGGGGGGGATACCTTCGGTTCGGGGACCAGGTTANCCGTTGTAG",
+export interface SequenceInputRef {
+  parseSequences: () => string[] | null;
+}
+
+// Species and chain-specific example sequences
+const exampleSequences: Record<Species, Record<string, string>> = {
+  human: {
+    heavy:
+      ">Human_IGH_Example\nCAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCTCCGGGGACCCTGTCCCTCACCTGCGCTGTCTCTGGTGGCTCCATCAGCAGTAGTAACTGGTGGAGTTGGGTCCGCCAGCCCCCAGGGAAGGGGCTGGAGTGGATTGGGGAAATCTATCATAGTCGGAGCACCAACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACAAGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGCACACCTCCGGGTGTATTACTATGGTTCGGGGAGTTATTAGGCCCGATTTGGGTGGTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCAG",
+    light:
+      ">Human_IGL_Example\nCAGCCTGTGCTGACTCAATCATCCTCTGCCTCTGCTTCCCTGGGATCCTCGGTCAAGCTCACCTGCACTCTGAGCAGTGGGCACAGTAGCTACATCATCGCATGGCATCAACAGCAGCCAGGGAAGGCCCCTCGGTACTTGATGAAGCTTGAAGGTAGTGGAAGCTACAACAAGGGGAGCGGAGTTCCTGATCGCTTCTCAGGCTCCAGCTCTGGGGCTGACTGCTACCTCACCATCTCCAACCTCCAGTCTGAGGATGAGGCTGATTATTACTGTGAGACCTGGGACAGTAACACTCGGGTATTCGGCGGAGGGACCAAGCTGACCGTCCTAG",
+    trb:
+      ">Human_TRB_Example\nGAAGCTGGAGTGGTTCAGTCTCCCAGATATAAGATTATAGAGAAAAAGCAGCCTGTGGCTTTTTGGTGCAATCCTATTTCTGGACACAATACCCTTTACTGGTACCGGCAGAACTTGGGACAGGGCCCGGAGCTTCTGATTCGATATGAGAATGAGGAAGCAGTAGACGATTCACAGTTGCCTAAGGATCGATTTTCTGCAGAGAGGCTCAAAGGAGTAGGCTCCACTCTCAAGATCCAGCCTGCAGAGCTTGGGGACTCGGCCGNGTATCTCTGTGCCAGCNACCCTGACGGGGGGGATACCTTCGGTTCGGGGACCAGGTTANCCGTTGTAG",
+  },
+  rhesus_macaque: {
+    heavy:
+      ">RhesusMacaque_IGH_Example\nCAGGTGCAGCTACAGGAGTCGGGCCCAGGACTGGTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTCTGGTGGCTCCTTCAGCAGTTACTGGTGGAGCTGGATCCGCCAGCCCCCAGGGAAGGGACTGGAGTGGATTGGGGAGATCAATGGTAATAGTGGGAGCACCAACTACAACCCCTCCCTCAAGAGTCGAGTCACCATTTCAAAAGACGCGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCGGACACGGCCGTGTATTACTGTGCGAGAATCCTGGACAATGACAAGAGTAGAGAGTTACGTCCCAGGGGTCCGGACAACTCATTGGATGTCTGGGGCCGGGGAGTTCTGGTCACCATCTCCTCAGGCTTCCACCAAGGGCCCATCGGTCTTCCCCCTGGCGCCCT"
+  }
 };
 
-const SequenceInput: React.FC<SequenceInputProps> = ({
+const SequenceInput = forwardRef<SequenceInputRef, SequenceInputProps>(({
   selectedChain,
+  selectedSpecies = 'human',
   setSequence,
   sequence,
   isDisabled,
   setFile,
   setResults,
-}) => {
+}, ref) => {
   // Local textarea text, always a string
   const [text, setText] = useState<string>("");
+  
+  // Get context actions to clear processing errors
+  const { actions } = useAlignment();
 
   // Sync prop to textarea
   useEffect(() => {
@@ -45,6 +64,7 @@ const SequenceInput: React.FC<SequenceInputProps> = ({
       setText("");
     }
   }, [sequence]);
+
 
   const [report, setReport] = useState<ParseReport>({
     records: [],
@@ -62,24 +82,32 @@ const SequenceInput: React.FC<SequenceInputProps> = ({
   );
 
   const handleExample = () => {
-    if (!selectedChain) return;
-    const example = exampleSequences[selectedChain.toLowerCase()] || "";
+    if (!selectedChain || !selectedSpecies) return;
+    const speciesExamples = exampleSequences[selectedSpecies];
+    const example = speciesExamples?.[selectedChain.toLowerCase()] || "";
+
+    // If no example for this species/chain combo, show a helpful message
+    if (!example) {
+      const chainName = selectedChain === 'heavy' ? 'Heavy Chain' :
+                        selectedChain === 'light' ? 'Light Chain' :
+                        selectedChain === 'trb' ? 'T-Cell Receptor Beta' : selectedChain;
+      const speciesName = selectedSpecies === 'human' ? 'Human' : 'Rhesus Macaque';
+      const message = `No example sequence available for ${speciesName} ${chainName}`;
+      setReport({ records: [], errors: [message], warnings: [] });
+      return;
+    }
+
     setText(example);
 
     try {
-      const rep = parseInput(example);
+      const rep = parseInput(example, { tolerant: true });
       setReport(rep);
       setFile(null);
       setResults(null);
-      if (rep.errors.length === 0 && rep.records.length > 0) {
-        const seqs = rep.records.map(r => r.sequence);
-        setSequence(seqs.length === 1 ? seqs[0] : seqs);
-      } else {
-        setSequence(example);
-      }
+      setSequence(rep.records);
     } catch (e) {
       setReport({ records: [], errors: ["Failed to parse example."], warnings: [] });
-      setSequence(example);
+      setSequence([]);
     }
   };
 
@@ -87,25 +115,28 @@ const SequenceInput: React.FC<SequenceInputProps> = ({
     setText("");
     setReport({ records: [], errors: [], warnings: [] });
     setResults(null);
-    setSequence("");
+    setSequence([]);
+    ErrorHandler.clearProcessingError();
+    actions.resetProcessing();
   };
+
 
   const onChangeText = (val: string) => {
     setText(val);
     setResults(null);
-    try {
-      const rep = parseInput(val);
-      setReport(rep);
-      if (rep.errors.length === 0 && rep.records.length > 0) {
-        const seqs = rep.records.map(r => r.sequence);
-        setSequence(seqs.length === 1 ? seqs[0] : seqs);
-      } else {
-        setSequence(val);
+    
+    if (val.trim()) {
+      try {
+        const rep = parseInput(val, { tolerant: true });
+        setReport(rep);
+        setSequence(rep.records);        
+      } catch (e) {
+        setReport({ records: [], errors: ["Failed to parse input."], warnings: [] });
+        setSequence([]);
       }
-    } catch (e) {
-      // Show a friendly error, do not crash
-      setReport({ records: [], errors: ["Failed to parse input."], warnings: [] });
-      setSequence(val);
+    } else {
+      setReport({ records: [], errors: [], warnings: [] });
+      setSequence([]);
     }
   };
 
@@ -163,21 +194,17 @@ const SequenceInput: React.FC<SequenceInputProps> = ({
           spellCheck={false}
         />
         <div id="sequence-help" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-          FASTA is supported. Each record starts with &gt;Header. Only A, C, G, T, or N are allowed in sequences.
+          FASTA is supported. For multiple record, use FASTA format. Each record starts with &gt;Header. Only A, C, G, T, or N are allowed in sequences.
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 mb-6">
-        <span className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-          Parsed: {counts.total}
-        </span>
-        <span className="px-2 py-1 text-xs rounded bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-          Warnings: {counts.warnings}
-        </span>
-        <span className="px-2 py-1 text-xs rounded bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-          Errors: {counts.errors}
-        </span>
-      </div>
+      {text && report.errors.length === 0 && (
+        <div className="flex flex-wrap items-center gap-2 mb-6">
+          <span className="px-2 py-1 text-xs rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+            Ready to parse on submit
+          </span>
+        </div>
+      )}
 
       {report.errors.length > 0 && (
         <div className="mb-6 rounded-lg border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950 p-4">
@@ -190,18 +217,8 @@ const SequenceInput: React.FC<SequenceInputProps> = ({
         </div>
       )}
 
-      {report.warnings.length > 0 && report.errors.length === 0 && (
-        <div className="mb-6 rounded-lg border border-yellow-300 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950 p-4">
-        <div className="text-yellow-800 dark:text-yellow-200 font-semibold mb-2">Warnings</div>
-          <ul className="list-disc pl-5 text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
-            {report.warnings.map((w, i) => (
-              <li key={`warn-${i}`}>{w}</li>
-            ))}
-          </ul>
-        </div>
-      )}
 
-      {report.errors.length === 0 && report.records.length > 0 && (
+      {/* {report.errors.length === 0 && report.records.length > 0 && (
         <div className="mb-8">
           <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Detected records</div>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
@@ -218,9 +235,11 @@ const SequenceInput: React.FC<SequenceInputProps> = ({
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
-};
+});
+
+SequenceInput.displayName = 'SequenceInput';
 
 export default SequenceInput;

@@ -4,22 +4,24 @@
  */
 
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
-import { 
-  AppState, 
-  AlignmentInput, 
-  ProcessingParams, 
-  ChainType, 
+import {
+  AppState,
+  AlignmentInput,
+  ProcessingParams,
+  ChainType,
   ModelPreloadStatus,
   ProcessingState,
   AlignmentResult,
   AlignmentError
 } from '@/types/alignment';
+import { Species, DEFAULT_SPECIES } from '@/config/species/config';
 import { AppConfig } from '@/config/app.config';
 import { ErrorHandler } from '@/utils/errorHandler';
 
 // Action types
 type AlignmentAction =
   | { type: 'SET_INPUT'; payload: AlignmentInput | null }
+  | { type: 'SET_SPECIES'; payload: Species }
   | { type: 'SET_CHAIN'; payload: ChainType }
   | { type: 'SET_MODEL'; payload: string }
   | { type: 'SET_PARAMS'; payload: ProcessingParams }
@@ -38,6 +40,7 @@ type AlignmentAction =
 // Initial state
 const initialState: AppState = {
   form: {
+    selectedSpecies: DEFAULT_SPECIES,
     selectedChain: AppConfig.ui.defaultChain,
     selectedModelId: '', // Let user choose, don't force default
     input: null,
@@ -75,6 +78,29 @@ function alignmentReducer(state: AppState, action: AlignmentAction): AppState {
           input: action.payload,
           isValid: validateForm({ ...state.form, input: action.payload }),
           validationErrors: getValidationErrors({ ...state.form, input: action.payload })
+        }
+      };
+
+    case 'SET_SPECIES':
+      return {
+        ...state,
+        form: {
+          ...state.form,
+          selectedSpecies: action.payload,
+          selectedChain: AppConfig.ui.defaultChain, // Reset chain when species changes
+          selectedModelId: '', // Reset model when species changes
+          isValid: validateForm({
+            ...state.form,
+            selectedSpecies: action.payload,
+            selectedChain: AppConfig.ui.defaultChain,
+            selectedModelId: ''
+          }),
+          validationErrors: getValidationErrors({
+            ...state.form,
+            selectedSpecies: action.payload,
+            selectedChain: AppConfig.ui.defaultChain,
+            selectedModelId: ''
+          })
         }
       };
 
@@ -238,10 +264,9 @@ function validateForm(form: AppState['form']): boolean {
 
 function getValidationErrors(form: AppState['form']): string[] {
   const errors: string[] = [];
-  
   if (!form.input) {
     errors.push('Input is required');
-  } else if (form.input.type === 'sequence' && form.input.content.trim() === '') {
+  } else if (form.input.type === 'sequence' && !form.input.content) {
     errors.push('Sequence cannot be empty');
   } else if (form.input.type === 'file' && !form.input.file) {
     errors.push('File is required');
@@ -260,6 +285,7 @@ const AlignmentContext = createContext<{
   dispatch: React.Dispatch<AlignmentAction>;
   actions: {
     setInput: (input: AlignmentInput | null) => void;
+    setSpecies: (species: Species) => void;
     setChain: (chain: ChainType) => void;
     setModel: (modelId: string) => void;
     setParams: (params: ProcessingParams) => void;
@@ -288,6 +314,10 @@ export function AlignmentProvider({ children }: AlignmentProviderProps) {
   const actions = {
     setInput: useCallback((input: AlignmentInput | null) => {
       dispatch({ type: 'SET_INPUT', payload: input });
+    }, []),
+
+    setSpecies: useCallback((species: Species) => {
+      dispatch({ type: 'SET_SPECIES', payload: species });
     }, []),
 
     setChain: useCallback((chain: ChainType) => {
@@ -375,6 +405,7 @@ export const useAlignmentSelectors = () => {
   return {
     // Form selectors
     input: state.form.input,
+    selectedSpecies: state.form.selectedSpecies,
     selectedChain: state.form.selectedChain,
     selectedModelId: state.form.selectedModelId,
     params: state.form.params,

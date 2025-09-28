@@ -6,6 +6,7 @@ export type SegmentKey = "V" | "D" | "J";
 /** Legacy per-allele entry */
 export type AlleleEntry = {
   sequence: string;
+  sequence_gapped: string;
   asc?: string;
   iuis?: string;
   iglabel?: string;
@@ -18,16 +19,18 @@ export type ReferenceJson = Partial<Record<SegmentKey, SegmentMap>>;
 
 /** Derived maps */
 export type SequencesMap = Record<string, string>;
+export type SequencesGappedMap = Record<string, string>;
 export type LabelProps   = Record<string, { asc?: string; iuis?: string; iglabel?: string; anchor?: number }>;
 
 export type ReferenceBundle = {
   names:  Record<SegmentKey, string[]>;
   seqs:   Partial<Record<SegmentKey, SequencesMap>>;
+  seqs_gapped: Partial<Record<SegmentKey, SequencesGappedMap>>;
   labels: Partial<Record<SegmentKey, LabelProps>>;
 };
 
 /** Internal, ordered block representation for one chain */
-type OrderedSegment = { names: string[]; seqs: SequencesMap; labels: LabelProps };
+type OrderedSegment = { names: string[]; seqs: SequencesMap; seqs_gapped: SequencesGappedMap; labels: LabelProps };
 type ChainBlock = Partial<Record<SegmentKey, OrderedSegment>>;
 
 const SEGMENTS: SegmentKey[] = ["V", "D", "J"];
@@ -60,13 +63,15 @@ function asDataConfig(payload: any): any | null {
 function buildOrderedFromLegacy(seg?: SegmentMap): OrderedSegment {
   const names = seg ? sortAlleleNames(Object.keys(seg)) : [];
   const seqs: SequencesMap = {};
+  const seqs_gapped: SequencesGappedMap = {};
   const labels: LabelProps = {};
   for (const k of names) {
     const v = seg![k];
     seqs[k]   = v.sequence;
+    seqs_gapped[k] = v.sequence_gapped;
     labels[k] = { asc: v.asc, iuis: v.iuis, iglabel: v.iglabel, anchor: v.anchor };
   }
-  return { names, seqs, labels };
+  return { names, seqs, seqs_gapped, labels };
 }
 
 /** Build one ordered segment from DataConfig JSON. Respect the provided index order. No sorting. */
@@ -75,13 +80,15 @@ function buildOrderedFromDataConfig(segJson: any): OrderedSegment {
   const index: string[] = Array.isArray(segJson?.index) ? segJson.index.slice() : [];
   const alleles = segJson?.alleles || {};
   const seqs: SequencesMap = {};
+  const seqs_gapped: SequencesGappedMap = {};
   const labels: LabelProps = {};
   for (const name of index) {
     const d = alleles[name] || {};
     seqs[name] = d.sequence ?? "";
+    seqs_gapped[name] = d.sequence_gapped ?? "";
     labels[name] = { asc: d.asc, iuis: d.iuis, iglabel: d.iglabel, anchor: d.anchor };
   }
-  return { names: index, seqs, labels };
+  return { names: index, seqs, seqs_gapped, labels };
 }
 
 /** Normalize any payload (legacy or dataconfig) to a chain block with ordered segments. */
@@ -117,11 +124,13 @@ function normalizeToChainBlock(payload: any): ChainBlock {
 function mergeBlocks(blocks: ChainBlock[]): ReferenceBundle {
   const names: Record<SegmentKey, string[]> = { V: [], D: [], J: [] };
   const seqs:  Partial<Record<SegmentKey, SequencesMap>> = { V: {}, D: {}, J: {} };
+  const seqs_gapped: Partial<Record<SegmentKey, SequencesGappedMap>> = { V: {}, D: {}, J: {} };
   const labels: Partial<Record<SegmentKey, LabelProps>>   = { V: {}, D: {}, J: {} };
 
   for (const seg of SEGMENTS) {
     const allNames: string[] = [];
     const segSeqs: SequencesMap = {};
+    const segSeqs_gapped: SequencesGappedMap = {};
     const segLabels: LabelProps = {};
 
     for (const block of blocks) {
@@ -131,6 +140,7 @@ function mergeBlocks(blocks: ChainBlock[]): ReferenceBundle {
       for (const name of s.names) {
         allNames.push(name);
         segSeqs[name] = s.seqs[name];
+        segSeqs_gapped[name] = s.seqs_gapped[name];
         segLabels[name] = s.labels[name];
       }
     }
@@ -138,11 +148,12 @@ function mergeBlocks(blocks: ChainBlock[]): ReferenceBundle {
     names[seg] = allNames;
     if (allNames.length) {
       seqs[seg] = segSeqs;
+      seqs_gapped[seg] = segSeqs_gapped;
       labels[seg] = segLabels;
     }
   }
 
-  return { names, seqs, labels };
+  return { names, seqs, seqs_gapped, labels };
 }
 
 export function buildReferenceBundle(ref: ReferenceJson): ReferenceBundle {
@@ -153,6 +164,7 @@ export function buildReferenceBundle(ref: ReferenceJson): ReferenceBundle {
   return {
     names:  { V: V.names, D: D.names, J: J.names },
     seqs:   { V: V.seqs,  D: D.seqs,  J: J.seqs  },
+    seqs_gapped: { V: V.seqs_gapped, D: D.seqs_gapped, J: J.seqs_gapped },
     labels: { V: V.labels, D: D.labels, J: J.labels },
   };
 }
@@ -191,11 +203,12 @@ export class ReferenceLoader {
   public addShortD = (seg?: Record<string, string>): Record<string, string> | undefined => seg ? { ...seg, 'Short-D': '' } : seg;
   public getNames(seg: SegmentKey): string[] { return this.ensure().names[seg] || []; }
   public getSeqs(seg: SegmentKey): SequencesMap | undefined { return this.ensure().seqs[seg]; }
+  public getSeqsGapped(seg: SegmentKey): SequencesGappedMap | undefined { return this.ensure().seqs_gapped[seg]; }
   public getLabels(seg: SegmentKey): LabelProps | undefined { return this.ensure().labels[seg]; }
 
   /** Sequence by allele NAME key */
   public getAllele(seg: SegmentKey, name: string): string | undefined { return this.getSeqs(seg)?.[name]; }
-
+  public getAlleleGapped(seg: SegmentKey, name: string): string | undefined { return this.getSeqsGapped(seg)?.[name]; }   
   /** Anchor by allele NAME key */
   public getAlleleAnchor(seg: SegmentKey, name: string): number | undefined { return this.getLabels(seg)?.[name]?.anchor; }
 

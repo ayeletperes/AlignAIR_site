@@ -5,7 +5,7 @@ import { logger } from '@/utils/logger';
 import { getModelById } from '@/lib/model/modelMetadataLoader';
 import { MODEL_ID_TO_CHAIN } from '@/config/model/config';
 import { getOrLoadOrientationModel } from '@/lib/preprocessing/Orientation/utilities';
-
+import { ParsedRecord } from '@/utils/preprocessing/sequenceParse';
 /**
  * Load only the default IGH model at startup
  * NOTE: Now delegates to unified model loader
@@ -82,16 +82,13 @@ const updateProgress = async (progress: number, setProgress: (progress: number) 
  * Submit alignment request using model ID
  */
 export const submitAlignmentRequestById = async (
-  formData: {
-    modelId: string;
-    input: string | File;
-    flag: 'file' | 'sequence';
-    params: any;
-  },
+  modelId: string,
+  input: string | File | ParsedRecord[],
+  flag: 'file' | 'sequence',
+  params: any,
   setProgress: (progress: number) => void
 ) => {
   try {
-    const { modelId, input, flag, params } = formData;
     
     const timingAnalysis: Record<string, number> = {};
 
@@ -163,7 +160,7 @@ export const submitAlignmentRequestById = async (
         
         // Run the tokenization worker
         await sequenceTokenizerWorker(
-          input,
+          input as ParsedRecord[] | File,
           queue,
           maxLength,
           orientationModel,
@@ -189,7 +186,7 @@ export const submitAlignmentRequestById = async (
     // Create BatchProcessor and run processing
     const batchProcessor = new BatchProcessor();
     const { predictions, sequences } = await batchProcessor.process(
-      { chain: chain as any, input, flag: flag as any },
+      { chain: chain as any, input: input as string | File, flag: flag as any },
       tokenizer,
       modelInference,
       candidateExtractor

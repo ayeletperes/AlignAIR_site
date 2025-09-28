@@ -1,6 +1,7 @@
 import React from 'react';
 import InputCounter from '@/components/inputs/inputCounter';
 import ModelSelector from '@/components/inputs/ModelSelector';
+import { Species } from '@/config/species/config';
 
 interface Params {
   vCap: number;
@@ -15,6 +16,8 @@ interface ParamInputProps {
   setParams: (params: Params) => void;
   params: Params;
   isDisabled?: boolean;
+  selectedSpecies?: Species;
+  setSelectedSpecies?: (species: Species) => void;
   setSelectedChain: (chain: string) => void;
   selectedChain: string;
   selectedModelId?: string;
@@ -24,11 +27,13 @@ interface ParamInputProps {
 
 type InputChangeHandler = (id: string, value: number) => void;
 
-const ParamInput: React.FC<ParamInputProps> = ({ 
-  setParams, 
-  params, 
-  isDisabled, 
-  setSelectedChain, 
+const ParamInput: React.FC<ParamInputProps> = ({
+  setParams,
+  params,
+  isDisabled,
+  selectedSpecies,
+  setSelectedSpecies,
+  setSelectedChain,
   selectedChain,
   selectedModelId,
   setSelectedModelId,
@@ -45,6 +50,8 @@ const ParamInput: React.FC<ParamInputProps> = ({
   return (
     <>
       <ModelSelector
+        selectedSpecies={selectedSpecies}
+        setSelectedSpecies={setSelectedSpecies}
         selectedChain={selectedChain}
         setSelectedChain={setSelectedChain}
         selectedModelId={selectedModelId}

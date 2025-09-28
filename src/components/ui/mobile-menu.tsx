@@ -204,6 +204,25 @@ export default function MobileMenu() {
               </div>
             </Link>
 
+            <Link
+              href="/tools/v-gene-alignment"
+              className="flex items-center px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-200 group"
+              onClick={() => setMobileNavOpen(false)}
+            >
+              <div className="p-2 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg mr-3">
+                <svg className="w-5 h-5 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <div className="flex items-center">
+                <div>
+                  <div className="font-semibold">V Gene Alignment Viewer</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">View V gene alignments</div>
+                </div>
+                <span className="ml-2 px-2 py-1 bg-yellow-600 text-white text-xs rounded-full">DEV</span>
+              </div>
+            </Link>
+
             {/* Divider */}
             <div className="my-6 border-t border-gray-200 dark:border-gray-700"></div>
 

@@ -369,7 +369,7 @@ npm start`}
                 <p className="text-sm text-gray-300 mb-2">Check model file paths and metadata format</p>
                 <pre className="text-xs bg-gray-900 p-2 rounded text-red-400">
 {`// Verify model paths in modelConfig.ts
-modelPath: '/models/alignment/heavy/igh-v1.0/model.json'`}
+modelPath: '/models/alignment/human/heavy/IGH_S5F_576/model.json'`}
                 </pre>
               </div>
               

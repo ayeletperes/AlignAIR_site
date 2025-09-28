@@ -55,15 +55,7 @@ export function useProcessingOrchestrator() {
     try {
       // Start processing
       startProcessing('Initializing alignment...');
-
-      // Prepare form data for submission
-      const formData = {
-        modelId: selectedModelId,
-        input: input.type === 'file' ? (input as any).file : input.content,
-        flag: input.type as 'file' | 'sequence',
-        params: params
-      };
-
+     
       // Create progress callback that updates our processing state
       const setProgress = (progress: number) => {
         let step: ProcessingStep = 'preprocessing';
@@ -91,7 +83,10 @@ export function useProcessingOrchestrator() {
 
       // Call the real alignment submission function
       let result: any = await submitAlignmentRequestById(
-        formData,
+        selectedModelId,
+        input.type === 'file' ? (input as any).file : input.content,
+        input.type as 'file' | 'sequence',
+        params,
         setProgress
       );
       

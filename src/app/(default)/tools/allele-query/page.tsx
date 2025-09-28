@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect, useMemo } from 'react';
 import { ReferenceLoader, type SegmentKey } from '@/lib/data/ReferenceLoader';
 import { logger } from '@/utils/logger';
@@ -32,7 +33,7 @@ export default function AlleleQueryPage() {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   const [selectedModelId, setSelectedModelId] = useState<string>(
-    AVAILABLE_MODELS[0]?.id || 'igh-v1.0'
+    AVAILABLE_MODELS[0]?.id || 'IGH_S5F_576'
   );
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchType, setSearchType] = useState<SearchKind>('iuis');

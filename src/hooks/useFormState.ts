@@ -6,10 +6,12 @@
 import { useCallback } from 'react';
 import { useAlignment, useAlignmentSelectors } from '@/contexts/AlignmentContext';
 import { ChainType, ProcessingParams, AlignmentInput } from '@/types/alignment';
+import { Species } from '@/config/species/config';
 import { AppConfig } from '@/config/app.config';
 
 interface FormHandlers {
   setInput: (input: AlignmentInput | null) => void;
+  setSpecies: (species: Species) => void;
   setChain: (chain: ChainType) => void;
   setModel: (modelId: string) => void;
   setParams: (params: ProcessingParams) => void;
@@ -29,6 +31,7 @@ export function useFormState() {
   const { actions } = useAlignment();
   const {
     input,
+    selectedSpecies,
     selectedChain,
     selectedModelId,
     params,
@@ -40,6 +43,10 @@ export function useFormState() {
   const handlers: FormHandlers = {
     setInput: useCallback((input: AlignmentInput | null) => {
       actions.setInput(input);
+    }, [actions]),
+
+    setSpecies: useCallback((species: Species) => {
+      actions.setSpecies(species);
     }, [actions]),
 
     setChain: useCallback((chain: ChainType) => {
@@ -57,6 +64,7 @@ export function useFormState() {
     clearForm: useCallback(() => {
       actions.setInput(null);
       actions.clearResults();
+      actions.resetProcessing();
     }, [actions]),
 
     resetForm: useCallback(() => {
@@ -65,6 +73,7 @@ export function useFormState() {
       actions.setModel(''); // Let user choose, don't force default
       actions.setParams(AppConfig.processing.defaultParams);
       actions.clearResults();
+      actions.resetProcessing();
     }, [actions])
   };
 
@@ -91,6 +100,7 @@ export function useFormState() {
     clearSequence: () => {
       if (input?.type === 'sequence') {
         actions.setInput(null);
+        actions.resetProcessing();
       }
     }
   };
@@ -98,16 +108,17 @@ export function useFormState() {
   return {
     // State
     input,
+    selectedSpecies,
     selectedChain,
     selectedModelId,
     params,
-    
+
     // Handlers
     ...handlers,
-    
+
     // Validation
     ...validation,
-    
+
     // File helpers
     ...fileHelpers
   };

@@ -408,6 +408,8 @@ function numberIghvFromNt(ntSeq: string): string | null {
       return null;
     }
   }
+
+  
   
 export { 
     ntDiff, 

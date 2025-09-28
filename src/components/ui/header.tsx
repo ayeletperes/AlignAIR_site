@@ -133,6 +133,21 @@ export default function Header() {
                       <div>
                         <div className="font-medium">Allele Query</div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">Search allele database</div>
+                        <span className="ml-2 px-2 py-1 bg-yellow-600 text-white text-xs rounded-full">DEV</span>
+                      </div>
+                    </Link>
+                  </DropdownItem>
+                  <DropdownItem key="v-gene-alignment" textValue="V Allele Alignment Viewer" className="text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-3">
+                      <Link href="/tools/v-gene-alignment" className="flex items-center w-full">
+                      <div className="p-2 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg mr-3">
+                        <svg className="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="font-medium">V Gene Alignment Viewer</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">View V gene alignments</div>
+                        <span className="ml-2 px-2 py-1 bg-yellow-600 text-white text-xs rounded-full">DEV</span>
                       </div>
                     </Link>
                   </DropdownItem>

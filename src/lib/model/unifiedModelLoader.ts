@@ -86,7 +86,7 @@ export const clearModelCache = () => {
  */
 export const preloadDefaultModel = async (): Promise<void> => {
   try {
-    await loadModelById({ modelId: 'igh-v1.0' });
+    await loadModelById({ modelId: 'IGH_S5F_576' });
     logger.info('[UnifiedModelLoader] Default IGH model preloaded successfully');
   } catch (error) {
     logger.error('[UnifiedModelLoader] Failed to preload default IGH model:', error);

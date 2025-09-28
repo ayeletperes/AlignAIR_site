@@ -1,5 +1,6 @@
 import { encodeAndEqualPadSequence } from '@/utils/preprocessing/sequenceProcessor';
 import { sequenceReader, fastaFileReader, SequenceRecord } from '@/utils/preprocessing/sequenceReaders';
+import { ParsedRecord } from '@/utils/preprocessing/sequenceParse';
 import { fixOrientation } from '@/lib/preprocessing/Orientation/utilities';
 import { logger } from '@/utils/logger';
 import * as tf from '@tensorflow/tfjs';
@@ -7,7 +8,7 @@ import * as tf from '@tensorflow/tfjs';
 
 
 export async function sequenceTokenizerWorker(
-  input: string | File,
+  input: ParsedRecord[] | File,
   queue: any,
   maxSeqLength: number,
   orientationPipeline: any,
@@ -33,7 +34,6 @@ export async function sequenceTokenizerWorker(
 
   let sequences: Record<string, SequenceRecord> = {};
   let content: string | undefined;
-
   if (flag === 'file') {
     // Reading file
     stepStart('File Read');
@@ -60,8 +60,7 @@ export async function sequenceTokenizerWorker(
   } else {
     // Handling direct sequence input
     stepStart('Direct Sequence Read');
-    const sequenceArray = sequenceReader(input as string);
-    sequences = Object.fromEntries(sequenceArray.map(seq => [seq.id, seq]));
+    sequences = Object.fromEntries((input as ParsedRecord[]).map((seq: any) => [seq.id, seq]));
     stepEnd('Direct Sequence Read');
   }
 
@@ -70,7 +69,6 @@ export async function sequenceTokenizerWorker(
   while (sequenceEntries.length > 0) {
     const batchEntries = sequenceEntries.splice(0, batchSize);
     let batch: Record<string, SequenceRecord> = Object.fromEntries(batchEntries);
-
     // Extract candidate regions
     stepStart('Candidate Extraction');
     batch = Object.fromEntries(

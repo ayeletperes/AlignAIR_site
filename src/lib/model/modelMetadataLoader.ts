@@ -32,6 +32,7 @@ export interface ModelMetadata {
   documentationUrl?: string;
   modelPath: string;
   checkpoint: string;
+  dataconfigPython?: string;
   orientationModelPath: string;
   referencePath: string | string[];
   hasD: boolean;

@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { AVAILABLE_MODELS, getModelById, ModelMetadata } from '@/lib/model/modelMetadataLoader';
+import { getModelById, ModelMetadata } from '@/lib/model/modelMetadataLoader';
+import {
+  Species,
+  DEFAULT_SPECIES,
+  SPECIES_INFO,
+  getSpeciesModelMetadata,
+  getSpeciesChainTypes,
+  getAvailableSpecies
+} from '@/config/species/config';
+import { SPECIES_PROMPTS, formatSpeciesSelectionPrompt } from '@/config/species/prompts';
 
 interface ModelSelectorProps {
+  selectedSpecies?: Species;
+  setSelectedSpecies?: (species: Species) => void;
   selectedChain: string;
   setSelectedChain: (chain: string) => void;
   selectedModelId?: string;
@@ -9,19 +20,26 @@ interface ModelSelectorProps {
   onModelChange?: () => void;
 }
 
-const ModelSelector: React.FC<ModelSelectorProps> = ({ 
-  selectedChain, 
-  setSelectedChain, 
+const ModelSelector: React.FC<ModelSelectorProps> = ({
+  selectedSpecies = DEFAULT_SPECIES,
+  setSelectedSpecies,
+  selectedChain,
+  setSelectedChain,
   selectedModelId,
   setSelectedModelId,
   onModelChange
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState<ModelMetadata | null>(null);
+  const [showSpeciesInfo, setShowSpeciesInfo] = useState(false);
 
-  // Filter models based on selected chain type
-  const availableModels = AVAILABLE_MODELS.filter((model: ModelMetadata) => model.chainType === selectedChain);
-  
+  // Get available models for the selected species and filter by chain type
+  const allSpeciesModels = getSpeciesModelMetadata(selectedSpecies);
+  const availableModels = allSpeciesModels.filter((model: ModelMetadata) => model.chainType === selectedChain);
+  // Get available chain types for the selected species
+  const availableChains = getSpeciesChainTypes(selectedSpecies);
+  const allAvailableSpecies = getAvailableSpecies();
+
   // Load the selected model data
   useEffect(() => {
     const loadSelectedModel = async () => {
@@ -52,6 +70,22 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
     }
   }, [selectedChain, availableModels, selectedModelId, selectedModel, setSelectedModelId, onModelChange]);
 
+  const handleSpeciesSelect = (newSpecies: Species) => {
+    if (setSelectedSpecies) {
+      setSelectedSpecies(newSpecies);
+    }
+
+    // Reset chain and model selection when species changes
+    const newAvailableChains = getSpeciesChainTypes(newSpecies);
+    if (newAvailableChains.length > 0 && !newAvailableChains.includes(selectedChain)) {
+      setSelectedChain(newAvailableChains[0]);
+    }
+
+    if (onModelChange) {
+      onModelChange();
+    }
+  };
+
   const handleChainSelect = (newChain: string) => {
     setSelectedChain(newChain);
     setIsOpen(false);
@@ -81,9 +115,65 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
   return (
     <div className="mb-6">
       <div className="block mb-2 text-base font-medium text-gray-900 dark:text-white">
-        Chain Type & Model Selection
+        Species, Chain Type & Model Selection
       </div>
-      <div className="grid md:grid-cols-2 md:gap-6">
+
+      {/* Species Info Banner */}
+      {showSpeciesInfo && (
+        <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+          <div className="flex justify-between items-start mb-2">
+            <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+              Species Selection Guide
+            </h4>
+            <button
+              onClick={() => setShowSpeciesInfo(false)}
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-300"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="text-sm text-blue-800 dark:text-blue-200 whitespace-pre-line">
+            {formatSpeciesSelectionPrompt()}
+          </div>
+        </div>
+      )}
+
+      <div className="grid md:grid-cols-3 md:gap-4">
+        {/* Species Selection */}
+        <div className="relative z-0 w-full mb-5 group">
+          <div className="flex items-center mb-2">
+            <span className="text-sm font-medium text-gray-900 dark:text-white">
+              Species
+            </span>
+            <button
+              onClick={() => setShowSpeciesInfo(!showSpeciesInfo)}
+              className="ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              title="Species selection guide"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+          </div>
+          <select
+            id="species-select"
+            value={selectedSpecies}
+            onChange={(e) => handleSpeciesSelect(e.target.value as Species)}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500"
+          >
+            {allAvailableSpecies.map((species) => (
+              <option key={species} value={species}>
+                {SPECIES_INFO[species].icon} {SPECIES_INFO[species].name}
+              </option>
+            ))}
+          </select>
+          <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            {SPECIES_INFO[selectedSpecies].description}
+          </div>
+        </div>
+
         {/* Chain Type Selection */}
         <div className="relative z-0 w-full mb-5 group">
           <span className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -95,10 +185,17 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
             onChange={(e) => handleChainSelect(e.target.value)}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-purple-500 dark:focus:border-purple-500"
           >
-            <option value="heavy">Heavy Chain</option>
-            <option value="light">Light Chain</option>
-            <option value="trb">T-Cell Receptor Beta</option>
+            {availableChains.map((chainType) => (
+              <option key={chainType} value={chainType}>
+                {getChainDisplayName(chainType)}
+              </option>
+            ))}
           </select>
+          {availableChains.length === 0 && (
+            <div className="mt-1 text-xs text-yellow-600 dark:text-yellow-400">
+              No chain types available for {SPECIES_INFO[selectedSpecies].name}
+            </div>
+          )}
         </div>
 
         {/* Model Selection */}
@@ -156,6 +253,17 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
       {/* Model Info */}
       {selectedModel && (
         <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">{SPECIES_INFO[selectedSpecies].icon}</span>
+            <div className="flex-1">
+              <div className="text-sm font-medium text-gray-900 dark:text-white">
+                {selectedModel.name} - {SPECIES_INFO[selectedSpecies].name}
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 italic">
+                {SPECIES_INFO[selectedSpecies].scientificName}
+              </div>
+            </div>
+          </div>
           <div className="flex items-start justify-between mb-2">
             <p className="text-sm text-gray-600 dark:text-gray-400 flex-1">
               {selectedModel.description}

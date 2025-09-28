@@ -81,6 +81,24 @@ const toArr = (t: tf.Tensor | null | undefined): number[] | null =>
 const padSize = (seq: string, maxLen = PADDED_MAX_LEN) =>
   Math.floor((maxLen - seq.length) / 2);
 
+function clip(x: number, min: number, max: number) {
+  return Math.min(Math.max(x, min), max);
+}
+
+const sanitizeBounds = (rawStart: number[] | null, rawEnd: number[] | null, pads: number[], seqLengths: number[]) =>{
+  if (!rawStart || !rawEnd) return [];
+  // Remove padding, convert to [start:end) with standard rounding
+  let s = rawStart.map((v, i) => (Math.round(v - pads[i]) | 0));
+  let e = rawEnd.map((v, i) => (Math.round(v - pads[i]) | 0));
+  // Clamp to valid range: start in [0, L-1], end in [1, L]
+  s = s.map((v, i) => clip(v, 0, seqLengths[i] - 1));
+  e = e.map((v, i) => clip(v, 1, seqLengths[i]));
+  // ensure non-empty end-exclusive interval
+  e = e.map((v, i) => Math.max(v, s[i] + 1));
+  return [s, e];
+}
+  
+
 const adjust = (vals: number[] | null, pads: number[]) =>
   !vals ? [] : vals.map((v, i) => Math.round(Math.abs(v - pads[i])));
 
@@ -137,30 +155,98 @@ export const cleanAndArrangePredictions = async (params: CleanAndArrangeParams):
   const j_logits = extract('j_allele', predictions, modelOutputNodes);
   const d_logits = hasD ? extract('d_allele', predictions, modelOutputNodes) : null;
 
-  // Start and end tensors
+  // Prefer discrete boundaries from position logits if available; fallback to expectations
   logger.step('Extracting start and end tensors');
-  const vStartT = extract('v_sequence_start', predictions, modelOutputNodes);
-  const vEndT   = extract('v_sequence_end',   predictions, modelOutputNodes);
-  const jStartT = extract('j_sequence_start', predictions, modelOutputNodes);
-  const jEndT   = extract('j_sequence_end',   predictions, modelOutputNodes);
-  const dStartT = hasD ? extract('d_sequence_start', predictions, modelOutputNodes) : null;
-  const dEndT   = hasD ? extract('d_sequence_end',   predictions, modelOutputNodes) : null;
-  // Convert to arrays
-  logger.step('Converting to arrays');
-  const vStart = toArr(vStartT)!, vEnd = toArr(vEndT)!, jStart = toArr(jStartT)!, jEnd = toArr(jEndT)!;
-  const dStart = toArr(dStartT),  dEnd = toArr(dEndT);
+  const first = predictions[0];
+  
+  const stackOrNone = (key: string) => {
+    return key in first ? extract(key, predictions, modelOutputNodes) : null;
+  };
+
+  // Try logits path
+  const vStartLogits = stackOrNone('v_start_logits');
+  const vEndLogits = stackOrNone('v_end_logits');
+  const jStartLogits = stackOrNone('j_start_logits');
+  const jEndLogits = stackOrNone('j_end_logits');
+
+  // Helper function to extract argmax positions from logits
+  const extractArgmax = (logitsKey: string): number[] => {
+    const tensor = extract(logitsKey, predictions, modelOutputNodes);
+    const data = tensor.dataSync() as Float32Array;
+    const [batchSize, seqLen] = tensor.shape;
+
+    return Array.from({length: batchSize}, (_, i) => {
+      const start = i * seqLen;
+      const row = data.slice(start, start + seqLen);
+      let maxIdx = 0;
+      let maxVal = row[0];
+      for (let j = 1; j < seqLen; j++) {
+        if (row[j] > maxVal) {
+          maxVal = row[j];
+          maxIdx = j;
+        }
+      }
+      return maxIdx;
+    });
+  };
+
+  let vStart: number[], vEnd: number[], jStart: number[], jEnd: number[];
+
+  if (vStartLogits && vEndLogits && jStartLogits && jEndLogits) {
+    vStart = extractArgmax('v_start_logits');
+    vEnd = extractArgmax('v_end_logits');
+    jStart = extractArgmax('j_start_logits');
+    jEnd = extractArgmax('j_end_logits');
+  } else {
+    // Fallback: use provided scalar starts/ends (expectations)
+    const vStartT = extract('v_sequence_start', predictions, modelOutputNodes);
+    const vEndT = extract('v_sequence_end', predictions, modelOutputNodes);
+    const jStartT = extract('j_sequence_start', predictions, modelOutputNodes);
+    const jEndT = extract('j_sequence_end', predictions, modelOutputNodes);
+    
+    vStart = toArr(vStartT)!;
+    vEnd = toArr(vEndT)!;
+    jStart = toArr(jStartT)!;
+    jEnd = toArr(jEndT)!;
+  }
+
+  let dStart: number[] | null = null, dEnd: number[] | null = null;
+  
+  if (hasD) {
+    const dStartLogits = stackOrNone('d_start_logits');
+    const dEndLogits = stackOrNone('d_end_logits');
+    
+    if (dStartLogits && dEndLogits) {
+      dStart = extractArgmax('d_start_logits');
+      dEnd = extractArgmax('d_end_logits');
+    } else {
+      const dStartT = extract('d_sequence_start', predictions, modelOutputNodes);
+      const dEndT = extract('d_sequence_end', predictions, modelOutputNodes);
+      
+      dStart = toArr(dStartT);
+      dEnd = toArr(dEndT);
+    }
+  }
 
   const seqs = Object.values(sequences).map(s => s.sequence);
   const pads = seqs.map(s => padSize(s, PADDED_MAX_LEN));
-
   // Correct padding
   logger.step('Correcting padding');
-  const v_sequence_start = adjust(vStart, pads);
-  const v_sequence_end   = adjust(vEnd,   pads);
-  const j_sequence_start = adjust(jStart, pads);
-  const j_sequence_end   = adjust(jEnd,   pads);
-  const d_sequence_start = hasD ? adjust(dStart, pads) : null;
-  const d_sequence_end   = hasD ? adjust(dEnd,   pads) : null;
+  const seqLengths = seqs.map(s => s.length);
+  const [v_sequence_start, v_sequence_end] = sanitizeBounds(vStart, vEnd, pads, seqLengths);
+  let [j_sequence_start, j_sequence_end] = sanitizeBounds(jStart, jEnd, pads, seqLengths);
+  let [d_sequence_start, d_sequence_end] = hasD ? sanitizeBounds(dStart, dEnd, pads, seqLengths) : [null, null];
+  // Optional monotonic repair: enforce V ≤ D ≤ J ordering where applicable
+  logger.step('Monotonic repair');
+  if (hasD && d_sequence_start && d_sequence_end) {
+    d_sequence_start = d_sequence_start.map((v, i) => Math.max(v, v_sequence_end[i]));
+    d_sequence_end = d_sequence_end.map((v, i) => Math.max(v, d_sequence_start[i] + 1));
+    j_sequence_start = j_sequence_start.map((v, i) => Math.max(v, d_sequence_end[i]));
+    j_sequence_end = j_sequence_end.map((v, i) => Math.max(v, j_sequence_start[i] + 1));
+  } else {
+    j_sequence_start = j_sequence_start.map((v, i) => Math.max(v, v_sequence_end[i]));
+    j_sequence_end = j_sequence_end.map((v, i) => Math.max(v, j_sequence_start[i] + 1));
+  }
 
   // Allele encoder: names from reference maps
   logger.step('Getting allele names');
@@ -183,7 +269,7 @@ export const cleanAndArrangePredictions = async (params: CleanAndArrangeParams):
   j_logits.dispose();
   if (d_logits) d_logits.dispose();
 
-  // Germline alignment using your matcher
+  // Germline alignment using matcher
   logger.step('Matching germline alleles');
   const vMatcher = new HeuristicReferenceMatcher(referenceLoader.getSeqs('V') || {});
   const jMatcher = new HeuristicReferenceMatcher(referenceLoader.getSeqs('J') || {});

@@ -2,6 +2,8 @@
  * Core alignment types for type safety across the application
  */
 
+import type { Species } from '@/config/species/config';
+import { ParsedRecord } from '@/utils/preprocessing/sequenceParse';
 // Processing pipeline types
 export type ProcessingStep = 
   | 'idle' 
@@ -60,7 +62,7 @@ export type InputType = 'sequence' | 'file';
 
 export interface SequenceInput {
   type: 'sequence';
-  content: string;
+  content: string | ParsedRecord[];
   name?: string;
 }
 
@@ -132,6 +134,7 @@ export interface AlignmentError {
 
 // Form state types
 export interface FormState {
+  selectedSpecies: Species;
   selectedChain: ChainType;
   selectedModelId: string;
   input: AlignmentInput | null;

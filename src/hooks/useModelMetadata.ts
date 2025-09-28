@@ -69,7 +69,7 @@ export function useModelMetadata(options: UseModelMetadataOptions = {}) {
       // Load only the default IGH model
       await loadDefaultModel();
       // Load metadata for display purposes
-      const ighModel = await loadModelMetadata('igh-v1.0');
+      const ighModel = await loadModelMetadata('IGH_S5F_576');
       setAllModels(ighModel ? [ighModel] : []);
       if (process.env.NODE_ENV === 'development') {
         logger.info('[ModelMetadata] Loaded default IGH model');
