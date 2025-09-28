@@ -7,6 +7,6 @@ tensorflow_convert.sh
 archive/
 app/\(auth\)
 app/api
-scripts/
+scripts_dev/
 tsconfig.tsbuildinfo
 out/
