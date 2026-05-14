@@ -11,7 +11,6 @@ export const env = {
 
   // Feature toggles based on environment
   features: {
-    alleleQuery: process.env.NODE_ENV === 'development',
     modelWarmup: true,
     analytics: process.env.NODE_ENV === 'production',
     memoryMonitoring: process.env.NODE_ENV === 'development',
