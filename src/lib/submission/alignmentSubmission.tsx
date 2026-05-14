@@ -77,29 +77,130 @@ const updateProgress = async (progress: number, setProgress: (progress: number) 
   await new Promise((resolve) => setTimeout(resolve, delayMs));
 };
 
+/**
+ * LRU result cache keyed by canonical (input + modelId + params). Lets the
+ * user re-run the same query (e.g. tweak a download option, undo a clear)
+ * without paying for inference again. File inputs are not cached — hashing
+ * a File would require reading it a second time, which defeats the win.
+ */
+const RESULT_CACHE_MAX = 16;
+const resultCache = new Map<string, any>();
+
+const lruGet = (key: string): any | undefined => {
+  const v = resultCache.get(key);
+  if (v === undefined) return undefined;
+  // Touch: move to most-recently-used position
+  resultCache.delete(key);
+  resultCache.set(key, v);
+  return v;
+};
+
+const lruSet = (key: string, value: any): void => {
+  if (resultCache.has(key)) resultCache.delete(key);
+  resultCache.set(key, value);
+  while (resultCache.size > RESULT_CACHE_MAX) {
+    const oldest = resultCache.keys().next().value;
+    if (oldest === undefined) break;
+    resultCache.delete(oldest);
+  }
+};
 
 /**
- * Submit alignment request using model ID
+ * Lightweight non-cryptographic string hash (FNV-1a 32-bit) for cache keys.
+ * Collisions on this would be extremely rare for our payload sizes and the
+ * cache itself is non-authoritative, so SHA via SubtleCrypto would be overkill.
+ */
+const fastHash = (s: string): string => {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return h.toString(16);
+};
+
+const buildCacheKey = (
+  input: string | File | ParsedRecord[],
+  modelId: string,
+  params: any
+): string | null => {
+  // Don't cache File inputs; hashing them is a second full read.
+  if (input instanceof File) return null;
+  let canonicalInput: string;
+  if (typeof input === 'string') {
+    canonicalInput = input;
+  } else if (Array.isArray(input)) {
+    canonicalInput = input.map((r) => `${r.id || ''}|${r.sequence}`).join('\n');
+  } else {
+    return null;
+  }
+  return `${modelId}:${fastHash(canonicalInput)}:${fastHash(JSON.stringify(params || {}))}`;
+};
+
+export const clearResultCache = (): void => {
+  resultCache.clear();
+};
+
+
+/**
+ * Phases the alignment pipeline goes through, exposed to callers so they can
+ * render step-aware progress UI without having to map percentages to labels.
+ */
+export type AlignmentPhase =
+  | 'loading-model'
+  | 'tokenizing'
+  | 'inferring'
+  | 'postprocessing'
+  | 'complete';
+
+export interface SubmitAlignmentCallbacks {
+  setProgress: (progress: number) => void;
+  setPhase?: (phase: AlignmentPhase) => void;
+}
+
+/**
+ * Submit alignment request using model ID.
+ *
+ * Backwards-compatible: pass either a setProgress callback (legacy) or a
+ * { setProgress, setPhase } object.
  */
 export const submitAlignmentRequestById = async (
   modelId: string,
   input: string | File | ParsedRecord[],
   flag: 'file' | 'sequence',
   params: any,
-  setProgress: (progress: number) => void
+  progress: ((progress: number) => void) | SubmitAlignmentCallbacks
 ) => {
+  const { setProgress, setPhase }: SubmitAlignmentCallbacks =
+    typeof progress === 'function'
+      ? { setProgress: progress }
+      : progress;
+
+  // Cache lookup before any expensive work. On hit, fast-forward the progress
+  // bar so the UI still feels responsive (no abrupt "done" without phases).
+  const cacheKey = buildCacheKey(input, modelId, params);
+  if (cacheKey) {
+    const cached = lruGet(cacheKey);
+    if (cached) {
+      logger.info('Alignment cache hit — skipping inference');
+      setPhase?.('complete');
+      setProgress(100);
+      return cached;
+    }
+  }
   try {
-    
+
     const timingAnalysis: Record<string, number> = {};
 
     const stepStart = (stepName: string) => (timingAnalysis[stepName] = performance.now());
     const stepEnd = (stepName: string) => {
       timingAnalysis[stepName] = performance.now() - timingAnalysis[stepName];
     };
-    
+
     stepStart('total');
+    setPhase?.('loading-model');
     await updateProgress(10, setProgress);
-    
+
     stepStart('loadModel');
     // Load the model by ID using unified loader
     const { loader, modelOutputNodes } = await loadModelById({
@@ -110,7 +211,7 @@ export const submitAlignmentRequestById = async (
       },
     });
     stepEnd('loadModel');
-    
+
     // Get model metadata for chain type
     const modelMetadata = await getModelById(modelId);
     if (!modelMetadata) {
@@ -118,6 +219,7 @@ export const submitAlignmentRequestById = async (
     }
     const chain = modelMetadata.chainType;
 
+    setPhase?.('tokenizing');
     await updateProgress(20, setProgress);
     stepStart('batchProcessor');
     
@@ -183,17 +285,35 @@ export const submitAlignmentRequestById = async (
       }
     };
 
-    // Create BatchProcessor and run processing
+    // Create BatchProcessor and run processing.
+    // Map internal phase callbacks to (a) the orchestrator's phase state and
+    // (b) an evolving numeric percentage in the 20-85 range so the overall
+    // progress bar keeps moving while batches stream through inference.
     const batchProcessor = new BatchProcessor();
     const { predictions, sequences } = await batchProcessor.process(
-      { chain: chain as any, input: input as string | File, flag: flag as any },
+      {
+        chain: chain as any,
+        input: input as string | File,
+        flag: flag as any,
+        onPhaseProgress: (phase, percent) => {
+          if (phase === 'tokenize') {
+            // 20 -> 30 across tokenization
+            void updateProgress(20 + Math.round(percent * 0.1), setProgress, 0);
+          } else {
+            setPhase?.('inferring');
+            // 30 -> 85 across inference
+            void updateProgress(30 + Math.round(percent * 0.55), setProgress, 0);
+          }
+        },
+      },
       tokenizer,
       modelInference,
       candidateExtractor
     );
     stepEnd('batchProcessor');
-    
-    await updateProgress(40, setProgress);
+
+    setPhase?.('postprocessing');
+    await updateProgress(90, setProgress);
     stepStart('cleanAndArrangePredictions');
     const referenceLoader = loader.getReferenceLoader();
     const cleanAndArrangeStep = new CleanAndArrangeStep('Clean and Arrange Predictions');
@@ -203,6 +323,7 @@ export const submitAlignmentRequestById = async (
       referenceLoader, modelMetadata.hasD, 
       modelMetadata.multiChain, params);
     stepEnd('cleanAndArrangePredictions');
+    setPhase?.('complete');
     await updateProgress(100, setProgress);
     stepEnd('total');
     
@@ -211,7 +332,9 @@ export const submitAlignmentRequestById = async (
       timingAnalysis[key] = timingAnalysis[key] / 1000;
     });
     logger.info('Timing Analysis (in seconds):', timingAnalysis);
-    return { processedPredictions, sequences, referenceLoader, modelMetadata };
+    const result = { processedPredictions, sequences, referenceLoader, modelMetadata };
+    if (cacheKey) lruSet(cacheKey, result);
+    return result;
   } catch (error) {
     logger.error('Error during alignment submission:', error);
     throw error;

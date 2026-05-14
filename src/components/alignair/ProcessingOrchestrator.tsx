@@ -9,7 +9,18 @@ import { useAlignmentSelectors } from '@/contexts/AlignmentContext';
 import { AlignmentResult, ProcessingStep } from '@/types/alignment';
 import { ErrorHandler } from '@/utils/errorHandler';
 import { logger } from '@/utils/logger';
-import { submitAlignmentRequestById } from '@/lib/submission/alignmentSubmission';
+import { submitAlignmentRequestById, AlignmentPhase } from '@/lib/submission/alignmentSubmission';
+
+// Map internal pipeline phases to the orchestrator's ProcessingStep enum and a
+// user-visible label. Keeping this here (not in alignmentSubmission) so the
+// pipeline stays UI-agnostic.
+const PHASE_TO_STEP: Record<AlignmentPhase, { step: ProcessingStep; message: string }> = {
+  'loading-model': { step: 'validating', message: 'Loading model…' },
+  'tokenizing': { step: 'preprocessing', message: 'Tokenizing sequences…' },
+  'inferring': { step: 'inference', message: 'Running alignment inference…' },
+  'postprocessing': { step: 'postprocessing', message: 'Finalizing results…' },
+  'complete': { step: 'complete', message: 'Processing complete!' },
+};
 
 /**
  * Hook to use the processing orchestrator
@@ -55,30 +66,20 @@ export function useProcessingOrchestrator() {
     try {
       // Start processing
       startProcessing('Initializing alignment...');
-     
-      // Create progress callback that updates our processing state
+
+      // Phase is the source of truth for which step is highlighted; the
+      // numeric progress only drives the progress-bar width.
+      let currentStep: ProcessingStep = 'validating';
+      let currentMessage = 'Loading model…';
+
+      const setPhase = (phase: AlignmentPhase) => {
+        const mapped = PHASE_TO_STEP[phase];
+        currentStep = mapped.step;
+        currentMessage = mapped.message;
+      };
+
       const setProgress = (progress: number) => {
-        let step: ProcessingStep = 'preprocessing';
-        let message = 'Processing...';
-        
-        if (progress <= 20) {
-          step = 'validating';
-          message = 'Loading model...';
-        } else if (progress <= 40) {
-          step = 'preprocessing';
-          message = 'Processing sequences...';
-        } else if (progress <= 70) {
-          step = 'inference';
-          message = 'Running alignment analysis...';
-        } else if (progress < 100) {
-          step = 'postprocessing';
-          message = 'Finalizing results...';
-        } else {
-          step = 'complete';
-          message = 'Processing complete!';
-        }
-        
-        updateStep(step, progress, message);
+        updateStep(currentStep, progress, currentMessage);
       };
 
       // Call the real alignment submission function
@@ -87,7 +88,7 @@ export function useProcessingOrchestrator() {
         input.type === 'file' ? (input as any).file : input.content,
         input.type as 'file' | 'sequence',
         params,
-        setProgress
+        { setProgress, setPhase }
       );
       
       // Create result object compatible with both AlignmentResult interface and Results component

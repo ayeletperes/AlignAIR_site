@@ -4,6 +4,7 @@ import {
   SegmentKey,
   ReferenceJson,
 } from '@/lib/data/ReferenceLoader';
+import { fetchReferenceJson } from '@/lib/data/referenceCache';
 import { getModelById,  getModelsByChainType} from '@/lib/model/modelMetadataLoader';
 import * as tf from '@tensorflow/tfjs';
 import { logger } from '@/utils/logger';
@@ -387,12 +388,9 @@ Original error: ${error.message}`;
       };
   
       const paths = toPaths(referencePath);
-      const payloads: any[] = [];
-      for (const path of paths) {
-        const res = await fetch(path);
-        if (!res?.ok) throw new Error(`Failed to fetch reference: ${path}`);
-        payloads.push(await res.json());
-      }
+      // Fetch reference payloads via IndexedDB cache; each path is a large
+      // static germline JSON, so a warm load skips network + parse.
+      const payloads: any[] = await Promise.all(paths.map(fetchReferenceJson));
       const refLoader = new ReferenceLoader(payloads);
       await refLoader.load();
       // Keep references around in the shapes your code expects

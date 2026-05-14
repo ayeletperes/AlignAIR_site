@@ -6,6 +6,12 @@ export interface ProcessingParams {
   flag: 'file' | 'sequence';
   maxLength?: number;
   batchSize?: number;
+  /**
+   * Optional progress callback emitted while iterating batches.
+   * `phase` distinguishes the tokenization sweep from inference so the
+   * orchestrator can surface step-aware progress without sniffing percentages.
+   */
+  onPhaseProgress?: (phase: 'tokenize' | 'inference', percent: number) => void;
 }
 
 export interface ProcessingResult {
@@ -54,6 +60,7 @@ export class BatchProcessor {
       flag,
       maxLength = 576,
       batchSize = getDefaultBatchSize(),
+      onPhaseProgress,
     } = params;
 
     // Validate required components
@@ -61,14 +68,19 @@ export class BatchProcessor {
     if (!candidateExtractor) throw new Error('Candidate extractor is not initialized');
 
     logger.info('Starting batch processing...');
-    
+
+    onPhaseProgress?.('tokenize', 0);
     // Tokenize input sequences
     const tokenizedBatches = await tokenizer.tokenize(input, maxLength, batchSize, flag);
+    onPhaseProgress?.('tokenize', 100);
+
     const predictions: any[] = [];
     const sequences: Record<string, any> = {};
     let batchNumber = 0;
+    const totalBatches = tokenizedBatches.length;
 
-    logger.info(`Processing ${tokenizedBatches.length} batches...`);
+    logger.info(`Processing ${totalBatches} batches...`);
+    onPhaseProgress?.('inference', 0);
 
     for (const batch of tokenizedBatches) {
       if (!batch || !batch.tokenizedBatch) {
@@ -78,17 +90,20 @@ export class BatchProcessor {
 
       const startTime = performance.now();
       const { tokenizedBatch, orientationFixedSequences } = batch;
-      
+
       // Merge sequences
       Object.assign(sequences, orientationFixedSequences);
       try {
         // Model prediction
         const batchPredictions = await model.predict(tokenizedBatch);
         predictions.push(batchPredictions);
-        
+
         batchNumber++;
         const duration = performance.now() - startTime;
         logger.info(`Processed batch ${batchNumber}. Time: ${(duration / 1000).toFixed(2)}s`);
+        if (totalBatches > 0) {
+          onPhaseProgress?.('inference', Math.round((batchNumber / totalBatches) * 100));
+        }
       } catch (error) {
         logger.error(`Error during batch prediction for batch ${batchNumber + 1}:`, error);
         continue;

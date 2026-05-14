@@ -14,16 +14,40 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence,
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [fileName, setFileName] = useState('');
   const [sequenceCount, setSequenceCount] = useState(0);
+  const [isDragActive, setIsDragActive] = useState(false);
+
+  const ingestFile = (file: File) => {
+    setSequence([]);
+    setResults(null);
+    processFile(file);
+    setFile(file);
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      // Clear any free-text sequence first, then set the file input in state
-      setSequence([]);
-      setResults(null);
-      processFile(file);
-      setFile(file);
-    }
+    if (file) ingestFile(file);
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragActive(false);
+    if (isDisabled) return;
+    const file = event.dataTransfer.files?.[0];
+    if (file) ingestFile(file);
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (isDisabled) return;
+    if (!isDragActive) setIsDragActive(true);
+  };
+
+  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragActive(false);
   };
 
   const processFile = (file: File) => {
@@ -87,7 +111,7 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence,
 
   return (
     <>
-      <div className="grid md:grid-cols-2 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div className="relative z-0 w-full mb-5 group">
             <label htmlFor="file_input" className="block mb-2 text-base font-large text-white-900 dark:text-white">
               Or Enter a FASTA file
@@ -113,7 +137,18 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence,
           )}
         </div>
       </div>
-      <div id="fileinput" className="flex items-center justify-center w-full relative z-10">
+      <div
+        id="fileinput"
+        className={`flex flex-col items-stretch w-full relative z-10 rounded-lg border-2 border-dashed transition-colors ${
+          isDragActive
+            ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+            : 'border-transparent'
+        }`}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragEnter={handleDragOver}
+        onDragLeave={handleDragLeave}
+      >
         <input
           className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
           onChange={handleFileUpload}
@@ -126,7 +161,9 @@ const FileInput: React.FC<FileInputProps> = ({ setFile, isDisabled, setSequence,
           aria-label="Upload FASTA file"
         />
         <div id="file_input_help" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-          Supported formats: FASTA (.fasta, .fa), Text (.txt). Maximum 1000 sequences.
+          {isDragActive
+            ? 'Drop the file to upload'
+            : 'Supported formats: FASTA (.fasta, .fa), Text (.txt). Drag and drop is also supported. Maximum 1000 sequences.'}
         </div>
       </div>
       <div ref={fileInfoRef} style={{ display: 'none' }}>
