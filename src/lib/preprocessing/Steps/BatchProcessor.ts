@@ -31,6 +31,17 @@ export interface CandidateExtractor {
   extract(sequences: string[]): any;
 }
 
+/**
+ * Pick a batch size that scales with the host's hardware concurrency.
+ * Floor 128 keeps single-core/low-spec devices honest; cap 1024 avoids
+ * pathological GPU memory pressure on multi-thousand-sequence inputs.
+ */
+const getDefaultBatchSize = (): number => {
+  const cores =
+    (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 4;
+  return Math.max(128, Math.min(1024, cores * 64));
+};
+
 export class BatchProcessor {
   async process(
     params: ProcessingParams,
@@ -42,7 +53,7 @@ export class BatchProcessor {
       input,
       flag,
       maxLength = 576,
-      batchSize = 256,
+      batchSize = getDefaultBatchSize(),
     } = params;
 
     // Validate required components

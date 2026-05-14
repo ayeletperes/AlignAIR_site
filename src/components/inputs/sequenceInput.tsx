@@ -81,18 +81,40 @@ const SequenceInput = forwardRef<SequenceInputRef, SequenceInputProps>(({
     [report]
   );
 
+  // Live sequence stats derived from current parsed records.
+  // Surfaces count + length distribution + invalid-char hint before submission
+  // so users catch malformed input without paying the cost of inference.
+  const sequenceStats = useMemo(() => {
+    const records = report.records;
+    if (records.length === 0) return null;
+    const lengths = records.map((r) => r.sequence.length);
+    const total = lengths.reduce((a, b) => a + b, 0);
+    const min = Math.min(...lengths);
+    const max = Math.max(...lengths);
+    const avg = Math.round(total / lengths.length);
+    // Detect characters outside the IUPAC set the model accepts.
+    // Hot path on every keystroke — keep the regex simple.
+    const allowed = /^[ACGTNacgtn\s>]*$/;
+    const invalidCharDetected = !allowed.test(text);
+    return { count: records.length, min, max, avg, total, invalidCharDetected };
+  }, [report.records, text]);
+
   const handleExample = () => {
     if (!selectedChain || !selectedSpecies) return;
     const speciesExamples = exampleSequences[selectedSpecies];
     const example = speciesExamples?.[selectedChain.toLowerCase()] || "";
 
-    // If no example for this species/chain combo, show a helpful message
+    // If no example for this species/chain combo, show a helpful message.
+    // For Rhesus Macaque, only the heavy chain is currently supported, so the
+    // absence of an example reflects model availability — say so explicitly.
     if (!example) {
       const chainName = selectedChain === 'heavy' ? 'Heavy Chain' :
                         selectedChain === 'light' ? 'Light Chain' :
                         selectedChain === 'trb' ? 'T-Cell Receptor Beta' : selectedChain;
       const speciesName = selectedSpecies === 'human' ? 'Human' : 'Rhesus Macaque';
-      const message = `No example sequence available for ${speciesName} ${chainName}`;
+      const message = selectedSpecies === 'rhesus_macaque'
+        ? `${chainName} is not yet available for ${speciesName}. Switch to Human or choose Heavy Chain.`
+        : `No example sequence available for ${speciesName} ${chainName} yet.`;
       setReport({ records: [], errors: [message], warnings: [] });
       return;
     }
@@ -203,6 +225,26 @@ const SequenceInput = forwardRef<SequenceInputRef, SequenceInputProps>(({
           <span className="px-2 py-1 text-xs rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
             Ready to parse on submit
           </span>
+          {sequenceStats && (
+            <>
+              <span className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                {sequenceStats.count} sequence{sequenceStats.count === 1 ? '' : 's'}
+              </span>
+              <span className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                {sequenceStats.min === sequenceStats.max
+                  ? `${sequenceStats.min} bp`
+                  : `${sequenceStats.min}–${sequenceStats.max} bp (avg ${sequenceStats.avg})`}
+              </span>
+              <span className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                {sequenceStats.total.toLocaleString()} bp total
+              </span>
+              {sequenceStats.invalidCharDetected && (
+                <span className="px-2 py-1 text-xs rounded bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">
+                  Non-ACGTN characters present
+                </span>
+              )}
+            </>
+          )}
         </div>
       )}
 

@@ -32,13 +32,23 @@ const loadOnnx = async () => {
       // Set WASM paths before creating any sessions
       if (onnx?.env?.wasm) {
         onnx.env.wasm.wasmPaths = '/wasm/';
-        onnx.env.wasm.numThreads = 1; // start with single thread for stability
+        // Multi-threaded WASM requires SharedArrayBuffer, which requires
+        // cross-origin isolation (COOP/COEP). Fall back to single-thread otherwise.
+        const isCrossOriginIsolated =
+          typeof window !== 'undefined' && (window as any).crossOriginIsolated === true;
+        const hwConcurrency =
+          (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 4;
+        onnx.env.wasm.numThreads = isCrossOriginIsolated
+          ? Math.max(1, Math.min(hwConcurrency, 8))
+          : 1;
         onnx.env.wasm.simd = true;    // enable SIMD if available
-        
+
         logger.info('ONNX WASM environment configured:', {
           wasmPaths: onnx.env.wasm.wasmPaths,
           numThreads: onnx.env.wasm.numThreads,
-          simd: onnx.env.wasm.simd
+          simd: onnx.env.wasm.simd,
+          crossOriginIsolated: isCrossOriginIsolated,
+          hardwareConcurrency: hwConcurrency
         });
       }
       

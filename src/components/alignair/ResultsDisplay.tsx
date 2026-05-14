@@ -68,7 +68,7 @@ export function ResultsDisplay() {
         
         {/* Processing Status */}
         {showProcessingStatus && (
-          <div className="mb-8">
+          <div className="mb-8" role="status" aria-live="polite" aria-atomic="false">
             <ProcessingStatus
               isProcessing={isProcessing}
               progress={currentProgress}
