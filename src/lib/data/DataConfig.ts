@@ -1,3 +1,6 @@
+// Translation of the Python AlignAIR `DataConfig` class.
+// See TRANSLATION_MAP.md (row: Reference / DataConfig) for the upstream path
+// and known divergences. Bump UPSTREAM.json when porting changes here.
 import { DataConfig as IDataConfig, ConfigMetadata, Allele } from '@/lib/data/types';
 
 export class DataConfig implements IDataConfig {
