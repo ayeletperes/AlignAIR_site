@@ -3,13 +3,25 @@
  *
  * Each `expected/<modelId>/<caseName>.json` file holds the output of running
  * the upstream Python pipeline (at the SHA pinned in UPSTREAM.json) on the
- * matching `inputs/<modelId>_<caseName>.fasta`. This test feeds the FASTA
- * through the JS site's pipeline and asserts the structural fields match.
+ * matching `inputs/<modelId>_<caseName>.fasta`. The expected/ tree is
+ * regenerated automatically by `.github/workflows/parity-regen.yml` (or
+ * manually via `tests/parity/scripts/run-python-parity.sh`).
  *
- * Status: expected/ is empty on first checkout. The suite is `describe.skip`
- * until fixtures exist (see tests/parity/README.md for the regeneration
- * command). Once committed, flip to `describe.each` and CI will catch
- * regressions automatically.
+ * What this Jest suite asserts: each `expected/*.json` is **structurally
+ * valid** — it parses, contains records, and every record has the fields
+ * downstream code relies on. This catches a broken canonicalizer, a corrupt
+ * commit, or a truncated regen.
+ *
+ * What it does NOT assert: that the JS site's `submitAlignmentRequestById()`
+ * pipeline produces the same output as Python. Running the JS pipeline in
+ * Jest would require TF.js + ONNX Runtime in jsdom, which the existing test
+ * infra mocks out. JS-vs-Python comparison happens in two other ways:
+ *
+ *   1. The Action regenerates expected/*.json against the pinned SHA. When
+ *      a Python algorithm change lands, the diff is visible in a PR and a
+ *      human ports the JS to match.
+ *   2. A future headless-browser harness (Playwright) or a Node-compatible
+ *      pipeline build would close the loop. Tracked as a follow-up.
  */
 
 import fs from 'fs';
@@ -64,30 +76,30 @@ function listFixtures(): Array<{ modelId: string; caseName: string; expectedPath
 const fixtures = listFixtures();
 const hasFixtures = fixtures.length > 0;
 
-// Suite is skipped until expected/ is populated. See tests/parity/README.md.
-(hasFixtures ? describe : describe.skip)('Parity: JS site vs Python AlignAIR', () => {
+// Suite is skipped until expected/ is populated by the regen workflow.
+// Once it exists, this validates the structure of every committed fixture.
+(hasFixtures ? describe : describe.skip)('Parity fixture structure', () => {
   it.each(fixtures)(
-    '$modelId / $caseName matches expected output',
-    async ({ expectedPath }) => {
+    '$modelId / $caseName parses and has the required fields',
+    ({ expectedPath }) => {
       const expected: ExpectedRecord[] = JSON.parse(fs.readFileSync(expectedPath, 'utf8'));
 
-      // TODO(parity): wire up to submitAlignmentRequestById once expected/ is generated.
-      // Pseudocode:
-      //   const records = parseFasta(fs.readFileSync(inputPath, 'utf8'));
-      //   const result = await submitAlignmentRequestById(modelId, records, 'sequence', defaultParams, noopProgress);
-      //   const actual = canonicalizeForParity(result);
-      //   expect(actual).toEqual(expected);
-      //
-      // For now, the test only validates the fixture is parseable.
       expect(Array.isArray(expected)).toBe(true);
       expect(expected.length).toBeGreaterThan(0);
       for (const rec of expected) {
         expect(typeof rec.sequence_id).toBe('string');
         expect(Array.isArray(rec.v_call)).toBe(true);
         expect(Array.isArray(rec.j_call)).toBe(true);
+        // Coordinates may legitimately be null for short / failed segments,
+        // but when present they should be integers.
+        if (rec.v_sequence_start != null) {
+          expect(Number.isInteger(rec.v_sequence_start)).toBe(true);
+        }
+        if (rec.mutation_rate != null) {
+          expect(typeof rec.mutation_rate).toBe('number');
+        }
       }
     },
-    60_000,
   );
 });
 

@@ -1,9 +1,9 @@
 # Parity tests — JS site vs Python AlignAIR
 
 These fixtures pin the JS site's inference output against a reference
-produced by the upstream Python AlignAIR at a known commit. Whenever an
-upstream sync touches algorithm code, regenerate the expected outputs and
-re-run these tests as part of the port.
+produced by the upstream Python AlignAIR at a known commit. The
+`expected/*.json` tree is **regenerated automatically** by a GitHub
+Action; you should rarely need to run anything locally.
 
 ## Layout
 
@@ -16,96 +16,107 @@ tests/parity/
 │   │   ├── TCRB_UNIFORM_576_baseline.fasta
 │   │   └── IGH_AlignAIR_RHESUS_MACAQUE_baseline.fasta
 │   └── expected/
-│       └── <modelId>/<caseName>.json   ← generated, not yet committed
-├── parity.test.ts
-└── README.md   ← you are here
+│       └── <modelId>/<caseName>.json   ← produced by the regen Action
+├── scripts/
+│   ├── airr_to_json.py        ← canonicalizes AIRR CSV → stable JSON
+│   └── run-python-parity.sh   ← orchestrator (used by Action + local)
+├── parity.test.ts             ← Jest: structural validation of expected/
+└── README.md                  ← you are here
 ```
 
-## Status
+## How regeneration works
 
-The expected-output JSON files do **not** exist yet — `parity.test.ts` is
-currently `describe.skip(...)` until they are generated. This is intentional:
-generating them requires running the Python pipeline at the version pinned
-in `UPSTREAM.json`, which can't be done in the JS site's CI environment.
+`.github/workflows/parity-regen.yml` fires when:
 
-## How to generate `expected/` (one-time bootstrap, and after each upstream sync)
+- `UPSTREAM.json` changes (i.e., after each upstream sync)
+- a fixture input changes
+- the orchestrator script itself changes
+- you trigger it manually from the Actions tab (workflow_dispatch)
 
-Run this once locally with `pip install alignair` (or from a clone of
-`MuteJester/AlignAIR` checked out to the SHA in `UPSTREAM.json`).
+The Action:
+
+1. Installs Python AlignAIR at the SHA pinned in `UPSTREAM.json`
+2. Downloads model bundles (via `AlignAIR.Hub.hub` if available at that SHA)
+3. Runs each input FASTA through `python app.py run ... --airr-format`
+4. Canonicalizes the AIRR CSV outputs via `scripts/airr_to_json.py`
+5. If any `expected/*.json` changed, opens a PR titled `parity: regenerate
+   expected fixtures`
+
+You review the PR. If the diff makes sense (e.g., you just synced upstream
+and bucket-A algorithm changes are expected to shift the numbers), merge it
+and port the JS code to match. If outputs changed unexpectedly without a JS
+change, that's a regression — investigate before merging.
+
+## Running locally
+
+You only need to do this if the Action is broken (e.g., upstream changed
+their CLI surface and the orchestrator script needs a tweak) or if you
+want a faster feedback loop while developing the canonicalizer.
 
 ```bash
-# 1. Install at the pinned commit.
-PIN=$(jq -r '.sha' UPSTREAM.json)
-pip install "alignair @ git+https://github.com/MuteJester/AlignAIR@${PIN}"
-
-# 2. Pre-download model bundles to ~/.alignair/models/ (HuggingFace Hub).
-python -c "from AlignAIR.Hub import hub; hub.list_available_models()"
-
-# 3. Run each fixture through Python AlignAIR's CLI.
-mkdir -p tests/parity/fixtures/expected
-for fa in tests/parity/fixtures/inputs/*.fasta; do
-  base=$(basename "$fa" .fasta)
-  model=${base%_baseline}            # e.g. IGH_S5F_576
-  case=${base#*_}                    # e.g. baseline
-  out_dir="tests/parity/fixtures/expected/${model}"
-  mkdir -p "$out_dir"
-
-  # chain type from MODEL_ID_TO_CHAIN in src/config/model/config.ts
-  case "$model" in
-    IGH_*|IGH_AlignAIR_RHESUS_MACAQUE) chain=heavy ;;
-    IGL_*)                              chain=light ;;
-    TCRB_*)                             chain=trb ;;
-  esac
-
-  python -m AlignAIR run \
-    --model-checkpoint "$model" \
-    --chain-type "$chain" \
-    --sequences "$fa" \
-    --save-path "/tmp/parity_out" \
-    --airr-format
-
-  # Convert AIRR CSV to a canonical JSON the JS side can compare against.
-  python tests/parity/scripts/airr_to_json.py \
-    "/tmp/parity_out/$(basename "$fa" .fasta).csv" \
-    "$out_dir/${case}.json"
-done
-
-# 4. Commit the generated expected/ tree.
-git add tests/parity/fixtures/expected
-git commit -m "parity: regenerate fixtures against $(jq -r '.ref' UPSTREAM.json)"
+# from repo root
+./tests/parity/scripts/run-python-parity.sh
 ```
 
-> The `airr_to_json.py` helper is not yet written — it should round the
-> `mutation_rate` field to 3 decimal places, sort allele lists
-> deterministically, and drop columns the JS side doesn't emit (e.g.
-> `sequence_alignment` and `germline_alignment` strings, since we only
-> compare structured fields).
+Environment knobs:
 
-## How the test asserts equality
+| Var | Default | Purpose |
+|---|---|---|
+| `ALIGNAIR_WORKDIR` | `/tmp/alignair_parity` | Where the Python checkout + tmp outputs live |
+| `ALIGNAIR_MODEL_DIR` | `$ALIGNAIR_WORKDIR/pretrained_models` | Where model bundles are kept |
+| `SKIP_INSTALL=1` | — | Reuse an existing `pip install` |
+| `SKIP_MODELS=1` | — | Reuse already-downloaded bundles |
 
-`parity.test.ts` calls `submitAlignmentRequestById()` for each fixture input
-and compares the post-processed predictions against the matching JSON in
-`expected/`. The fields checked are:
+After running locally, `git diff -- tests/parity/fixtures/expected/` to
+review.
 
-- `sequence_id`
-- `v_call`, `d_call`, `j_call` (allele arrays, order-sensitive)
-- `v_sequence_start` / `v_sequence_end`, `d_*`, `j_*` (segment coordinates)
-- `v_germline_start` / `v_germline_end` (reference coordinates)
-- `productive` (boolean)
-- `mutation_rate` (within ±0.001 — round-trip tolerance for f32 ↔ f64)
-- `indel_count`
-- `type_` (chain type indicator for multi-chain models)
+## What `parity.test.ts` actually does
 
-Likelihood vectors are **not** asserted directly — they're high-dimensional
-floats that depend on backend numerics and would flake. Equality of derived
-calls (above) is the right invariant.
+It is **structural**, not full-pipeline. It loads every committed
+`expected/*.json` and checks each record has the fields downstream code
+depends on (`sequence_id`, `v_call`/`j_call` arrays, integer coordinates
+when present, numeric `mutation_rate` when present). This catches:
 
-## Triggering a regeneration
+- a broken canonicalizer
+- a corrupt/truncated regen commit
+- a schema drift between releases
 
-Regenerate expected fixtures when an upstream sync involves a bucket-A
-change (algorithm/output schema). The triage checklist in the auto-opened
-sync issue includes this step.
+It does **not** check that the JS site's `submitAlignmentRequestById()`
+produces matching output. That would require running TF.js + ONNX Runtime
+in jsdom, which the existing JS test infra mocks out. JS-vs-Python parity
+is enforced via the regen Action's PR diff workflow: a human reads the
+diff and ports the JS to match.
 
-If a regenerated fixture's JSON differs from the previous expected output,
-that proves the algorithm changed and the JS port is needed. If it matches
-exactly, the upstream commit was python-only — re-classify as bucket B.
+Future work to fully close the loop:
+
+- **Headless-browser harness** (Playwright) that submits each input on a
+  built site and exports the result, then diffs against `expected/*.json`.
+- **Node-compatible pipeline build** so the site's TS modules can be
+  executed directly under Jest with `@tensorflow/tfjs-node` and
+  `onnxruntime-node`. Would also unlock the planned CLI/MCP work.
+
+## Adding a new fixture
+
+1. Drop a FASTA at `tests/parity/fixtures/inputs/<modelId>_<caseName>.fasta`.
+   `modelId` must match one of the IDs in `src/config/model/config.ts`.
+2. Push. The regen Action picks it up and opens a PR adding the matching
+   `expected/<modelId>/<caseName>.json`.
+3. Review and merge.
+
+## Field reference (what `expected/*.json` contains)
+
+| Field | Type | Notes |
+|---|---|---|
+| `sequence_id` | string | Carried through from the FASTA header |
+| `v_call`, `d_call`, `j_call` | string[] | Sorted lexicographically, deduplicated |
+| `v_sequence_start`/`end`, `d_*`, `j_*` | int \| null | 1-indexed positions |
+| `v_germline_start`/`end` | int \| null | Reference coordinates |
+| `productive` | boolean | |
+| `mutation_rate` | number | Rounded to 3 decimal places |
+| `indel_count` | int | |
+| `type_` | string | Multi-chain models only |
+
+Fields not in the table (`sequence_alignment`, `germline_alignment`,
+likelihood vectors, etc.) are intentionally dropped by the canonicalizer
+because they are either too large, backend-dependent, or not produced by
+the JS site.
