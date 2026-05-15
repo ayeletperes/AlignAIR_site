@@ -11,14 +11,21 @@ const orientationModelCache = new Map<string, any>();
 // Lazy load ONNX Runtime to avoid import issues
 let onnx: any = null;
 const loadOnnxRuntime = async () => {
-  if (typeof window === 'undefined') return null;
-  
+  // Browser: window.ort (loaded via <script> tag). Node: globalThis.ort
+  // (set by the CLI bootstrap via require('onnxruntime-node')).
+  const hasGlobalOrt =
+    (typeof window !== 'undefined' && (window as any).ort) ||
+    (typeof globalThis !== 'undefined' && (globalThis as any).ort);
+  if (!hasGlobalOrt) return null;
+
   if (!onnx) {
     try {
-      // Use globally loaded ONNX Runtime
       if (typeof window !== 'undefined' && (window as any).ort) {
         onnx = (window as any).ort;
-        logger.info('Using globally loaded ONNX Runtime');
+        logger.info('Using globally loaded ONNX Runtime (browser)');
+      } else if ((globalThis as any).ort) {
+        onnx = (globalThis as any).ort;
+        logger.info('Using globally loaded ONNX Runtime (Node)');
       } else {
         throw new Error('ONNX Runtime not available - please ensure the script is loaded');
       }
@@ -177,7 +184,8 @@ export async function getOrLoadOrientationModel(chainType: string, orientationMo
   logger.info(`[OrientationCache] Orientation model path: "${orientationModelPath}"`);
   
   try {
-    if (typeof window === 'undefined') {
+    // Allow Node execution where the CLI bootstrap has set globalThis.ort.
+    if (typeof window === 'undefined' && !((globalThis as any).ort)) {
       logger.warn('ONNX Runtime not available on server side, skipping orientation model load');
       throw new Error('Server side rendering - ONNX not available');
     }

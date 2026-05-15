@@ -12,20 +12,26 @@ import { logger } from '@/utils/logger';
 // Lazy load ONNX Runtime to avoid SSR issues and improve error handling
 let onnx: any = null;
 const loadOnnx = async () => {
-  if (typeof window === 'undefined') {
-    // Server-side rendering, skip loading ONNX Runtime
-    logger.info('Server-side detected, skipping ONNX Runtime loading');
+  // Skip on Next.js SSR (no window AND no globalThis.ort) but allow Node
+  // execution where the CLI bootstrap has set globalThis.ort.
+  if (typeof window === 'undefined' && !((globalThis as any).ort)) {
+    logger.info('Server-side detected without globalThis.ort, skipping ONNX Runtime loading');
     return null;
   }
-  
+
   if (!onnx) {
     try {
       logger.info('Loading ONNX Runtime...');
       
-      // Use globally loaded ONNX Runtime
+      // Use globally loaded ONNX Runtime. In the browser the site loads
+      // `window.ort` via a <script> tag; in Node the CLI bootstrap sets
+      // `globalThis.ort = require('onnxruntime-node')`. Check both.
       if (typeof window !== 'undefined' && (window as any).ort) {
         onnx = (window as any).ort;
-        logger.info('Using globally loaded ONNX Runtime');
+        logger.info('Using globally loaded ONNX Runtime (browser)');
+      } else if (typeof globalThis !== 'undefined' && (globalThis as any).ort) {
+        onnx = (globalThis as any).ort;
+        logger.info('Using globally loaded ONNX Runtime (Node)');
       } else {
         throw new Error('ONNX Runtime not available, please ensure the script is loaded');
       }
