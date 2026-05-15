@@ -12,7 +12,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { setPublicDir } from '../bootstrap/paths';
+import { setPublicDir, setRemote } from '../bootstrap/paths';
 import { parseInput, type ParsedRecord } from '@/utils/preprocessing/sequenceParse';
 
 interface AlignOptions {
@@ -21,6 +21,8 @@ interface AlignOptions {
   out?: string;
   airr?: boolean;
   modelsDir?: string;
+  modelsUrl?: string;
+  cacheDir?: string;
 }
 
 const DEFAULT_PARAMS = {
@@ -32,34 +34,18 @@ const DEFAULT_PARAMS = {
   jThresh: 0.8,
 };
 
-/** Walk up from cwd to find the site's public/ directory as a default. */
-function locatePublicDir(): string | null {
-  let cur = process.cwd();
-  for (let i = 0; i < 6; i++) {
-    const candidate = path.join(cur, 'public', 'models', 'alignment');
-    if (fs.existsSync(candidate)) return path.join(cur, 'public');
-    const parent = path.dirname(cur);
-    if (parent === cur) break;
-    cur = parent;
-  }
-  // Try the CLI's own location.
-  const here = path.resolve(__dirname, '../../..', 'public');
-  if (fs.existsSync(path.join(here, 'models', 'alignment'))) return here;
-  return null;
-}
-
 export async function align(opts: AlignOptions): Promise<void> {
   if (!opts.modelId) throw new Error('--model is required');
   if (!opts.fasta) throw new Error('--fasta is required');
   if (!fs.existsSync(opts.fasta)) throw new Error(`fasta file not found: ${opts.fasta}`);
 
-  const publicDir = opts.modelsDir ?? locatePublicDir();
-  if (!publicDir) {
-    throw new Error(
-      'could not find public/ models directory. Pass --models-dir <path> pointing at the site repo public/ folder.',
-    );
+  // Pick fetch mode. Explicit --models-dir wins; otherwise download from
+  // the deployed site URL and cache under ~/.alignair/cache/.
+  if (opts.modelsDir) {
+    setPublicDir(opts.modelsDir);
+  } else {
+    setRemote({ baseUrl: opts.modelsUrl, cacheDir: opts.cacheDir });
   }
-  setPublicDir(publicDir);
 
   // Lazy-load after publicDir is set, so the pipeline's first module-level
   // network/file accesses get the patched globals.

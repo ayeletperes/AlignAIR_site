@@ -19,6 +19,7 @@ import './bootstrap/runtimes';
 import { listModels } from './commands/list-models';
 import { modelInfo } from './commands/model-info';
 import { align } from './commands/align';
+import { runMcpServer } from './commands/mcp';
 
 interface ParsedArgs {
   command: string;
@@ -56,12 +57,24 @@ function printHelp(): void {
   console.log(`alignair — command line interface
 
 Usage:
-  alignair list-models
-  alignair model-info <modelId>
-  alignair align --model <modelId> --fasta <path> [--out <path>] [--airr] [--models-dir <path>]
+  alignair list-models                            List the bundled models.
+  alignair model-info <modelId>                   Show full metadata for a model.
+  alignair align --model <id> --fasta <path>      Run alignment on a FASTA file.
+                 [--out <path>] [--airr]
+                 [--models-url <url>] [--cache-dir <path>]
+                 [--models-dir <path>]            (offline override; reads a local public/ dir)
+  alignair mcp                                    Start an MCP stdio server.
+  alignair clear-cache                            Delete the on-disk model cache.
+
+Model artifacts are downloaded from the deployed site on first use and
+cached under ~/.alignair/cache/ (override with ALIGNAIR_CACHE_DIR or
+--cache-dir). Default base URL: https://alignair.ai (override with
+ALIGNAIR_URL or --models-url).
 
 Common flags:
-  --models-dir <path>   Directory containing model bundles (default: site's public/models/alignment/)
+  --models-url <url>    Site base URL to fetch artifacts from
+  --cache-dir <path>    Local cache directory
+  --models-dir <path>   Use a local public/ dir instead of downloading
   --json                Emit JSON instead of pretty output (where applicable)
 `);
 }
@@ -86,6 +99,21 @@ async function main(): Promise<void> {
         out: flags.out ? String(flags.out) : undefined,
         airr: !!flags.airr,
         modelsDir: flags['models-dir'] ? String(flags['models-dir']) : undefined,
+        modelsUrl: flags['models-url'] ? String(flags['models-url']) : undefined,
+        cacheDir: flags['cache-dir'] ? String(flags['cache-dir']) : undefined,
+      });
+      return;
+    case 'clear-cache': {
+      const { clearCache } = await import('./cache');
+      clearCache();
+      console.log('cache cleared');
+      return;
+    }
+    case 'mcp':
+      await runMcpServer({
+        modelsDir: flags['models-dir'] ? String(flags['models-dir']) : undefined,
+        modelsUrl: flags['models-url'] ? String(flags['models-url']) : undefined,
+        cacheDir: flags['cache-dir'] ? String(flags['cache-dir']) : undefined,
       });
       return;
     case 'help':

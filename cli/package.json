@@ -13,9 +13,11 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-node": "^4.22.0",
-    "onnxruntime-node": "^1.16.0"
+    "onnxruntime-node": "^1.16.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^20.10.4",
