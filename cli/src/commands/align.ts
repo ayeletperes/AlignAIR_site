@@ -106,6 +106,10 @@ export async function align(opts: AlignOptions): Promise<void> {
   } else {
     process.stdout.write(output);
   }
+
+  // TF.js Node keeps a worker thread alive after inference; without an
+  // explicit exit Node hangs ~60s waiting on it. Output is already flushed.
+  process.exit(0);
 }
 
 function serializePredictions(predictions: any, airr?: boolean): Record<string, unknown>[] {
