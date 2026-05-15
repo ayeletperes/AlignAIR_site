@@ -65,7 +65,6 @@ export const AppConfig = {
 
   // Feature flags
   features: {
-    alleleQuery: process.env.NODE_ENV === 'development',
     modelWarmup: true,
     analytics: process.env.NODE_ENV === 'production',
     memoryMonitoring: process.env.NODE_ENV === 'development',

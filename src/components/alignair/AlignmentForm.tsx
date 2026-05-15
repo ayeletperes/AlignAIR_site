@@ -3,7 +3,7 @@
  * Integrates the original form.tsx with new state management architecture
  */
 
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useFormState } from '@/hooks/useFormState';
 import { useProcessingState } from '@/hooks/useProcessingState';
 import { useModelPreloader } from '@/hooks/useModelPreloader';
@@ -47,9 +47,9 @@ export function AlignmentForm() {
   const handleButtonClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     logger.info('Button clicked manually by user');
-    
+
     if (!canStartProcessing || orchestratorProcessing || isAnyModelLoading()) {
       logger.info('Cannot start - conditions not met');
       return;
@@ -66,6 +66,51 @@ export function AlignmentForm() {
   const handleSetSelectedModelId = (modelId: string) => {
     setModel(modelId);
   };
+
+  // Keyboard shortcuts:
+  //   Ctrl/Cmd + Enter -> submit (when form is ready)
+  //   Esc              -> reset results, or clear form when there are no results
+  const submitViaShortcut = useCallback(async () => {
+    if (!canStartProcessing || orchestratorProcessing || isAnyModelLoading()) {
+      return;
+    }
+    try {
+      await processAlignment();
+    } catch (error) {
+      logger.error('Failed to start processing:', error);
+    }
+  }, [canStartProcessing, orchestratorProcessing, isAnyModelLoading, processAlignment]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Ignore shortcuts triggered while typing into a non-textarea editable element
+      // would be wrong here — users will type their sequence in a textarea and still
+      // want Ctrl+Enter to fire, so we explicitly require the modifier.
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (!hasResults) {
+          void submitViaShortcut();
+        }
+        return;
+      }
+      if (e.key === 'Escape' && !orchestratorProcessing) {
+        const active = document.activeElement as HTMLElement | null;
+        // Don't steal Esc from inputs/menus that might want it
+        if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) {
+          return;
+        }
+        if (hasResults) {
+          clearForm();
+          resetProcessing();
+          MemoryOptimizer.performCleanup();
+        } else if (hasInput) {
+          clearForm();
+        }
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [hasResults, hasInput, orchestratorProcessing, clearForm, resetProcessing, submitViaShortcut]);
 
   // Your original form JSX with the same beautiful design
   return (
@@ -127,7 +172,7 @@ export function AlignmentForm() {
             </div>
             
             {!isFormValid && hasInput && !hasResults && (
-              <div className="mt-4 text-center">
+              <div className="mt-4 text-center" role="alert" aria-live="polite">
                 <p className="text-sm text-red-500 dark:text-red-400">
                   Please check your input and ensure all required fields are completed.
                 </p>
@@ -140,6 +185,11 @@ export function AlignmentForm() {
                 )}
               </div>
             )}
+
+            {/* Keyboard shortcut hint for power users; hidden visually but discoverable */}
+            <p className="sr-only" aria-live="off">
+              Press Control or Command plus Enter to start alignment. Press Escape to clear.
+            </p>
           </div>
         </div>
       </form>

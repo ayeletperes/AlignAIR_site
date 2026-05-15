@@ -26,6 +26,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
+    "check-upstream": "./scripts/check-upstream.sh",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "postinstall": "node scripts/copy-onnx-assets.js"

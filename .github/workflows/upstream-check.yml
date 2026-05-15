@@ -1,0 +1,72 @@
+name: Upstream AlignAIR sync check
+
+on:
+  schedule:
+    # Mondays 09:00 UTC. GitHub may delay cron by a few minutes — that's fine.
+    - cron: '0 9 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Run upstream check
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          ./scripts/check-upstream.sh > "${RUNNER_TEMP}/report.md" 2>&1
+          rc=$?
+          echo "exit_code=$rc" >> "$GITHUB_OUTPUT"
+          echo "report_path=${RUNNER_TEMP}/report.md" >> "$GITHUB_OUTPUT"
+          # Compute a stable title key (latest main SHA short) so we can find
+          # an existing open issue and append rather than duplicate.
+          latest_sha=$(curl -sSL \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            "https://api.github.com/repos/MuteJester/AlignAIR/branches/main" \
+            | jq -r '.commit.sha')
+          echo "latest_sha=$latest_sha" >> "$GITHUB_OUTPUT"
+          echo "issue_title=Upstream AlignAIR sync: ${latest_sha:0:12}" >> "$GITHUB_OUTPUT"
+
+      - name: Show report in job summary
+        run: cat "${{ steps.check.outputs.report_path }}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Find or create sync issue
+        if: steps.check.outputs.exit_code == '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_TITLE: ${{ steps.check.outputs.issue_title }}
+          REPORT_PATH: ${{ steps.check.outputs.report_path }}
+        run: |
+          set -euo pipefail
+          # Search for an existing open issue with this exact title.
+          existing=$(gh issue list \
+            --state open \
+            --label upstream-sync \
+            --search "in:title \"${ISSUE_TITLE}\"" \
+            --json number,title \
+            --jq ".[] | select(.title == \"${ISSUE_TITLE}\") | .number" \
+            | head -n1)
+
+          if [[ -n "$existing" ]]; then
+            echo "Appending comment to existing issue #$existing"
+            gh issue comment "$existing" --body-file "$REPORT_PATH"
+          else
+            echo "Opening new issue: $ISSUE_TITLE"
+            gh issue create \
+              --title "$ISSUE_TITLE" \
+              --body-file "$REPORT_PATH" \
+              --label upstream-sync \
+              --label needs-triage
+          fi

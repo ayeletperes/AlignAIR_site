@@ -1,5 +1,6 @@
-// Pure TypeScript implementation matching Python FastKmerDensityExtractor
-// No framework dependencies - pure sequence processing logic
+// Translation of the Python AlignAIR `FastKmerDensityExtractor`.
+// See TRANSLATION_MAP.md (row: Candidate extraction) for the upstream path
+// and bump UPSTREAM.json when porting changes here.
 
 export class FastKmerDensityExtractor {
   private k: number;

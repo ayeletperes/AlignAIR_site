@@ -5,50 +5,78 @@ export const metadata = {
 
 import Link from 'next/link'
 
+const sections = [
+  {
+    number: '01',
+    category: 'architecture',
+    title: 'Model architecture',
+    body: "Learn how AlignAIR's residual convolutional backbone processes and segments sequences.",
+    href: '/docs/technical/architecture',
+  },
+  {
+    number: '02',
+    category: 'thresholding',
+    title: 'Thresholding logic',
+    body: 'How AlignAIR selects V, D, and J alleles from likelihood vectors using dynamic thresholds and caps.',
+    href: '/docs/technical/thresholding',
+  },
+  {
+    number: '03',
+    category: 'mutations',
+    title: 'Mutation models',
+    body: 'Simulation models used to train AlignAIR on realistic SHM patterns, including S5F.',
+    href: '/docs/technical/mutations',
+  },
+];
+
 export default function TechnicalDocsPage() {
   return (
-    <section>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
-        <div className="relative pt-32 pb-10 md:pt-40 md:pb-16">
-          <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
-            <h1 className="h1 mb-4">Technical Overview</h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-              This section presents the architectural and algorithmic foundation of AlignAIR. It is intended for users
-              who are interested in understanding the inner workings of the pipeline including its segmentation model,
-              likelihood thresholding mechanism, and mutation simulation framework.
-            </p>
+    <section className="bg-white dark:bg-black text-gray-900 dark:text-gray-100">
+      <div className="max-w-5xl mx-auto px-6 sm:px-8">
+
+        {/* Hero */}
+        <div className="pt-16 pb-12 border-b border-gray-200 dark:border-gray-800">
+          <div className="text-xs font-mono uppercase tracking-widest text-purple-700 dark:text-purple-400 mb-3">
+            // technical
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight text-gray-900 dark:text-white mb-4">
+            Technical Overview
+          </h1>
+          <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl">
+            Architectural and algorithmic foundation of AlignAIR. Intended for users who want to understand the
+            segmentation model, likelihood thresholding mechanism, and mutation simulation framework.
+          </p>
+        </div>
+
+        {/* Section grid */}
+        <div className="py-12">
+          <div className="grid sm:grid-cols-3 gap-px bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 rounded-md overflow-hidden">
+            {sections.map((s) => (
+              <Link
+                key={s.href}
+                href={s.href}
+                className="group block bg-white dark:bg-black p-6 hover:bg-gray-50 dark:hover:bg-gray-950 transition-colors"
+              >
+                <div className="text-xs font-mono uppercase tracking-widest text-gray-500 mb-3">
+                  {s.number} / {s.category}
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">
+                  {s.title}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
+                  {s.body}
+                </p>
+                <div className="inline-flex items-center text-sm text-purple-700 dark:text-purple-400 group-hover:translate-x-0.5 transition-transform">
+                  Open
+                  <svg className="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="py-12 md:py-20 border-t border-gray-300 dark:border-gray-800 grid gap-8 md:grid-cols-2">
-
-            <div>
-              <h2 className="h3 mb-2">🧠 Model Architecture</h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Learn how AlignAIR's residual convolutional backbone processes and segments sequences.
-              </p>
-              <Link className="text-purple-600 dark:text-purple-400 hover:underline" href="/docs/technical/architecture">Explore Architecture →</Link>
-            </div>
-
-            <div>
-              <h2 className="h3 mb-2">🎚️ Thresholding Logic</h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Understand how AlignAIR selects V, D, and J alleles from likelihood vectors using dynamic thresholds and caps.
-              </p>
-              <Link className="text-purple-600 dark:text-purple-400 hover:underline" href="/docs/technical/thresholding">Explore Thresholding →</Link>
-            </div>
-
-            <div>
-              <h2 className="h3 mb-2">🧬 Mutation Models</h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Explore the simulation models used to train AlignAIR on realistic SHM patterns, including S5F.
-              </p>
-              <Link className="text-purple-600 dark:text-purple-400 hover:underline" href="/docs/technical/mutations">Explore Mutation Models →</Link>
-            </div>
-
-          </div>
-        </div>
       </div>
     </section>
   )

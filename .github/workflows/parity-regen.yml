@@ -1,0 +1,118 @@
+name: Parity fixture regeneration
+
+on:
+  push:
+    branches: [main, dev_api]
+    paths:
+      - 'UPSTREAM.json'
+      - 'tests/parity/fixtures/inputs/**'
+      - 'tests/parity/scripts/**'
+      - '.github/workflows/parity-regen.yml'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Why are you re-running (will be in the PR body)'
+        required: false
+        default: 'manual regeneration'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('UPSTREAM.json') }}
+
+      - name: Cache model bundles
+        uses: actions/cache@v4
+        with:
+          path: /tmp/alignair_parity/pretrained_models
+          # Bundle cache key keyed off UPSTREAM.sha so a sync busts it.
+          key: alignair-models-${{ hashFiles('UPSTREAM.json') }}
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Run parity regeneration
+        id: regen
+        env:
+          ALIGNAIR_WORKDIR: /tmp/alignair_parity
+        run: |
+          set +e
+          ./tests/parity/scripts/run-python-parity.sh 2>&1 | tee "$RUNNER_TEMP/regen.log"
+          rc=${PIPESTATUS[0]}
+          echo "exit_code=$rc" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Show log in job summary
+        run: |
+          {
+            echo "## Regeneration log"
+            echo ""
+            echo '```'
+            cat "$RUNNER_TEMP/regen.log"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail job if regen failed
+        if: steps.regen.outputs.exit_code != '0'
+        run: |
+          echo "::error::run-python-parity.sh exited with code ${{ steps.regen.outputs.exit_code }}"
+          exit 1
+
+      - name: Diff expected fixtures
+        id: diff
+        run: |
+          if git diff --quiet -- tests/parity/fixtures/expected/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open PR with regenerated fixtures
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: parity/regen-${{ github.run_id }}
+          commit-message: 'parity: regenerate expected fixtures'
+          title: 'parity: regenerate expected fixtures'
+          body: |
+            Automated regeneration of `tests/parity/fixtures/expected/*.json`
+            from the Python AlignAIR pipeline at the SHA pinned in
+            `UPSTREAM.json`.
+
+            **Reason:** ${{ github.event.inputs.reason || 'push to watched paths' }}
+
+            Review the diff for each fixture. If outputs changed:
+
+            - If an algorithm change was intended (you just synced upstream),
+              also port the relevant JS code and open the implementation PR
+              against `dev_api`.
+            - If outputs unexpectedly differ without a JS change, that's a
+              regression — investigate before merging.
+
+            See `tests/parity/README.md` for the regeneration workflow.
+          labels: |
+            parity
+            automated
+
+      - name: Note no-op
+        if: steps.diff.outputs.changed == 'false'
+        run: |
+          echo "## Result" >> "$GITHUB_STEP_SUMMARY"
+          echo "Fixtures regenerated and matched committed expected/*.json. No PR opened." >> "$GITHUB_STEP_SUMMARY"

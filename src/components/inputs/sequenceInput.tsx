@@ -81,18 +81,64 @@ const SequenceInput = forwardRef<SequenceInputRef, SequenceInputProps>(({
     [report]
   );
 
+  // Heuristic: text contains nucleotides but no FASTA header line. Triggers a
+  // one-click "wrap as FASTA" affordance so users who paste a bare sequence
+  // aren't left wondering why parsing produced zero records.
+  const looksLikeBareSequence = useMemo(() => {
+    if (!text.trim()) return false;
+    if (text.includes('>')) return false;
+    const stripped = text.replace(/\s+/g, '');
+    if (stripped.length < 20) return false;
+    return /^[ACGTNacgtn]+$/.test(stripped);
+  }, [text]);
+
+  const wrapAsFasta = useCallback(() => {
+    const stripped = text.replace(/\s+/g, '');
+    const wrapped = `>seq1\n${stripped}`;
+    setText(wrapped);
+    try {
+      const rep = parseInput(wrapped, { tolerant: true });
+      setReport(rep);
+      setSequence(rep.records);
+    } catch {
+      // No-op; parser already populated errors via report state.
+    }
+  }, [text, setSequence]);
+
+  // Live sequence stats derived from current parsed records.
+  // Surfaces count + length distribution + invalid-char hint before submission
+  // so users catch malformed input without paying the cost of inference.
+  const sequenceStats = useMemo(() => {
+    const records = report.records;
+    if (records.length === 0) return null;
+    const lengths = records.map((r) => r.sequence.length);
+    const total = lengths.reduce((a, b) => a + b, 0);
+    const min = Math.min(...lengths);
+    const max = Math.max(...lengths);
+    const avg = Math.round(total / lengths.length);
+    // Detect characters outside the IUPAC set the model accepts.
+    // Hot path on every keystroke — keep the regex simple.
+    const allowed = /^[ACGTNacgtn\s>]*$/;
+    const invalidCharDetected = !allowed.test(text);
+    return { count: records.length, min, max, avg, total, invalidCharDetected };
+  }, [report.records, text]);
+
   const handleExample = () => {
     if (!selectedChain || !selectedSpecies) return;
     const speciesExamples = exampleSequences[selectedSpecies];
     const example = speciesExamples?.[selectedChain.toLowerCase()] || "";
 
-    // If no example for this species/chain combo, show a helpful message
+    // If no example for this species/chain combo, show a helpful message.
+    // For Rhesus Macaque, only the heavy chain is currently supported, so the
+    // absence of an example reflects model availability — say so explicitly.
     if (!example) {
       const chainName = selectedChain === 'heavy' ? 'Heavy Chain' :
                         selectedChain === 'light' ? 'Light Chain' :
                         selectedChain === 'trb' ? 'T-Cell Receptor Beta' : selectedChain;
       const speciesName = selectedSpecies === 'human' ? 'Human' : 'Rhesus Macaque';
-      const message = `No example sequence available for ${speciesName} ${chainName}`;
+      const message = selectedSpecies === 'rhesus_macaque'
+        ? `${chainName} is not yet available for ${speciesName}. Switch to Human or choose Heavy Chain.`
+        : `No example sequence available for ${speciesName} ${chainName} yet.`;
       setReport({ records: [], errors: [message], warnings: [] });
       return;
     }
@@ -142,7 +188,7 @@ const SequenceInput = forwardRef<SequenceInputRef, SequenceInputProps>(({
 
   return (
     <>
-      <div className="grid md:grid-cols-2 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <div className="relative z-0 w-full mb-5 group">
           <label htmlFor="sequenceInput" className="block mb-2 text-base font-medium text-white-900 dark:text-white">
             Enter sequence or FASTA
@@ -196,6 +242,18 @@ const SequenceInput = forwardRef<SequenceInputRef, SequenceInputProps>(({
         <div id="sequence-help" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
           FASTA is supported. For multiple record, use FASTA format. Each record starts with &gt;Header. Only A, C, G, T, or N are allowed in sequences.
         </div>
+        {looksLikeBareSequence && (
+          <div className="mt-2 flex items-center gap-2 rounded border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/30 px-3 py-2 text-xs text-amber-800 dark:text-amber-200">
+            <span>Looks like a raw sequence without a FASTA header.</span>
+            <button
+              type="button"
+              onClick={wrapAsFasta}
+              className="px-2 py-1 rounded bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 hover:bg-amber-300 dark:hover:bg-amber-700"
+            >
+              Wrap as FASTA
+            </button>
+          </div>
+        )}
       </div>
 
       {text && report.errors.length === 0 && (
@@ -203,6 +261,26 @@ const SequenceInput = forwardRef<SequenceInputRef, SequenceInputProps>(({
           <span className="px-2 py-1 text-xs rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
             Ready to parse on submit
           </span>
+          {sequenceStats && (
+            <>
+              <span className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                {sequenceStats.count} sequence{sequenceStats.count === 1 ? '' : 's'}
+              </span>
+              <span className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                {sequenceStats.min === sequenceStats.max
+                  ? `${sequenceStats.min} bp`
+                  : `${sequenceStats.min}–${sequenceStats.max} bp (avg ${sequenceStats.avg})`}
+              </span>
+              <span className="px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                {sequenceStats.total.toLocaleString()} bp total
+              </span>
+              {sequenceStats.invalidCharDetected && (
+                <span className="px-2 py-1 text-xs rounded bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">
+                  Non-ACGTN characters present
+                </span>
+              )}
+            </>
+          )}
         </div>
       )}
 

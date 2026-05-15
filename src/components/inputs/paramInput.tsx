@@ -69,7 +69,7 @@ const ParamInput: React.FC<ParamInputProps> = ({
       
       <fieldset className="mb-6">
         <legend className="block mb-2 text-base font-large text-white-900 dark:text-white">Select the max number of assignments for each call</legend>
-        <div id="capButtons" className="grid md:grid-cols-3 md:gap-6">
+        <div id="capButtons" className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
           <div className="relative z-0 w-full mb-5 group">
             <InputCounter id="vCap" label="V Cap" steps="1" min="1" max="100" defaultValue={params.vCap.toString()} onChange={handleInputChange} />
           </div>
@@ -83,7 +83,7 @@ const ParamInput: React.FC<ParamInputProps> = ({
       </fieldset>
       <fieldset className="mb-6">
         <legend className="block mb-2 text-base font-large text-white-900 dark:text-white">Percentage for each allele assignment selection</legend>
-        <div id="confButton" className="grid md:grid-cols-3 md:gap-6">
+        <div id="confButton" className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
           <div className="relative z-0 w-full mb-5 group">
             <InputCounter id="vThresh" label="V Threshold" steps="0.01" min="0" max="1" defaultValue={params.vThresh.toString()} onChange={handleInputChange} />
           </div>

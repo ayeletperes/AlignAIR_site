@@ -349,20 +349,20 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       {/* Main docs layout */}
       <div className="flex">
 
-      {/* Enhanced Sidebar */}
-      <aside className="w-80 bg-gradient-to-b from-gray-900 via-gray-900 to-black border-r border-gray-800 relative">
+      {/* Sidebar */}
+      <aside className="w-80 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 relative">
 
         {/* Header */}
-        <div className="p-6 border-b border-gray-800">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center mb-6">
-            <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg mr-3">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="p-2 bg-gray-900 dark:bg-white rounded-md mr-3">
+              <svg className="w-5 h-5 text-white dark:text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">AlignAIR Docs</h2>
-              <p className="text-sm text-gray-400">Complete documentation</p>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">AlignAIR Docs</h2>
+              <p className="text-xs font-mono uppercase tracking-wider text-gray-500 dark:text-gray-500">documentation</p>
             </div>
           </div>
 
@@ -376,25 +376,25 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             <input
               type="text"
               placeholder="Search docs..."
-              className="w-full pl-10 pr-20 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full pl-10 pr-20 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-md text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               value={searchQuery}
               onChange={handleSearchChange}
               onFocus={handleSearchFocus}
               onKeyDown={handleKeyDown}
             />
-            
+
             {/* Search Results Dropdown */}
             {isSearchOpen && searchResults.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md shadow-xl z-50 max-h-96 overflow-y-auto">
                 <div className="p-2">
-                  <div className="text-xs text-gray-400 mb-2 px-2">
-                    {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} found
+                  <div className="text-xs font-mono uppercase tracking-wider text-gray-500 mb-2 px-2">
+                    {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
                   </div>
                   {searchResults.map((result, index) => (
                     <Link
                       key={result.href}
                       href={result.href}
-                      className="block p-3 rounded-lg hover:bg-gray-700 transition-colors group"
+                      className="block p-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
                       onClick={() => {
                         setIsSearchOpen(false);
                         setSearchQuery('');
@@ -402,20 +402,20 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                       }}
                     >
                       <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="flex-shrink-0 w-7 h-7 bg-gray-900 dark:bg-white rounded-md flex items-center justify-center">
+                          <svg className="w-3.5 h-3.5 text-white dark:text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                           </svg>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-white group-hover:text-purple-300 transition-colors">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">
                             {result.title}
                           </div>
-                          <div className="text-xs text-gray-400 mt-1">
+                          <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                             {result.description}
                           </div>
                           <div className="flex items-center mt-2">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-700 text-gray-300">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wider bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
                               {result.category}
                             </span>
                           </div>
@@ -426,13 +426,13 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                 </div>
               </div>
             )}
-            
+
             {/* No Results Message */}
             {isSearchOpen && searchQuery.trim() && searchResults.length === 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md shadow-xl z-50">
                 <div className="p-4 text-center">
-                  <div className="text-gray-400 text-sm">
-                    No results found for "{searchQuery}"
+                  <div className="text-gray-600 dark:text-gray-400 text-sm">
+                    No results found for &quot;{searchQuery}&quot;
                   </div>
                   <div className="text-gray-500 text-xs mt-1">
                     Try different keywords or check the navigation menu
@@ -453,18 +453,18 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
               <div key={link.href} className="group">
                 <Link
                   href={link.href}
-                  className={`flex items-center w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center w-full px-3 py-2.5 rounded-md text-sm font-medium transition-colors duration-150 ${
                     isActive
-                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
-                      : 'hover:bg-gray-800 hover:text-white text-gray-300'
+                      ? 'bg-purple-100 dark:bg-purple-900/40 text-purple-900 dark:text-purple-100 border-l-2 border-purple-600 dark:border-purple-400'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
-                  <div className={`mr-3 transition-colors ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`}>
+                  <div className={`mr-3 transition-colors ${isActive ? 'text-purple-700 dark:text-purple-300' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-white'}`}>
                     {link.icon}
                   </div>
                   <div className="flex-1">
                     <div className="font-medium">{link.name}</div>
-                    <div className={`text-xs mt-0.5 ${isActive ? 'text-purple-100' : 'text-gray-500 group-hover:text-gray-400'}`}>
+                    <div className={`text-xs mt-0.5 ${isActive ? 'text-purple-700/80 dark:text-purple-200/80' : 'text-gray-500 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400'}`}>
                       {link.description}
                     </div>
                   </div>
@@ -479,16 +479,15 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 
                 {/* Submenu */}
                 {link.children && expanded && (
-                  <div className="ml-8 mt-2 space-y-1 animate-in slide-in-from-top-2 duration-200">
+                  <div className="ml-7 mt-1 space-y-0.5 animate-in slide-in-from-top-2 duration-200">
                     {link.children.map((child, childIndex) => (
                       <Link
                         key={child.href}
                         href={child.href}
-                        className={`flex items-center px-4 py-2 rounded-lg text-sm transition-all duration-200 ${
+                        className={`flex items-center px-3 py-1.5 rounded text-sm transition-colors duration-150 ${
                           pathname === child.href
-
-                            ? 'text-purple-400 bg-gray-800 border-l-2 border-purple-400'
-                            : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                            ? 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-900/20 border-l-2 border-purple-600 dark:border-purple-400'
+                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
                         }`}
                       >
                         <span className="mr-3 text-sm">{child.icon}</span>
@@ -502,24 +501,24 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="p-6 border-t border-gray-800">
-          <div className="bg-gradient-to-r from-blue-900 to-purple-900 rounded-lg p-4 border border-gray-700">
+        {/* Sidebar footer */}
+        <div className="p-6 border-t border-gray-200 dark:border-gray-800">
+          <div className="bg-white dark:bg-gray-900 rounded-md p-4 border border-gray-200 dark:border-gray-800">
             <div className="flex items-start">
-              <div className="p-2 bg-blue-600 rounded-lg mr-3">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-1.5 bg-gray-100 dark:bg-gray-800 rounded-md mr-3">
+                <svg className="w-4 h-4 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-white mb-1">Need Help?</h3>
-                <p className="text-xs text-blue-200 mb-2">Check our FAQ or get support</p>
-                <div className="flex space-x-2">
-                  <Link href="/docs/faq" className="text-xs text-blue-300 hover:text-blue-200 underline">
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-1">Need help?</h3>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Check the FAQ or open an issue</p>
+                <div className="flex space-x-2 text-xs">
+                  <Link href="/docs/faq" className="text-purple-700 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300 underline underline-offset-2">
                     FAQ
                   </Link>
-                  <span className="text-blue-400">•</span>
-                  <a href="https://github.com/MuteJester/AlignAIR" className="text-xs text-blue-300 hover:text-blue-200 underline">
+                  <span className="text-gray-400">·</span>
+                  <a href="https://github.com/MuteJester/AlignAIR" className="text-purple-700 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300 underline underline-offset-2">
                     GitHub
                   </a>
                 </div>
@@ -532,27 +531,27 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       {/* Main content area */}
       <main className="flex-1 flex flex-col min-h-screen">
 
-        {/* Enhanced Breadcrumb */}
-        <div className="bg-gray-900 border-b border-gray-800 px-8 py-4">
+        {/* Breadcrumb */}
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-8 py-4">
           <div className="flex items-center space-x-2 text-sm">
-            <Link href="/docs" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/docs" className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               Documentation
             </Link>
-            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
             {pageInfo.current ? (
               <>
-                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
+                <Link href="#" className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                   {pageInfo.parent}
                 </Link>
-                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-                <span className="text-white font-medium">{pageInfo.current}</span>
+                <span className="text-gray-900 dark:text-white font-medium">{pageInfo.current}</span>
               </>
             ) : (
-              <span className="text-white font-medium">{pageInfo.parent}</span>
+              <span className="text-gray-900 dark:text-white font-medium">{pageInfo.parent}</span>
             )}
           </div>
         </div>
@@ -564,29 +563,29 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
 
-        {/* Enhanced Footer Navigation */}
-        <div className="bg-gray-900 border-t border-gray-800 px-8 py-6">
+        {/* Footer navigation */}
+        <div className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-8 py-6">
           <div className="flex justify-between items-center">
 
             {/* Previous Page */}
             <div className="flex-1">
               {navigation.previous ? (
-                <Link href={navigation.previous.href} className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors group">
+                <Link href={navigation.previous.href} className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group">
                   <svg className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                   <div>
-                    <div className="text-xs text-gray-500">Previous</div>
+                    <div className="text-xs font-mono uppercase tracking-wider text-gray-500">Previous</div>
                     <div className="font-medium">{navigation.previous.name}</div>
                   </div>
                 </Link>
               ) : (
-                <Link href="/docs" className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors group">
+                <Link href="/docs" className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group">
                   <svg className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                   <div>
-                    <div className="text-xs text-gray-500">Back to</div>
+                    <div className="text-xs font-mono uppercase tracking-wider text-gray-500">Back to</div>
                     <div className="font-medium">Docs Home</div>
                   </div>
                 </Link>
@@ -594,37 +593,37 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             </div>
 
             {/* Center - Page Actions */}
-            <div className="flex items-center space-x-4">
-              <a 
-                href="https://github.com/MuteJester/AlignAIR" 
+            <div className="flex items-center space-x-3">
+              <a
+                href="https://github.com/MuteJester/AlignAIR"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-md text-sm transition-colors"
+                className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white rounded-md text-sm transition-colors"
               >
                 <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                 </svg>
-                Star on GitHub
+                Star
               </a>
-              <a 
-                href="https://github.com/MuteJester/AlignAIR/issues" 
+              <a
+                href="https://github.com/MuteJester/AlignAIR/issues"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm transition-colors"
+                className="inline-flex items-center px-3 py-1.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 rounded-md text-sm transition-colors"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Report Issue
+                Report issue
               </a>
             </div>
 
             {/* Next Page */}
             <div className="flex-1 flex justify-end">
               {navigation.next ? (
-                <Link href={navigation.next.href} className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors group">
+                <Link href={navigation.next.href} className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group">
                   <div className="text-right">
-                    <div className="text-xs text-gray-500">Next</div>
+                    <div className="text-xs font-mono uppercase tracking-wider text-gray-500">Next</div>
                     <div className="font-medium">{navigation.next.name}</div>
                   </div>
                   <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -632,9 +631,9 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                   </svg>
                 </Link>
               ) : (
-                <Link href="/alignair" className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors group">
+                <Link href="/alignair" className="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group">
                   <div className="text-right">
-                    <div className="text-xs text-gray-500">Try now</div>
+                    <div className="text-xs font-mono uppercase tracking-wider text-gray-500">Try now</div>
                     <div className="font-medium">AlignAIR Tool</div>
                   </div>
                   <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -647,27 +646,27 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* Legal Footer */}
-        <div className="bg-black border-t border-gray-800 px-8 py-4">
-          <div className="flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
+        <div className="bg-gray-50 dark:bg-black border-t border-gray-200 dark:border-gray-800 px-8 py-4">
+          <div className="flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 dark:text-gray-500">
             <div className="flex items-center space-x-4 mb-2 md:mb-0">
               <span>© 2025 AlignAIR. All rights reserved.</span>
-              <span className="hidden md:inline">•</span>
+              <span className="hidden md:inline">·</span>
               <span>Advancing computational biology through AI</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/docs/terms" className="hover:text-gray-300 transition-colors">
+              <Link href="/docs/terms" className="hover:text-gray-900 dark:hover:text-gray-300 transition-colors">
                 Terms
               </Link>
-              <span>•</span>
-              <Link href="/docs/license" className="hover:text-gray-300 transition-colors">
+              <span>·</span>
+              <Link href="/docs/license" className="hover:text-gray-900 dark:hover:text-gray-300 transition-colors">
                 License
               </Link>
-              <span>•</span>
-              <a 
-                href="https://github.com/MuteJester/AlignAIR" 
+              <span>·</span>
+              <a
+                href="https://github.com/MuteJester/AlignAIR"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-gray-300 transition-colors"
+                className="hover:text-gray-900 dark:hover:text-gray-300 transition-colors"
               >
                 Open Source
               </a>

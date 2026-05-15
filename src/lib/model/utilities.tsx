@@ -4,6 +4,7 @@ import {
   SegmentKey,
   ReferenceJson,
 } from '@/lib/data/ReferenceLoader';
+import { fetchReferenceJson } from '@/lib/data/referenceCache';
 import { getModelById,  getModelsByChainType} from '@/lib/model/modelMetadataLoader';
 import * as tf from '@tensorflow/tfjs';
 import { logger } from '@/utils/logger';
@@ -11,20 +12,26 @@ import { logger } from '@/utils/logger';
 // Lazy load ONNX Runtime to avoid SSR issues and improve error handling
 let onnx: any = null;
 const loadOnnx = async () => {
-  if (typeof window === 'undefined') {
-    // Server-side rendering, skip loading ONNX Runtime
-    logger.info('Server-side detected, skipping ONNX Runtime loading');
+  // Skip on Next.js SSR (no window AND no globalThis.ort) but allow Node
+  // execution where the CLI bootstrap has set globalThis.ort.
+  if (typeof window === 'undefined' && !((globalThis as any).ort)) {
+    logger.info('Server-side detected without globalThis.ort, skipping ONNX Runtime loading');
     return null;
   }
-  
+
   if (!onnx) {
     try {
       logger.info('Loading ONNX Runtime...');
       
-      // Use globally loaded ONNX Runtime
+      // Use globally loaded ONNX Runtime. In the browser the site loads
+      // `window.ort` via a <script> tag; in Node the CLI bootstrap sets
+      // `globalThis.ort = require('onnxruntime-node')`. Check both.
       if (typeof window !== 'undefined' && (window as any).ort) {
         onnx = (window as any).ort;
-        logger.info('Using globally loaded ONNX Runtime');
+        logger.info('Using globally loaded ONNX Runtime (browser)');
+      } else if (typeof globalThis !== 'undefined' && (globalThis as any).ort) {
+        onnx = (globalThis as any).ort;
+        logger.info('Using globally loaded ONNX Runtime (Node)');
       } else {
         throw new Error('ONNX Runtime not available, please ensure the script is loaded');
       }
@@ -32,13 +39,23 @@ const loadOnnx = async () => {
       // Set WASM paths before creating any sessions
       if (onnx?.env?.wasm) {
         onnx.env.wasm.wasmPaths = '/wasm/';
-        onnx.env.wasm.numThreads = 1; // start with single thread for stability
+        // Multi-threaded WASM requires SharedArrayBuffer, which requires
+        // cross-origin isolation (COOP/COEP). Fall back to single-thread otherwise.
+        const isCrossOriginIsolated =
+          typeof window !== 'undefined' && (window as any).crossOriginIsolated === true;
+        const hwConcurrency =
+          (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 4;
+        onnx.env.wasm.numThreads = isCrossOriginIsolated
+          ? Math.max(1, Math.min(hwConcurrency, 8))
+          : 1;
         onnx.env.wasm.simd = true;    // enable SIMD if available
-        
+
         logger.info('ONNX WASM environment configured:', {
           wasmPaths: onnx.env.wasm.wasmPaths,
           numThreads: onnx.env.wasm.numThreads,
-          simd: onnx.env.wasm.simd
+          simd: onnx.env.wasm.simd,
+          crossOriginIsolated: isCrossOriginIsolated,
+          hardwareConcurrency: hwConcurrency
         });
       }
       
@@ -377,12 +394,9 @@ Original error: ${error.message}`;
       };
   
       const paths = toPaths(referencePath);
-      const payloads: any[] = [];
-      for (const path of paths) {
-        const res = await fetch(path);
-        if (!res?.ok) throw new Error(`Failed to fetch reference: ${path}`);
-        payloads.push(await res.json());
-      }
+      // Fetch reference payloads via IndexedDB cache; each path is a large
+      // static germline JSON, so a warm load skips network + parse.
+      const payloads: any[] = await Promise.all(paths.map(fetchReferenceJson));
       const refLoader = new ReferenceLoader(payloads);
       await refLoader.load();
       // Keep references around in the shapes your code expects

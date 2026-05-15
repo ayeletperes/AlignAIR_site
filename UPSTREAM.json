@@ -1,0 +1,19 @@
+{
+  "$comment": "Pin against the upstream Python AlignAIR repo. The check-upstream script and GitHub Action diff against this. Bump after each successful upstream sync. See TRANSLATION_MAP.md for context.",
+  "repo": "MuteJester/AlignAIR",
+  "ref": "v2.0.2",
+  "sha": "e74c3592143004315656ae1ec74f52c31ba9bb41",
+  "checked_at": "2026-05-14",
+  "paths": [
+    "src/AlignAIR/Pipeline/",
+    "src/AlignAIR/Preprocessing/",
+    "src/AlignAIR/PostProcessing/",
+    "src/AlignAIR/Data/batch_readers/",
+    "src/AlignAIR/Data/tokenizers/",
+    "src/AlignAIR/Data/MultiChainDataset.py",
+    "src/AlignAIR/Hub/hub.py",
+    "src/AlignAIR/Models/",
+    "src/AlignAIR/Serialization/",
+    "src/AlignAIR/API/Make_Javascript_Format.py"
+  ]
+}
