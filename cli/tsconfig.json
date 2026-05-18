@@ -3,9 +3,9 @@
     "target": "ES2020",
     "module": "commonjs",
     "moduleResolution": "node",
-    "lib": ["ES2020"],
+    "lib": ["ES2020", "DOM"],
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "..",
     "strict": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
@@ -18,9 +18,11 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["../src/*"]
+      "@/*": ["../src/*"],
+      "@tensorflow/tfjs": ["./node_modules/@tensorflow/tfjs"],
+      "@tensorflow/tfjs/*": ["./node_modules/@tensorflow/tfjs/*"]
     }
   },
-  "include": ["src/**/*.ts", "../src/lib/**/*", "../src/utils/**/*", "../src/config/**/*", "../src/types/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": ["dist", "node_modules"]
 }
