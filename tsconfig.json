@@ -45,6 +45,7 @@
   "exclude": [
     "out/**/*",
     "node_modules",
+    "cli",
     "archive/**/*",
     "src/tests/**/*",
     "app/(default)/alignair/.archive_page",
